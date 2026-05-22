@@ -174,12 +174,15 @@ def study():
             except Exception as e:
                 print(f"Error reading PYQ PDF: {e}")
         
+        ai_engine = request.form.get('ai_engine', 'gemini')
+        
         # Get AI-powered study plan incorporating syllabus, pyq, subject name and scope
         result = analyze_study_materials(
             syllabus_text, 
             pqp_text, 
             subject_name=title,
-            scope=scope
+            scope=scope,
+            ai_engine=ai_engine
         )
         
         if result['success']:
@@ -248,11 +251,14 @@ def analyze_study_material():
         except Exception as e:
             print(f"Error reading PYQ PDF: {e}")
             
+    ai_engine = request.form.get('ai_engine', 'gemini')
+    
     result = analyze_study_materials(
         syllabus_text, 
         pqp_text, 
         subject_name=title,
-        scope=scope
+        scope=scope,
+        ai_engine=ai_engine
     )
     
     if result['success']:
@@ -364,9 +370,11 @@ def code_assistant():
             data = request.get_json(silent=True) or {}
             code = data.get('code', '')
             language = data.get('language', 'python')
+            ai_engine = data.get('ai_engine', 'gemini')
         else:
             code = request.form.get('code', '')
             language = request.form.get('language', 'python')
+            ai_engine = request.form.get('ai_engine', 'gemini')
         
         if not code:
             return jsonify({
@@ -375,7 +383,7 @@ def code_assistant():
             })
         
         # Get AI analysis using Gemini service
-        analysis_result = analyze_code(code, language)
+        analysis_result = analyze_code(code, language, ai_engine=ai_engine)
         
         # Save analysis to database
         if analysis_result['success']:
@@ -409,14 +417,16 @@ def api_analyze_code():
         data = request.get_json(silent=True) or {}
         code = data.get('code', '')
         language = data.get('language', 'python')
+        ai_engine = data.get('ai_engine', 'gemini')
     else:
         code = request.form.get('code', '')
         language = request.form.get('language', 'python')
+        ai_engine = request.form.get('ai_engine', 'gemini')
         
     if not code:
         return jsonify({'success': False, 'message': 'Please enter code to analyze'})
         
-    result = analyze_code(code, language)
+    result = analyze_code(code, language, ai_engine=ai_engine)
     if result['success']:
         explanation = result.get('explanation', result.get('summary', ''))
         save_code_analysis(

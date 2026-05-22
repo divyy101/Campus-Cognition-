@@ -83,7 +83,7 @@
                 <h5 class="mb-3 text-gradient">📊 Account Statistics</h5>
                 <div class="list-item">
                     <span>Member Since</span>
-                    <span style="color: var(--accent-blue); font-weight: 700;">{{ user['created_at'][:10] }}</span>
+                    <span style="color: var(--accent-blue); font-weight: 700;">{{ user['created_at'][:10] if user['created_at'] else '' }}</span>
                 </div>
                 <div class="list-item mt-2">
                     <span>Last Login</span>
@@ -128,7 +128,7 @@
 <script>
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(this);
+        const formData = new FormData(e.target);
         
         try {
             const response = await fetch('{{ url_for("profile") }}', {

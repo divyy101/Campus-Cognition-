@@ -46,7 +46,7 @@
                     <div class="mb-3">
                         <label for="created_at" class="form-label">Member Since</label>
                         <input type="text" class="form-control glass-input" id="created_at" 
-                               value="{{ user['created_at'][:10] }}" disabled>
+                               value="{{ user['created_at'][:10] if user['created_at'] else '' }}" disabled>
                     </div>
 
                     <div class="alert alert-info">
