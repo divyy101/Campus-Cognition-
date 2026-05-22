@@ -8,6 +8,7 @@ import PyPDF2
 from collections import Counter
 import google.generativeai as genai
 from functools import wraps
+from services.gemini_service import analyze_study_materials, is_api_available
 
 # Import database models
 from database.models import (
@@ -140,11 +141,18 @@ def study():
         syllabus_file = request.files.get('syllabus')
         pqp_file = request.files.get('pqp')
         
+        # New parameters
+        topic_names = request.form.get('topic_names', '')
+        unit_analysis = request.form.get('unit_analysis', '')
+        important_topics_custom = request.form.get('important_topics_custom', '')
+        time_slot = request.form.get('time_slot', '2 Hours/Day')
+        
         session_id = create_study_session(user_id, title)
         
         syllabus_text = ''
         pqp_text = ''
         
+        # Extract text from syllabus PDF
         if syllabus_file and allowed_file(syllabus_file.filename):
             filename = secure_filename(syllabus_file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{session_id}_{filename}")
@@ -155,9 +163,10 @@ def study():
                 with open(filepath, 'rb') as f:
                     reader = PyPDF2.PdfReader(f)
                     syllabus_text = '\n'.join([page.extract_text() for page in reader.pages])
-            except:
-                pass
+            except Exception as e:
+                print(f"Error reading syllabus PDF: {e}")
         
+        # Extract text from PYQ PDF
         if pqp_file and allowed_file(pqp_file.filename):
             filename = secure_filename(pqp_file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{session_id}_{filename}")
@@ -167,20 +176,122 @@ def study():
                 with open(filepath, 'rb') as f:
                     reader = PyPDF2.PdfReader(f)
                     pqp_text = '\n'.join([page.extract_text() for page in reader.pages])
-            except:
-                pass
+            except Exception as e:
+                print(f"Error reading PYQ PDF: {e}")
         
-        # Analyze content
+        # Parse custom topics provided by the student
+        custom_topics = [t.strip().capitalize() for t in topic_names.split(',') if t.strip()]
+        
+        # Extract topics from text
         topics = Counter()
         for text in [syllabus_text, pqp_text]:
-            words = text.lower().split()
-            topics.update([w for w in words if len(w) > 4])
+            if text:
+                import re
+                words = re.findall(r'[a-zA-Z]{4,}', text.lower())
+                topics.update(words)
         
-        important_topics = json.dumps([topic for topic, _ in topics.most_common(20)])
-        save_study_analysis(session_id, important_topics, '{}', '{}', '{}')
+        top_topics = [t.capitalize() for t, _ in topics.most_common(12)]
+        
+        # Merge custom topics into top_topics at the top
+        for ct in reversed(custom_topics):
+            if ct in top_topics:
+                top_topics.remove(ct)
+            top_topics.insert(0, ct)
+            
+        if not top_topics:
+            top_topics = ["Introduction", "Core Concepts", "Advanced Theories", "Practical Exercises", "Revision & Mock Tests"]
+            
+        priority_list = []
+        for i, (topic, count) in enumerate(topics.most_common(10)):
+            score = min(99, max(50, 75 + count * 2 - i * 3))
+            priority_list.append({
+                'topic': topic.capitalize(),
+                'priority_score': score
+            })
+            
+        # Add custom topics to priority_list first if they aren't already there
+        for ct in custom_topics:
+            exists = False
+            for p in priority_list:
+                if p['topic'].lower() == ct.lower():
+                    exists = True
+                    p['priority_score'] = 98 # Mark custom focus as extremely high priority
+                    break
+            if not exists:
+                priority_list.insert(0, {
+                    'topic': ct,
+                    'priority_score': 98
+                })
+                
+        if not priority_list:
+            priority_list = [
+                {'topic': 'Core Concepts', 'priority_score': 95},
+                {'topic': 'Advanced Theories', 'priority_score': 85},
+                {'topic': 'Revision & Mock Tests', 'priority_score': 80}
+            ]
+            
+        # Dynamic daily hours based on preferred study time slot
+        daily_hours = 2
+        if "1-2" in time_slot or "Light" in time_slot:
+            daily_hours = 2
+        elif "3-4" in time_slot or "Medium" in time_slot or "Moderate" in time_slot:
+            daily_hours = 4
+        elif "5+" in time_slot or "Intense" in time_slot or "Heavy" in time_slot:
+            daily_hours = 6
+            
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        weekly_plan = []
+        for i, day in enumerate(days):
+            day_topics = []
+            if top_topics:
+                day_topics.append(top_topics[i % len(top_topics)])
+                if i % 2 == 0 and len(top_topics) > 1:
+                    day_topics.append(top_topics[(i + 3) % len(top_topics)])
+            else:
+                day_topics = ["General Study"]
+            weekly_plan.append({
+                'day': day,
+                'duration_hours': daily_hours if i < 5 else (daily_hours + 2),
+                'topics': day_topics
+            })
+            
+        # Get AI-powered study plan incorporating all details
+        study_plan = ''
+        result = analyze_study_materials(
+            syllabus_text, 
+            pqp_text, 
+            topic_names=topic_names, 
+            unit_analysis=unit_analysis, 
+            important_topics=important_topics_custom, 
+            time_slot=time_slot
+        )
+        if result['success']:
+            study_plan = result['plan']
+        else:
+            study_plan = "AI analysis unavailable at this moment. Please try again later."
+            
+        analysis_obj = {
+            'important_topics': top_topics,
+            'priority_list': priority_list,
+            'weekly_plan': weekly_plan,
+            'full_plan': study_plan
+        }
+        
+        save_study_analysis(
+            session_id, 
+            json.dumps(top_topics), 
+            json.dumps(priority_list), 
+            json.dumps(weekly_plan), 
+            study_plan
+        )
         log_activity(user_id, 'STUDY_SESSION', f'Created study session: {title}')
         
-        return jsonify({'success': True, 'message': 'Study session created!', 'session_id': session_id})
+        return jsonify({
+            'success': True,
+            'message': 'Study session created and analyzed!',
+            'session_id': session_id,
+            'analysis': analysis_obj
+        })
     
     recent_sessions = get_user_study_sessions(user_id)
     return render_template('study.html', user=user, sessions=recent_sessions)
