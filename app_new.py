@@ -8,7 +8,7 @@ import PyPDF2
 from collections import Counter
 import google.generativeai as genai
 from functools import wraps
-from services.gemini_service import analyze_study_materials, is_api_available
+from services.gemini_service import analyze_study_materials, analyze_code, is_api_available, get_api_status
 
 # Import database models
 from database.models import (
@@ -138,6 +138,7 @@ def study():
     
     if request.method == 'POST':
         title = request.form.get('session_title', 'Study Session') # Subject Name
+        scope = request.form.get('scope', 'Exam Focused')
         syllabus_file = request.files.get('syllabus')
         pqp_file = request.files.get('pqp')
         
@@ -173,79 +174,107 @@ def study():
             except Exception as e:
                 print(f"Error reading PYQ PDF: {e}")
         
-        # Extract keywords/topics for visual lists
-        topics = Counter()
-        for text in [syllabus_text, pqp_text]:
-            if text:
-                import re
-                words = re.findall(r'[a-zA-Z]{5,}', text.lower())
-                topics.update(words)
-        
-        raw_keywords = [t.capitalize() for t, _ in topics.most_common(8)]
-        if not raw_keywords:
-            raw_keywords = ["Analysis", "Implementation", "Complexity Proofs", "Graph Structures", "System Optimization"]
-            
-        # Formulate a simplified visual list of highly probable questions
-        important_questions = [
-            f"Explain {raw_keywords[0]} & solve its core recurrence relations",
-            f"Trace {raw_keywords[1 % len(raw_keywords)]} step-by-step with cyclic models",
-            f"Contrast {raw_keywords[2 % len(raw_keywords)]} vs standard methods",
-            f"Discuss worst-case bounds for {raw_keywords[3 % len(raw_keywords)]}"
-        ]
-        
-        # Probability scores
-        priority_list = [
-            {'topic': important_questions[0], 'priority_score': 98},
-            {'topic': important_questions[1], 'priority_score': 92},
-            {'topic': important_questions[2], 'priority_score': 85},
-            {'topic': important_questions[3], 'priority_score': 78}
-        ]
-            
-        # Specific study timestamps/time blocks schedule
-        weekly_plan = [
-            {'day': 'Monday [09:00 - 11:00 AM]', 'duration_hours': 2, 'topics': [important_questions[0]]},
-            {'day': 'Wednesday [04:00 - 06:00 PM]', 'duration_hours': 2, 'topics': [important_questions[1]]},
-            {'day': 'Friday [10:00 - 12:00 AM]', 'duration_hours': 2, 'topics': [important_questions[2]]},
-            {'day': 'Saturday [02:00 - 04:00 PM]', 'duration_hours': 2, 'topics': [important_questions[3]]}
-        ]
-            
-        # Get AI-powered study plan incorporating syllabus, pyq and subject name
-        study_plan = ''
+        # Get AI-powered study plan incorporating syllabus, pyq, subject name and scope
         result = analyze_study_materials(
             syllabus_text, 
             pqp_text, 
-            subject_name=title
+            subject_name=title,
+            scope=scope
         )
-        if result['success']:
-            study_plan = result['plan']
-        else:
-            study_plan = "AI analysis unavailable at this moment. Please try again later."
-            
-        analysis_obj = {
-            'important_topics': important_questions,
-            'priority_list': priority_list,
-            'weekly_plan': weekly_plan,
-            'full_plan': study_plan
-        }
         
-        save_study_analysis(
-            session_id, 
-            json.dumps(important_questions), 
-            json.dumps(priority_list), 
-            json.dumps(weekly_plan), 
-            study_plan
-        )
-        log_activity(user_id, 'STUDY_SESSION', f'Created study session for: {title}')
+        if result['success']:
+            important_topics = result.get('important_questions', [])
+            study_priority = result.get('repeated_topics', [])
+            weekly_plan = result.get('weekly_plan', [])
+            
+            save_study_analysis(
+                session_id, 
+                json.dumps(important_topics), 
+                json.dumps(study_priority), 
+                json.dumps(weekly_plan), 
+                json.dumps(result)
+            )
+            log_activity(user_id, 'STUDY_SESSION', f'Created study session for: {title}')
         
         return jsonify({
-            'success': True,
+            'success': result['success'],
             'message': 'Study session created and analyzed!',
             'session_id': session_id,
-            'analysis': analysis_obj
+            'analysis': result
         })
     
     recent_sessions = get_user_study_sessions(user_id)
     return render_template('study.html', user=user, sessions=recent_sessions)
+
+
+@app.route('/analyze-study-material', methods=['POST'])
+@login_required
+def analyze_study_material():
+    user_id = session['user_id']
+    title = request.form.get('session_title', 'Study Session') # Subject Name
+    scope = request.form.get('scope', 'Exam Focused')
+    syllabus_file = request.files.get('syllabus')
+    pqp_file = request.files.get('pqp')
+    
+    session_id = create_study_session(user_id, title)
+    
+    syllabus_text = ''
+    pqp_text = ''
+    
+    # Extract text from syllabus PDF
+    if syllabus_file and allowed_file(syllabus_file.filename):
+        filename = secure_filename(syllabus_file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{session_id}_{filename}")
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        syllabus_file.save(filepath)
+        
+        try:
+            with open(filepath, 'rb') as f:
+                reader = PyPDF2.PdfReader(f)
+                syllabus_text = '\n'.join([page.extract_text() for page in reader.pages])
+        except Exception as e:
+            print(f"Error reading syllabus PDF: {e}")
+    
+    # Extract text from PYQ PDF
+    if pqp_file and allowed_file(pqp_file.filename):
+        filename = secure_filename(pqp_file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{session_id}_{filename}")
+        pqp_file.save(filepath)
+        
+        try:
+            with open(filepath, 'rb') as f:
+                reader = PyPDF2.PdfReader(f)
+                pqp_text = '\n'.join([page.extract_text() for page in reader.pages])
+        except Exception as e:
+            print(f"Error reading PYQ PDF: {e}")
+            
+    result = analyze_study_materials(
+        syllabus_text, 
+        pqp_text, 
+        subject_name=title,
+        scope=scope
+    )
+    
+    if result['success']:
+        important_topics = result.get('important_questions', [])
+        study_priority = result.get('repeated_topics', [])
+        weekly_plan = result.get('weekly_plan', [])
+        
+        save_study_analysis(
+            session_id, 
+            json.dumps(important_topics), 
+            json.dumps(study_priority), 
+            json.dumps(weekly_plan), 
+            json.dumps(result)
+        )
+        log_activity(user_id, 'STUDY_SESSION', f'Created study session for: {title}')
+        
+    return jsonify({
+        'success': result['success'],
+        'message': 'Study session created and analyzed!',
+        'session_id': session_id,
+        'analysis': result
+    })
 
 # ==========================================
 # SCHOLARSHIPS ROUTE
@@ -331,7 +360,6 @@ def code_assistant():
     user = get_user_by_id(user_id)
     
     if request.method == 'POST':
-        # Accept both JSON and form data
         if request.is_json:
             data = request.get_json(silent=True) or {}
             code = data.get('code', '')
@@ -339,29 +367,70 @@ def code_assistant():
         else:
             code = request.form.get('code', '')
             language = request.form.get('language', 'python')
-
-        analysis_result = {'explanation': '', 'errors': [], 'suggestions': [], 'optimized_code': code}
-
-        if GEMINI_API_KEY:
-            try:
-                model = genai.GenerativeModel('gemini-pro')
-                prompt = f"Analyze this {language} code:\n\n{code}\n\nProvide: 1) Explanation 2) Errors found 3) Suggestions 4) Optimized code"
-                response = model.generate_content(prompt)
-                analysis_result['explanation'] = response.text
-            except Exception as e:
-                analysis_result['explanation'] = f'Analysis unavailable: {str(e)}'
-
-        save_code_analysis(user_id, code, language, 
-                          analysis_result['explanation'], 
-                          json.dumps(analysis_result['errors']),
-                          json.dumps(analysis_result['suggestions']),
-                          analysis_result['optimized_code'])
-        log_activity(user_id, 'CODE_ANALYSIS', f'Analyzed {language} code')
-
-        return jsonify({'success': True, 'analysis': analysis_result})
+        
+        if not code:
+            return jsonify({
+                'success': False,
+                'message': 'Please enter code to analyze'
+            })
+        
+        # Get AI analysis using Gemini service
+        analysis_result = analyze_code(code, language)
+        
+        # Save analysis to database
+        if analysis_result['success']:
+            explanation = analysis_result.get('explanation', analysis_result.get('summary', ''))
+            save_code_analysis(
+                user_id, 
+                code, 
+                language, 
+                explanation, 
+                json.dumps(analysis_result.get('errors', [])),
+                json.dumps(analysis_result.get('suggestions', [])),
+                analysis_result.get('optimized_code', '')
+            )
+            log_activity(user_id, 'CODE_ANALYSIS', f'Analyzed {language} code ({len(code)} chars)')
+        
+        return jsonify({
+            'success': analysis_result['success'],
+            'analysis': analysis_result
+        })
     
     history = get_code_analysis_history(user_id)
-    return render_template('code-assistant.html', user=user, history=history)
+    api_status = get_api_status()
+    return render_template('code-assistant.html', user=user, history=history, api_status=api_status)
+
+
+@app.route('/analyze-code', methods=['POST'])
+@login_required
+def api_analyze_code():
+    user_id = session['user_id']
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        code = data.get('code', '')
+        language = data.get('language', 'python')
+    else:
+        code = request.form.get('code', '')
+        language = request.form.get('language', 'python')
+        
+    if not code:
+        return jsonify({'success': False, 'message': 'Please enter code to analyze'})
+        
+    result = analyze_code(code, language)
+    if result['success']:
+        explanation = result.get('explanation', result.get('summary', ''))
+        save_code_analysis(
+            user_id, 
+            code, 
+            language, 
+            explanation, 
+            json.dumps(result.get('errors', [])),
+            json.dumps(result.get('suggestions', [])),
+            result.get('optimized_code', '')
+        )
+        log_activity(user_id, 'CODE_ANALYSIS', f'Analyzed {language} code ({len(code)} chars)')
+        
+    return jsonify({'success': result['success'], 'analysis': result})
 
 # ==========================================
 # PROFILE ROUTE

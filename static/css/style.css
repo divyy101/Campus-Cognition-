@@ -895,3 +895,252 @@ a:hover {
 .no-scroll {
     overflow: hidden;
 }
+
+/* ==========================================================================
+   CAMPUS COGNITION - MULTI-AGENT SPECIFIC MODULE THEMES & GRAPHICS
+   ========================================================================== */
+
+/* 1. CODING AGENT: CYBERPUNK HACKER TERMINAL */
+body.theme-code {
+    background: #03050c radial-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 0) !important;
+    background-size: 24px 24px !important;
+    --accent-blue: #39ff14; /* Matrix Green */
+    --accent-purple: #00F0FF; /* Electric Cyan */
+    --accent-cyan: #ff007f; /* Neon Pink */
+    --border-color: rgba(57, 255, 20, 0.25);
+    font-family: 'Fira Code', 'Courier New', monospace !important;
+}
+
+body.theme-code .glass-card {
+    background: rgba(3, 5, 12, 0.9) !important;
+    border: 1px solid var(--accent-blue) !important;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.1), inset 0 0 10px rgba(57, 255, 20, 0.05) !important;
+    border-radius: 4px !important; /* Blocky retro feel */
+}
+
+body.theme-code .glass-card:hover {
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.25), inset 0 0 15px rgba(57, 255, 20, 0.1) !important;
+    border-color: var(--accent-purple) !important;
+}
+
+body.theme-code h1, body.theme-code h2, body.theme-code h3, body.theme-code h4, body.theme-code h5, body.theme-code h6 {
+    color: var(--accent-blue) !important;
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+    font-family: 'Fira Code', monospace;
+}
+
+body.theme-code .form-control, body.theme-code .form-select {
+    background: #020408 !important;
+    border: 1px solid var(--accent-blue) !important;
+    border-radius: 2px !important;
+    color: #39ff14 !important;
+    font-family: 'Fira Code', monospace;
+}
+
+body.theme-code .form-control:focus, body.theme-code .form-select:focus {
+    border-color: var(--accent-purple) !important;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
+}
+
+/* Glowing Console Grid Elements */
+.theme-code .btn {
+    border-radius: 2px !important;
+    font-family: 'Fira Code', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.theme-code .btn-primary {
+    background: transparent !important;
+    border: 1px solid var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2) !important;
+}
+
+.theme-code .btn-primary:hover {
+    background: var(--accent-blue) !important;
+    color: #03050c !important;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.6) !important;
+}
+
+/* scanline scan */
+.hacker-scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(57, 255, 20, 0.15);
+    opacity: 0.8;
+    z-index: 9999;
+    pointer-events: none;
+    animation: scan 8s linear infinite;
+}
+
+@keyframes scan {
+    0% { top: -5%; }
+    100% { top: 105%; }
+}
+
+
+/* 2. STUDY AGENT: FUTURISTIC AI STUDY LAB */
+body.theme-study {
+    background: linear-gradient(135deg, #0c051a 0%, #030514 50%, #15062a 100%) !important;
+    --accent-blue: #8B5CF6; /* Royal Violet */
+    --accent-purple: #EC4899; /* Deep Pink */
+    --accent-cyan: #06B6D4; /* Celestial Cyan */
+    --border-color: rgba(139, 92, 246, 0.25);
+}
+
+body.theme-study::before {
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 60%) !important;
+}
+
+body.theme-study .glass-card {
+    background: rgba(12, 6, 28, 0.65) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+body.theme-study .glass-card:hover {
+    border-color: var(--accent-cyan) !important;
+    box-shadow: 0 12px 40px rgba(6, 182, 212, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 3. OPPORTUNITIES: CORPORATE GLASS DASHBOARD */
+body.theme-opportunities {
+    background: linear-gradient(135deg, #090c15 0%, #0e1424 100%) !important;
+    --accent-blue: #0ea5e9; /* Deep Sky Blue */
+    --accent-purple: #14b8a6; /* Emerald Teal */
+    --accent-cyan: #e2e8f0; /* Platinum */
+    --border-color: rgba(14, 165, 233, 0.2);
+}
+
+body.theme-opportunities .glass-card {
+    background: rgba(15, 23, 42, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.03) !important;
+    border-radius: 12px !important;
+}
+
+body.theme-opportunities .glass-card:hover {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 15px 45px rgba(14, 165, 233, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 4. DASHBOARD: PREMIUM AI OPERATING SYSTEM */
+body.theme-dashboard {
+    background: radial-gradient(circle at 50% 50%, #0c0e1a 0%, #04050a 100%) !important;
+    --accent-blue: #00F0FF; /* Glowing Turquoise */
+    --accent-purple: #8b5cf6; /* Indigo */
+    --accent-cyan: #f43f5e; /* Cyber Pink */
+    --border-color: rgba(0, 240, 255, 0.18);
+}
+
+body.theme-dashboard .glass-card {
+    background: rgba(8, 10, 22, 0.8) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 8px 32px rgba(0, 240, 255, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+body.theme-dashboard .glass-card:hover {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 12px 40px rgba(0, 240, 255, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Interactive Floating Particle Overlay styles */
+.lab-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.lab-particle {
+    position: absolute;
+    background: radial-gradient(circle, var(--accent-purple) 0%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: floatParticle 12s infinite linear;
+}
+
+@keyframes floatParticle {
+    0% { transform: translateY(105vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.2; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(-5vh) translateX(50px); opacity: 0; }
+}
+
+/* Side by Side Diff Compare Grid styling */
+.diff-compare-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .diff-compare-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.diff-pane {
+    background: rgba(3, 5, 12, 0.95);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.diff-header {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.5rem 1rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.diff-code-wrapper {
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.diff-code-wrapper pre {
+    margin: 0;
+}
+
+.gauge-meter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.gauge-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.05);
+    border-top-color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+}
+

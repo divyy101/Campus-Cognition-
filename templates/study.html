@@ -1,334 +1,454 @@
-{% extends "base.html" %}
+{% extends "base_new.html" %}
 
-{% block title %}Study Agent - Campus Cognition{% endblock %}
+{% block title %}AI Study Lab - Campus Cognition{% endblock %}
 
-{% block extra_css %}
+{% block theme_class %}study{% endblock %}
+
+{% block content %}
+<!-- Elegant Floating Particle Overlay & Custom Lab Styling -->
+<div class="lab-particles" id="labParticles"></div>
+
 <style>
-    /* Premium Futuristic Dark Purple & Blue Cyber Theme */
-    :root {
-        --cyber-bg: linear-gradient(135deg, #0e041e 0%, #03051a 50%, #15092a 100%);
-        --cyber-purple: #9d4edd;
-        --cyber-purple-glow: rgba(157, 78, 221, 0.35);
-        --cyber-blue: #00d4ff;
-        --cyber-blue-glow: rgba(0, 212, 255, 0.35);
-        --cyber-pink: #ff007f;
-        --cyber-dark-card: rgba(12, 6, 28, 0.75);
-        --cyber-border: rgba(157, 78, 221, 0.25);
-        --cyber-text: #e2d9f3;
-        --cyber-font-mono: 'Fira Code', 'Courier New', monospace;
+    /* Scope styles to study theme */
+    body.theme-study {
+        position: relative;
+        overflow-x: hidden;
     }
 
-    body {
-        background: var(--cyber-bg) !important;
-        color: var(--cyber-text) !important;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    .lab-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
     }
 
-    /* Override standard glass elements with dark purple cyber styling */
-    .glass-card {
-        background: var(--cyber-dark-card) !important;
-        border: 1px solid var(--cyber-border) !important;
-        box-shadow: 0 8px 32px rgba(123, 104, 238, 0.12), inset 0 1px 1px rgba(157, 78, 221, 0.1) !important;
+    /* Pulsing glowing cards & inputs */
+    .lab-card {
+        background: rgba(12, 6, 28, 0.75) !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.05) !important;
+        border-radius: 12px !important;
         backdrop-filter: blur(15px) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .glass-card:hover {
-        border-color: rgba(0, 212, 255, 0.4) !important;
-        box-shadow: 0 12px 40px rgba(0, 212, 255, 0.18), inset 0 1px 2px rgba(0, 212, 255, 0.15) !important;
-        transform: translateY(-2px);
-    }
-
-    .cyber-title {
-        font-family: var(--cyber-font-mono);
-        text-shadow: 0 0 15px var(--cyber-purple-glow);
-        background: linear-gradient(135deg, #00d4ff 0%, #9d4edd 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
-        letter-spacing: 1px;
-    }
-
-    .cyber-tag {
-        font-family: var(--cyber-font-mono);
-        font-size: 0.75rem;
-        color: var(--cyber-blue);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        opacity: 0.85;
-    }
-
-    /* Geeky Cyber Banner */
-    .cyber-banner-card {
         position: relative;
         overflow: hidden;
-        border-radius: 20px;
-        border: 1px solid var(--cyber-border);
-        background: rgba(12, 6, 28, 0.95);
-        box-shadow: 0 8px 32px rgba(157, 78, 221, 0.15);
     }
 
-    .cyber-banner-img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        opacity: 0.65;
-        filter: brightness(0.8) contrast(1.1);
-        border-bottom: 1px solid var(--cyber-border);
-    }
-
-    .cyber-banner-overlay {
+    .lab-card::before {
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to bottom, rgba(14, 4, 30, 0.2) 0%, rgba(3, 5, 26, 0.95) 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 1.5rem;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+        opacity: 0.6;
     }
 
-    /* Cyber Custom Form Inputs */
-    .glass-input {
-        background: rgba(15, 8, 38, 0.6) !important;
-        border: 1px solid rgba(157, 78, 221, 0.35) !important;
-        color: #fff !important;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
+    .lab-card:hover {
+        border-color: var(--accent-cyan) !important;
+        box-shadow: 0 12px 40px rgba(6, 182, 212, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.1) !important;
+        transform: translateY(-2px);
     }
 
-    .glass-input:focus {
-        background: rgba(15, 8, 38, 0.85) !important;
-        border-color: var(--cyber-blue) !important;
-        box-shadow: 0 0 15px var(--cyber-blue-glow) !important;
-        color: #fff !important;
+    .lab-title {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        font-weight: 800;
+        background: linear-gradient(135deg, #00f0ff 0%, #a855f7 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
     }
 
-    .glass-input::placeholder {
-        color: rgba(226, 217, 243, 0.45) !important;
-    }
-
-    .form-label {
-        font-family: var(--cyber-font-mono);
-        color: #c9b3e6;
-        font-size: 0.85rem;
+    .lab-hud-header {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        letter-spacing: 1.5px;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 0.5rem;
+        color: var(--accent-cyan) !important;
+        font-size: 0.8rem;
     }
 
-    /* Upload drag and drop customization */
-    .upload-area {
-        background: rgba(14, 4, 30, 0.4);
-        border: 2px dashed rgba(157, 78, 221, 0.35);
-        border-radius: 12px;
-        padding: 2rem 1.5rem;
+    /* File uploader field */
+    .lab-upload-area {
+        background: rgba(8, 4, 20, 0.5);
+        border: 2px dashed rgba(139, 92, 246, 0.4);
+        border-radius: 10px;
+        padding: 2rem 1rem;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
+        position: relative;
     }
 
-    .upload-area:hover, .upload-area.dragover {
-        border-color: var(--cyber-blue);
-        background: rgba(0, 212, 255, 0.05);
-        box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+    .lab-upload-area:hover, .lab-upload-area.dragover {
+        border-color: var(--accent-cyan);
+        background: rgba(6, 182, 212, 0.08);
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
     }
 
-    .upload-area i {
+    .lab-upload-area i {
         font-size: 2.5rem;
-        color: var(--cyber-purple);
-        margin-bottom: 0.5rem;
+        color: var(--accent-blue);
         transition: all 0.3s ease;
     }
 
-    .upload-area:hover i {
-        color: var(--cyber-blue);
+    .lab-upload-area:hover i {
+        color: var(--accent-cyan);
         transform: scale(1.1);
     }
 
-    /* Cyber gradient button */
-    .cyber-btn {
-        background: linear-gradient(135deg, var(--cyber-purple) 0%, var(--cyber-indigo) 50%, var(--cyber-blue) 100%) !important;
-        border: none !important;
-        color: #fff !important;
-        font-family: var(--cyber-font-mono);
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        padding: 0.85rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 0 20px var(--cyber-purple-glow);
-        transition: all 0.3s ease;
+    /* Interactive chart wrapper */
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 220px;
     }
 
-    .cyber-btn:hover {
-        background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--cyber-purple) 100%) !important;
-        box-shadow: 0 0 25px var(--cyber-blue-glow);
-        transform: translateY(-1px);
+    /* Timeline schedule styling */
+    .lab-timeline-item {
+        background: rgba(255, 255, 255, 0.02);
+        border-left: 3px solid var(--accent-purple);
+        padding: 0.75rem 1rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 0.75rem;
+        transition: all 0.25s ease;
     }
 
-    /* Badges */
-    .cyber-badge-purple {
-        background: rgba(157, 78, 221, 0.2);
-        color: #d8b4fe;
-        border: 1px solid rgba(157, 78, 221, 0.4);
-    }
-
-    .cyber-badge-blue {
-        background: rgba(0, 212, 255, 0.15);
-        color: #a5f3fc;
-        border: 1px solid rgba(0, 212, 255, 0.4);
-    }
-
-    .cyber-badge-pink {
-        background: rgba(255, 0, 127, 0.15);
-        color: #fbcfe8;
-        border: 1px solid rgba(255, 0, 127, 0.4);
-    }
-
-    /* Monospace session lists */
-    .cyber-session-card {
-        background: rgba(14, 4, 30, 0.45);
-        border: 1px solid rgba(157, 78, 221, 0.2);
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-
-    .cyber-session-card:hover {
-        border-color: var(--cyber-blue);
-        background: rgba(15, 8, 38, 0.7);
+    .lab-timeline-item:hover {
+        background: rgba(139, 92, 246, 0.08);
+        border-left-color: var(--accent-cyan);
         transform: translateX(4px);
     }
 
-    /* Scrollbars customization */
-    ::-webkit-scrollbar {
-        width: 8px;
+    /* Diagnostics Log Console */
+    .lab-console-log {
+        background: #05030c;
+        color: var(--accent-cyan);
+        border: 1px dashed rgba(6, 182, 212, 0.4);
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 0.8rem;
+        padding: 12px;
+        border-radius: 6px;
+        max-height: 140px;
+        overflow-y: auto;
     }
-    ::-webkit-scrollbar-track {
-        background: #03051a;
+
+    /* KPI Pill Badge */
+    .kpi-badge {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        padding: 8px 12px;
+        text-align: center;
+        min-width: 90px;
     }
-    ::-webkit-scrollbar-thumb {
-        background: var(--cyber-purple);
-        border-radius: 4px;
+
+    .kpi-value {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #fff;
     }
-    ::-webkit-scrollbar-thumb:hover {
-        background: var(--cyber-blue);
+
+    .kpi-label {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Tab styling overrides */
+    .lab-tabs .nav-link {
+        color: var(--text-secondary);
+        border: 1px solid transparent;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .lab-tabs .nav-link:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .lab-tabs .nav-link.active {
+        color: var(--accent-cyan) !important;
+        background: rgba(6, 182, 212, 0.12) !important;
+        border-color: var(--accent-cyan) !important;
+        text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+
+    /* Historical Session Cards */
+    .archive-session-card {
+        background: rgba(14, 8, 32, 0.6);
+        border: 1px solid rgba(139, 92, 246, 0.15);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .archive-session-card:hover {
+        border-color: var(--accent-cyan);
+        background: rgba(20, 10, 45, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(6, 182, 212, 0.15);
     }
 </style>
-{% endblock %}
 
-{% block content %}
-<div class="container-fluid py-4">
-    <!-- Cyber Banner Header -->
-    <div class="row mb-4">
+<div class="container-fluid py-3 position-relative" style="z-index: 1;">
+    <!-- Lab Title Banner -->
+    <div class="row mb-3">
         <div class="col-12">
-            <div class="cyber-banner-card">
-                <img src="/static/images/study_agent_cyber.png" alt="Cyber holographic database" class="cyber-banner-img" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop'">
-                <div class="cyber-banner-overlay">
-                    <span class="cyber-tag"><i class="bi bi-cpu"></i> Cognitive Academic Portal // active</span>
-                    <h1 class="cyber-title mb-1"><i class="bi bi-book"></i> Study Agent</h1>
-                    <p class="text-white-50 mb-0">Improvise your target subjects, syllabus structures, and study timestamps using our multi-agent AI engine.</p>
+            <div class="lab-card p-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="lab-hud-header"><i class="bi bi-cpu-fill text-cyan"></i> AI Academic Cognition Research Lab // System Active</span>
+                    <h2 class="lab-title mb-0"><i class="bi bi-mortarboard-fill me-2"></i>Study Agent Portal</h2>
+                </div>
+                <div class="d-none d-md-flex gap-2">
+                    <span class="badge border border-info text-cyan bg-dark" style="font-family: 'Fira Code', monospace;">[ENGINE: v2.5-FLASH]</span>
+                    <span class="badge border border-purple text-purple bg-dark" id="statusPulse" style="font-family: 'Fira Code', monospace;">[STATUS: ONLINE]</span>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Main Workspace Split Pane -->
     <div class="row">
-        <!-- Simplified PDF & PYQ Upload Form -->
-        <div class="col-lg-6 mb-4">
-            <div class="glass-card p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="mb-0 text-primary" style="font-family: var(--cyber-font-mono);"><i class="bi bi-sliders"></i> Engine Inputs</h5>
-                    <span class="badge cyber-badge-blue font-monospace">[PORTAL: READY]</span>
+        <!-- Left Pane: Input deck -->
+        <div class="col-lg-5 col-xl-4 mb-4">
+            <div class="lab-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0 font-monospace text-white"><i class="bi bi-gear-fill text-purple me-1"></i> Control Desk</h5>
+                    <span class="badge badge-info bg-cyan text-dark font-monospace" style="font-size: 0.75rem;">INPUTS</span>
                 </div>
-                
-                <form id="studyForm" enctype="multipart/form-data" class="needs-validation" novalidate>
-                    <!-- Subject Name -->
-                    <div class="mb-4">
-                        <label for="session_title" class="form-label"><i class="bi bi-tag text-info me-1"></i> Subject Name</label>
-                        <input type="text" class="form-control glass-input" id="session_title" 
-                               name="session_title" placeholder="e.g., Algorithms & Data Structures" required>
+
+                <form id="studyForm" enctype="multipart/form-data">
+                    <!-- Subject Title -->
+                    <div class="mb-3">
+                        <label for="session_title" class="form-label font-monospace text-white-50 small"><i class="bi bi-bookmark-fill text-cyan me-1"></i> Subject Name</label>
+                        <input type="text" class="form-control bg-dark border-secondary text-white font-monospace" id="session_title" 
+                               name="session_title" placeholder="e.g., Computer Networks" required>
                     </div>
 
-                    <!-- Syllabus PDF -->
-                    <div class="mb-4">
-                        <label for="syllabus" class="form-label"><i class="bi bi-file-earmark-text text-info me-1"></i> Syllabus PDF (Optional)</label>
-                        <div class="upload-area" id="syllabusDropZone">
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            <p class="small text-muted mb-0">Drop syllabus PDF here or click to load</p>
-                            <input type="file" class="form-control" id="syllabus" name="syllabus" 
-                                   accept=".pdf" style="display: none;">
+                    <!-- Scope / Study Flavor -->
+                    <div class="mb-3">
+                        <label for="scope" class="form-label font-monospace text-white-50 small"><i class="bi bi-sliders text-cyan me-1"></i> Preparation Flavor</label>
+                        <select class="form-select bg-dark border-secondary text-white font-monospace" id="scope" name="scope">
+                            <option value="Exam Focused" selected>Exam Focused (Priority Marks)</option>
+                            <option value="Placement Oriented">Placement Oriented (Core Conceptual & Coding)</option>
+                            <option value="Conceptual Learning">Conceptual Learning (Deep Research)</option>
+                            <option value="Quick Revision">Quick Revision (Short-Notice Boost)</option>
+                        </select>
+                    </div>
+
+                    <!-- File Uploader: Syllabus -->
+                    <div class="mb-3">
+                        <label class="form-label font-monospace text-white-50 small"><i class="bi bi-file-earmark-text text-cyan me-1"></i> Syllabus Structure PDF (Optional)</label>
+                        <div class="lab-upload-area" id="syllabusDrop">
+                            <i class="bi bi-file-earmark-pdf upload-icon mb-1"></i>
+                            <p class="font-monospace mb-0 small text-white-50" id="syllabusText">Syllabus PDF File</p>
+                            <span class="text-tertiary small" style="font-size: 0.7rem;">Drag & drop or Click</span>
+                            <input type="file" id="syllabus" name="syllabus" accept=".pdf" class="d-none">
                         </div>
                     </div>
 
-                    <!-- PYQ PDF -->
+                    <!-- File Uploader: PYQs -->
                     <div class="mb-4">
-                        <label for="pqp" class="form-label"><i class="bi bi-file-earmark-check text-info me-1"></i> Previous Year Questions (Required)</label>
-                        <div class="upload-area" id="pqpDropZone">
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            <p class="small text-muted mb-0">Drop PYQ PDF here or click to load</p>
-                            <input type="file" class="form-control" id="pqp" name="pqp" 
-                                   accept=".pdf" required style="display: none;">
+                        <label class="form-label font-monospace text-white-50 small"><i class="bi bi-file-earmark-pdf-fill text-cyan me-1"></i> PYQs / Exam Notes PDF (Required)</label>
+                        <div class="lab-upload-area" id="pqpDrop">
+                            <i class="bi bi-file-earmark-pdf-fill upload-icon text-purple mb-1"></i>
+                            <p class="font-monospace mb-0 small text-white-50" id="pqpText">PYQ PDF File</p>
+                            <span class="text-tertiary small" style="font-size: 0.7rem;">Drag & drop or Click</span>
+                            <input type="file" id="pqp" name="pqp" accept=".pdf" required class="d-none">
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 cyber-btn mt-2">
-                        <i class="bi bi-arrow-repeat"></i> Analyze Materials & Suggest Questions
+                    <!-- Process Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100 font-monospace py-2" id="submitBtn">
+                        <i class="bi bi-cpu-fill animate-spin me-2"></i> COMPILE AI STUDY BLUEPRINT
                     </button>
                 </form>
 
-                <div id="uploadProgress" style="display: none;" class="mt-4 align-items-center justify-content-center p-3 glass-card text-center border-0" style="background: rgba(22, 10, 42, 0.6) !important;">
-                    <div class="spinner-border text-info spinner-border-sm" role="status"></div>
-                    <span class="ms-2 font-monospace" style="color: var(--cyber-blue); font-size: 0.9rem;">[PROCESSING: COMMENCING QUESTION SYNTHESIS...]</span>
+                <!-- Processing Console Progress Diagnostics -->
+                <div id="processingDeck" class="mt-3 d-none">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="font-monospace text-cyan small" id="processingStatus">[EXTRACTING PDF TEXT...]</span>
+                        <div class="spinner-border spinner-border-sm text-cyan" role="status"></div>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-cyan" id="diagnosticsProgress" style="width: 10%;"></div>
+                    </div>
+                    <div class="lab-console-log" id="diagnosticsLog">
+                        [SYS_INFO]: Diagnostics ready.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Analytical Output Results Section -->
-        <div class="col-lg-6 mb-4">
-            <div class="glass-card p-4 h-100 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="mb-0 text-info" style="font-family: var(--cyber-font-mono);"><i class="bi bi-terminal"></i> Synthesized Plan</h5>
-                    <span id="engineStatus" class="badge cyber-badge-purple font-monospace">[ENGINE: IDLE]</span>
+        <!-- Right Pane: Analysis HUD Dashboard -->
+        <div class="col-lg-7 col-xl-8 mb-4">
+            <!-- Default Placeholder HUD Screen -->
+            <div id="hudPlaceholder" class="lab-card p-5 h-100 d-flex flex-column align-items-center justify-content-center text-center">
+                <i class="bi bi-cpu text-purple animate-pulse" style="font-size: 4rem; opacity: 0.65;"></i>
+                <h4 class="mt-4 font-monospace text-white">Academic Analytics HUD</h4>
+                <p class="text-white-50 font-monospace max-w-md mx-auto small">
+                    Provide a Subject Name and upload PYQ PDF materials on the left panel, then trigger compilation to generate interactive weightage charts, timetables, and key exam lists.
+                </p>
+                <div class="mt-3">
+                    <span class="badge border border-info text-cyan font-monospace">AWAITING LAB PARAMETERS</span>
                 </div>
-                
-                <div id="resultsContainer" class="flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="text-center text-muted py-5">
-                        <i class="bi bi-cpu" style="font-size: 3rem; color: var(--cyber-purple); opacity: 0.5;"></i>
-                        <p class="mt-3 font-monospace">Engine ready for processing parameters.<br>Provide Subject Name & upload PYQs to compile.</p>
+            </div>
+
+            <!-- Active Dashboard HUD Screen -->
+            <div id="hudDashboard" class="lab-card p-4 h-100 d-none flex-column">
+                <!-- Subject Info & KPI Header -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 border-bottom border-secondary pb-3 mb-3">
+                    <div>
+                        <span class="badge bg-purple text-white font-monospace mb-1" id="scopeBadge">EXAM FOCUSED</span>
+                        <h3 class="text-white font-monospace mb-0" id="hudSubjectTitle">Algorithms Analysis</h3>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <div class="kpi-badge">
+                            <div class="kpi-value text-cyan" id="kpiTime">30h</div>
+                            <div class="kpi-label">Prep Time</div>
+                        </div>
+                        <div class="kpi-badge">
+                            <div class="kpi-value text-purple" id="kpiTopics">5</div>
+                            <div class="kpi-label">Core Topics</div>
+                        </div>
+                        <div class="kpi-badge">
+                            <div class="kpi-value text-cyan" id="kpiModel">AI</div>
+                            <div class="kpi-label">Synthesizer</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Summary Area -->
+                <div class="p-3 bg-dark border border-secondary rounded mb-3">
+                    <h6 class="font-monospace text-cyan mb-1 small"><i class="bi bi-info-circle-fill"></i> AI Executive Synthesis</h6>
+                    <p class="text-white-50 font-monospace mb-0 small" id="hudSummaryText" style="line-height: 1.6;">
+                        Summary text goes here.
+                    </p>
+                </div>
+
+                <!-- Interactive Charts Row -->
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="p-2 bg-dark rounded border border-secondary text-center h-100">
+                            <h6 class="font-monospace text-white small mb-2"><i class="bi bi-bar-chart-fill text-cyan"></i> Topic Repeat Rates</h6>
+                            <div class="chart-container">
+                                <canvas id="chartTopicFrequency"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="p-2 bg-dark rounded border border-secondary text-center h-100">
+                            <h6 class="font-monospace text-white small mb-2"><i class="bi bi-pie-chart-fill text-purple"></i> Time Allocation</h6>
+                            <div class="chart-container">
+                                <canvas id="chartTimeDistribution"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-2 bg-dark rounded border border-secondary text-center h-100">
+                            <h6 class="font-monospace text-white small mb-2"><i class="bi bi-graph-up-arrow text-cyan"></i> Unit Weightage %</h6>
+                            <div class="chart-container">
+                                <canvas id="chartUnitImportance"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Structured Dynamic Accordions and Tabs for Academic Materials -->
+                <ul class="nav nav-tabs lab-tabs mb-3" id="hudTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active font-monospace small" id="tab-questions" data-bs-toggle="tab" data-bs-target="#content-questions" type="button" role="tab"><i class="bi bi-question-circle"></i> PYQ Questions</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link font-monospace small" id="tab-timeline" data-bs-toggle="tab" data-bs-target="#content-timeline" type="button" role="tab"><i class="bi bi-clock-history"></i> Weekly Schedule</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link font-monospace small" id="tab-concepts" data-bs-toggle="tab" data-bs-target="#content-concepts" type="button" role="tab"><i class="bi bi-lightbulb"></i> Concepts</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link font-monospace small" id="tab-formulas" data-bs-toggle="tab" data-bs-target="#content-formulas" type="button" role="tab"><i class="bi bi-braces"></i> Formulas Sheet</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content flex-grow-1" id="hudTabsContent" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                    <!-- 1. PYQ Priority Questions -->
+                    <div class="tab-pane fade show active" id="content-questions" role="tabpanel">
+                        <div class="d-flex flex-column gap-2" id="hudQuestionsList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- 2. Timetable / Study Scheduler Timeline -->
+                    <div class="tab-pane fade" id="content-timeline" role="tabpanel">
+                        <div class="d-flex flex-column" id="hudTimelineList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- 3. Key Concepts -->
+                    <div class="tab-pane fade" id="content-concepts" role="tabpanel">
+                        <div class="p-3 bg-dark rounded border border-secondary">
+                            <h6 class="font-monospace text-cyan mb-2"><i class="bi bi-list-stars"></i> Primary Syllabi Pillars</h6>
+                            <ul class="font-monospace text-white-50 small mb-0 ps-3" id="hudConceptsList">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-dark rounded border border-secondary mt-3">
+                            <h6 class="font-monospace text-purple mb-1"><i class="bi bi-speedometer2"></i> Unit Difficulty Matrix</h6>
+                            <p class="font-monospace text-white-50 small mb-0" id="hudDifficultyText">
+                                <!-- Populated dynamically -->
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 4. Important Formulas & Core Theorems -->
+                    <div class="tab-pane fade" id="content-formulas" role="tabpanel">
+                        <div class="d-flex flex-column gap-2" id="hudFormulasList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategic Exam Tips Footnote Banner -->
+                <div class="p-3 mt-3 border border-info rounded" style="background: rgba(6, 182, 212, 0.05);">
+                    <h6 class="font-monospace text-cyan mb-1 small"><i class="bi bi-patch-check-fill"></i> Strategic Prep & Exam Execution Advice</h6>
+                    <div class="font-monospace text-white-50 small" id="hudTipsText" style="font-size: 0.75rem; line-height: 1.5;">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Historic Compiled Study Sessions -->
+    <!-- Bottom Section: Compiled Archives list -->
     <div class="row">
         <div class="col-12 mb-4">
-            <div class="glass-card p-4">
-                <h5 class="mb-4 text-primary font-monospace"><i class="bi bi-folder2-open"></i> Compiled Archives</h5>
-                <div class="row">
+            <div class="lab-card p-4">
+                <h5 class="mb-3 font-monospace text-white"><i class="bi bi-folder2-open text-cyan"></i> Compiled Lab Archives</h5>
+                <div class="row" id="archiveDeck">
                     {% if sessions %}
                         {% for session in sessions %}
-                        <div class="col-md-4 mb-3">
-                            <div class="cyber-session-card p-3 h-100 d-flex flex-column justify-content-between">
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="archive-session-card p-3 h-100 d-flex flex-column justify-content-between">
                                 <div>
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="mb-0 text-white font-monospace" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 80%;">{{ session['title'] }}</h6>
-                                        <i class="bi bi-journal-code text-info"></i>
+                                        <h6 class="mb-0 text-white font-monospace text-truncate" style="max-width: 80%;">{{ session['title'] }}</h6>
+                                        <i class="bi bi-journal-code text-cyan"></i>
                                     </div>
-                                    <small class="text-muted d-block mb-3" style="font-family: var(--cyber-font-mono);">
-                                        <i class="bi bi-calendar"></i> {{ session['created_at'][:10] }}
+                                    <small class="text-white-50 font-monospace d-block mb-3" style="font-size: 0.75rem;">
+                                        <i class="bi bi-calendar-event me-1 text-purple"></i> {{ session['created_at'][:10] }}
                                     </small>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge cyber-badge-purple text-xs">AI VERIFIED</span>
-                                    <button type="button" class="btn btn-sm cyber-btn font-monospace py-1 px-3" style="font-size: 0.75rem; letter-spacing: 1px;" 
+                                    <span class="badge border border-info text-cyan font-monospace px-2 py-1" style="font-size: 0.65rem;">AI SYNTHESIZED</span>
+                                    <button type="button" class="btn btn-sm btn-outline font-monospace py-1 px-3" style="font-size: 0.7rem; letter-spacing: 0.5px;" 
                                             onclick="viewSession('{{ session['id'] }}')">
-                                        Launch
+                                        Launch HUD
                                     </button>
                                 </div>
                             </div>
@@ -336,7 +456,7 @@
                         {% endfor %}
                     {% else %}
                     <div class="col-12 text-center text-muted py-4">
-                        <p class="font-monospace">No archived compiles found in database.</p>
+                        <p class="font-monospace small">No archived study blueprints found in database.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -345,296 +465,498 @@
     </div>
 </div>
 
-<!-- Holographic Study Modal -->
-<div class="modal fade" id="resultsModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content glass-card border-0" style="background: rgba(12, 6, 28, 0.98) !important;">
-            <div class="modal-header border-0 pb-0">
-                <span class="cyber-tag"><i class="bi bi-diagram-3"></i> AI Synthesized Report</span>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body pt-2">
-                <div id="modalContent"></div>
-            </div>
-        </div>
-    </div>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-// Setup drag and drop fields
-function setupDropZone(elementId, inputId) {
-    const dropZone = document.getElementById(elementId);
-    const input = document.getElementById(inputId);
-
-    dropZone.addEventListener('click', () => input.click());
-
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.style.borderColor = 'var(--cyber-blue)';
-        dropZone.style.background = 'rgba(0, 212, 255, 0.05)';
-    });
-
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.style.borderColor = 'rgba(157, 78, 221, 0.35)';
-        dropZone.style.background = 'rgba(14, 4, 30, 0.4)';
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.style.borderColor = 'rgba(157, 78, 221, 0.35)';
-        dropZone.style.background = 'rgba(14, 4, 30, 0.4)';
-        const files = e.dataTransfer.files;
-        if (files.length) {
-            input.files = files;
+    // Particle background animation logic
+    function createParticles() {
+        const container = document.getElementById('labParticles');
+        if (!container) return;
+        const particleCount = 18;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('lab-particle');
+            
+            // Random styling parameters
+            const size = Math.random() * 80 + 30;
+            const left = Math.random() * 100;
+            const delay = Math.random() * 10;
+            const duration = Math.random() * 12 + 10;
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${left}%`;
+            particle.style.bottom = `-100px`;
+            particle.style.animationDelay = `${delay}s`;
+            particle.style.animationDuration = `${duration}s`;
+            
+            // Random violet to deep pink gradient
+            const color = i % 2 === 0 ? 'var(--accent-blue)' : 'var(--accent-purple)';
+            particle.style.background = `radial-gradient(circle, ${color} 0%, transparent 70%)`;
+            
+            container.appendChild(particle);
         }
-    });
-
-    input.addEventListener('change', () => {
-        if (input.files[0]) {
-            dropZone.innerHTML = `<i class="bi bi-check2-all text-info" style="font-size: 2.5rem;"></i><p class="small text-info mb-0 font-monospace">${input.files[0].name}</p>`;
-        }
-    });
-}
-
-setupDropZone('syllabusDropZone', 'syllabus');
-setupDropZone('pqpDropZone', 'pqp');
-
-// Custom dynamic AI request handler
-document.getElementById('studyForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const pqpInput = document.getElementById('pqp');
-
-    if (!pqpInput.files[0]) {
-        showToast('Please upload a PYQ PDF to compile your exam questions.', 'warning');
-        return;
     }
+    createParticles();
 
-    document.getElementById('uploadProgress').style.display = 'flex';
-    document.getElementById('engineStatus').className = 'badge cyber-badge-pink font-monospace';
-    document.getElementById('engineStatus').innerText = '[ENGINE: SYNTHESIZING]';
+    // Drag and drop dropzone setups
+    function setupDropzone(zoneId, inputId, textId, defaultText) {
+        const dropZone = document.getElementById(zoneId);
+        const input = document.getElementById(inputId);
+        const textEl = document.getElementById(textId);
 
-    try {
-        const response = await fetch('{{ url_for("study") }}', {
-            method: 'POST',
-            body: formData
+        dropZone.addEventListener('click', () => input.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
         });
 
-        const data = await response.json();
-        document.getElementById('uploadProgress').style.display = 'none';
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
 
-        if (data.success) {
-            showAnalysisResults(data.analysis);
-            document.getElementById('engineStatus').className = 'badge cyber-badge-blue font-monospace';
-            document.getElementById('engineStatus').innerText = '[ENGINE: COMPILED]';
-            showToast('Personalized questions and timestamps successfully compiled!', 'success');
-        } else {
-            document.getElementById('engineStatus').className = 'badge bg-danger font-monospace';
-            document.getElementById('engineStatus').innerText = '[ENGINE: FAILED]';
-            showToast(data.message || 'Error compiling materials', 'danger');
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                input.files = files;
+                textEl.innerText = files[0].name;
+                textEl.classList.add('text-cyan');
+            }
+        });
+
+        input.addEventListener('change', () => {
+            if (input.files[0]) {
+                textEl.innerText = input.files[0].name;
+                textEl.classList.add('text-cyan');
+            } else {
+                textEl.innerText = defaultText;
+                textEl.classList.remove('text-cyan');
+            }
+        });
+    }
+
+    setupDropzone('syllabusDrop', 'syllabus', 'syllabusText', 'Syllabus PDF File');
+    setupDropzone('pqpDrop', 'pqp', 'pqpText', 'PYQ PDF File');
+
+    // Chart instances reference store
+    let chartTopic = null;
+    let chartTime = null;
+    let chartUnit = null;
+
+    function destroyCharts() {
+        if (chartTopic) chartTopic.destroy();
+        if (chartTime) chartTime.destroy();
+        if (chartUnit) chartUnit.destroy();
+    }
+
+    function renderCharts(metrics) {
+        destroyCharts();
+
+        // 1. Topic Frequency Chart
+        const topicCtx = document.getElementById('chartTopicFrequency').getContext('2d');
+        const tfLabels = Object.keys(metrics.topic_frequency || {});
+        const tfData = Object.values(metrics.topic_frequency || {});
+        
+        chartTopic = new Chart(topicCtx, {
+            type: 'radar',
+            data: {
+                labels: tfLabels,
+                datasets: [{
+                    label: 'Occurrences',
+                    data: tfData,
+                    backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                    borderColor: 'var(--accent-cyan)',
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: 'var(--accent-cyan)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#94a3b8', font: { family: 'Fira Code', size: 9 } },
+                        ticks: { backdropColor: 'transparent', color: '#94a3b8', font: { size: 8 } }
+                    }
+                }
+            }
+        });
+
+        // 2. Study Time Distribution Chart
+        const timeCtx = document.getElementById('chartTimeDistribution').getContext('2d');
+        const tdLabels = Object.keys(metrics.study_time_distribution || {});
+        const tdData = Object.values(metrics.study_time_distribution || {});
+
+        chartTime = new Chart(timeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: tdLabels,
+                datasets: [{
+                    data: tdData,
+                    backgroundColor: [
+                        'rgba(139, 92, 246, 0.75)',
+                        'rgba(236, 72, 153, 0.75)',
+                        'rgba(6, 182, 212, 0.75)'
+                    ],
+                    borderColor: '#05030c',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', font: { family: 'Fira Code', size: 8 } }
+                    }
+                }
+            }
+        });
+
+        // 3. Unit Importance weightage Chart
+        const unitCtx = document.getElementById('chartUnitImportance').getContext('2d');
+        const uiLabels = Object.keys(metrics.unit_importance || {});
+        const uiData = Object.values(metrics.unit_importance || {});
+
+        chartUnit = new Chart(unitCtx, {
+            type: 'bar',
+            data: {
+                labels: uiLabels,
+                datasets: [{
+                    data: uiData,
+                    backgroundColor: 'rgba(139, 92, 246, 0.5)',
+                    borderColor: 'var(--accent-blue)',
+                    borderWidth: 1.5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8', font: { family: 'Fira Code', size: 8 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { size: 8 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // Submit handler with beautiful simulated terminal console logging
+    document.getElementById('studyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const pqpInput = document.getElementById('pqp');
+
+        if (!pqpInput.files[0]) {
+            showToast('Please load a Previous Year Questions (PYQ) PDF.', 'warning');
+            return;
         }
-    } catch (error) {
-        document.getElementById('uploadProgress').style.display = 'none';
-        document.getElementById('engineStatus').className = 'badge bg-danger font-monospace';
-        document.getElementById('engineStatus').innerText = '[ENGINE: ERROR]';
-        showToast('System compile error: ' + error.message, 'danger');
-    }
-});
 
-// Render the results into a gorgeous futuristic visual grid
-function showAnalysisResults(analysis) {
-    const container = document.getElementById('resultsContainer');
-    
-    let html = `
-        <div class="p-1 animate-fade-in text-start">
-            <div class="mb-4">
-                <h6 class="font-monospace text-primary mb-2"><i class="bi bi-patch-check-fill"></i> Suggested Important Exam Questions</h6>
-                <div class="d-flex flex-column gap-2">
-    `;
-    
-    analysis.important_topics.forEach((topic, idx) => {
-        html += `
-            <div class="p-2 border-0 glass-card d-flex gap-3 align-items-center" style="background: rgba(14, 4, 30, 0.4) !important;">
-                <span class="badge cyber-badge-pink font-monospace">Q${idx + 1}</span>
-                <span class="text-white-50 font-monospace" style="font-size: 0.9rem;">${topic}</span>
-            </div>
-        `;
-    });
-    
-    html += `
-                </div>
-            </div>
+        // Show console diagnostics card & progress bar
+        const submitBtn = document.getElementById('submitBtn');
+        const procDeck = document.getElementById('processingDeck');
+        const consoleEl = document.getElementById('diagnosticsLog');
+        const bar = document.getElementById('diagnosticsProgress');
+        const textStatus = document.getElementById('processingStatus');
 
-            <div class="mb-4">
-                <h6 class="font-monospace text-info mb-3"><i class="bi bi-alarm-fill"></i> Allocated Study Timestamps</h6>
-                <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
-    `;
-    
-    analysis.weekly_plan.forEach(day => {
-        html += `
-            <div class="mb-2 p-2 glass-card border-0" style="background: rgba(14, 4, 30, 0.4) !important;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <strong class="text-white font-monospace"><i class="bi bi-clock-history text-info me-2"></i>${day.day}</strong>
-                    <span class="badge cyber-badge-blue font-monospace">${day.duration_hours}h Session</span>
-                </div>
-                <div class="small text-muted font-monospace mt-1 ms-4"><i class="bi bi-caret-right text-muted me-1"></i>Target: ${day.topics.join(' // ')}</div>
-            </div>
-        `;
-    });
-    
-    html += `
-                </div>
-            </div>
-            
-            <div class="text-center mt-3">
-                <button type="button" class="btn btn-sm cyber-btn font-monospace px-4 w-100" onclick="launchDetailedPlanView()">
-                    <i class="bi bi-eye"></i> Launch Detailed AI Syllabus Report
-                </button>
-            </div>
-        </div>
-    `;
-    
-    container.innerHTML = html;
-    
-    // Store full plan globally so it can be viewed in detail
-    window.lastCompiledPlan = analysis.full_plan;
-}
+        submitBtn.disabled = true;
+        procDeck.classList.remove('d-none');
+        consoleEl.innerHTML = '';
+        
+        const appendLog = (msg) => {
+            consoleEl.innerHTML += `<div class="mb-1 text-white-50">&gt; <span class="text-cyan">[${new Date().toLocaleTimeString()}]</span> ${msg}</div>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        };
 
-function launchDetailedPlanView() {
-    if (window.lastCompiledPlan) {
-        const modalContent = document.getElementById('modalContent');
-        let html = `
-            <div class="p-3">
-                <h4 class="mb-3 text-info font-monospace"><i class="bi bi-chat-left-text"></i> Interactive Academic Report</h4>
-                <div class="p-4 glass-card text-white-50" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.7; max-height: 480px; overflow-y: auto; background: rgba(10, 4, 25, 0.85) !important;">
-                    ${formatMarkdown(window.lastCompiledPlan)}
-                </div>
-            </div>
-        `;
-        modalContent.innerHTML = html;
-        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-        modal.show();
-    } else {
-        showToast('No active detailed report generated.', 'warning');
-    }
-}
+        const updateStatus = (text, width) => {
+            textStatus.innerText = `[${text.toUpperCase()}...]`;
+            bar.style.width = `${width}%`;
+        };
 
-async function viewSession(sessionId) {
-    showToast('Connecting to compiler databases...', 'info');
-    try {
-        const response = await fetch(`/study/${sessionId}`);
-        const data = await response.json();
-        if (data.success) {
-            const session = data.session;
-            const modalContent = document.getElementById('modalContent');
-            
-            let html = `
-                <div class="p-3 text-start">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h4 class="mb-0 text-primary font-monospace">${sanitizeHTML(session.title)}</h4>
-                        <span class="badge cyber-badge-blue font-monospace">ARCHIVED EXAM PREP</span>
-                    </div>
-                    <p class="text-muted font-monospace"><i class="bi bi-calendar-check"></i> Compiled on: ${session.created_at}</p>
-                    <hr style="border-color: var(--cyber-border)">
-            `;
-            
-            // Important topics
-            if (session.important_topics && session.important_topics.length > 0) {
-                html += `
-                    <div class="mb-4">
-                        <h6 class="font-monospace text-primary mb-2"><i class="bi bi-patch-check-fill"></i> Suggested Important Exam Questions</h6>
-                        <div class="d-flex flex-column gap-2">
-                `;
-                session.important_topics.forEach((topic, idx) => {
-                    html += `
-                        <div class="p-2 border-0 glass-card d-flex gap-3 align-items-center" style="background: rgba(14, 4, 30, 0.4) !important;">
-                            <span class="badge cyber-badge-pink font-monospace">Q${idx + 1}</span>
-                            <span class="text-white-50 font-monospace" style="font-size: 0.9rem;">${sanitizeHTML(topic)}</span>
-                        </div>
-                    `;
-                });
-                html += `
-                        </div>
-                    </div>
-                `;
+        appendLog('INITIALIZING PORTAL COMPILER...');
+        updateStatus('CONNECTING ENGINE', 15);
+
+        // Step intervals simulation
+        let step = 0;
+        const interval = setInterval(() => {
+            step++;
+            if (step === 1) {
+                appendLog('PARSING PYQ FILE STREAM...');
+                updateStatus('READING PYQ PDF', 30);
+            } else if (step === 2) {
+                appendLog('PARSING SYLLABUS PDF ATTACHMENT...');
+                updateStatus('PARSING SYLLABUS', 45);
+            } else if (step === 3) {
+                appendLog('EXTRACTING HEAVY RECURRING TOPIC NODES...');
+                updateStatus('EXTRACTING STRINGS', 60);
+            } else if (step === 4) {
+                appendLog('CONTACTING CAMPUS COGNITION AI SERVICES ROUTINES...');
+                updateStatus('SOLVING MATRIX PLAN', 80);
             }
-            
-            // Weekly plan
-            if (session.weekly_plan && session.weekly_plan.length > 0) {
-                html += `
-                    <div class="mb-4">
-                        <h6 class="font-monospace text-info mb-3"><i class="bi bi-alarm-fill"></i> Allocated Study Timestamps</h6>
-                `;
-                session.weekly_plan.forEach(day => {
-                    html += `
-                        <div class="mb-2 p-2 glass-card border-0" style="background: rgba(14, 4, 30, 0.4) !important;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong class="text-white font-monospace"><i class="bi bi-clock-history text-info me-2"></i>${sanitizeHTML(day.day)}</strong>
-                                <span class="badge cyber-badge-blue font-monospace">${day.duration_hours}h Session</span>
-                            </div>
-                            <div class="small text-muted font-monospace mt-1 ms-4"><i class="bi bi-caret-right text-muted me-1"></i>Target: ${day.topics.map(t => sanitizeHTML(t)).join(' // ')}</div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
+        }, 1200);
+
+        try {
+            const response = await fetch('{{ url_for("study") }}', {
+                method: 'POST',
+                body: formData
+            });
+
+            clearInterval(interval);
+            const data = await response.json();
+
+            if (data.success) {
+                updateStatus('BLUEPRINT SYNTHESIZED', 100);
+                appendLog('AI ANALYZER SUCCESSFUL. SERIALIZING PAYLOAD...');
+                appendLog('COMPILING CHART CANVAS GRAPHICS...');
+                appendLog('HUD INTERACTIVE GRID BOOTED.');
+                
+                setTimeout(() => {
+                    procDeck.classList.add('d-none');
+                    submitBtn.disabled = false;
+                    renderHUD(data.analysis);
+                    showToast('AI Study Blueprint completely generated!', 'success');
+                    
+                    // Prepend new archive session card to bottom archives
+                    addNewArchive(data.session_id, formData.get('session_title'));
+                }, 1000);
+            } else {
+                clearInterval(interval);
+                updateStatus('COMPILE FAILED', 0);
+                appendLog(`[COMPILATION_ERROR]: ${data.message || 'Unknown internal error'}`);
+                submitBtn.disabled = false;
+                showToast(data.message || 'Error occurred during AI compilation', 'danger');
             }
-            
-            // Full Detailed Study Plan (AI response)
-            if (session.full_plan) {
-                html += `
-                    <div class="mt-4">
-                        <h6 class="font-monospace text-info mb-3"><i class="bi bi-chat-left-text"></i> Interactive AI Detailed Plan</h6>
-                        <div class="p-4 glass-card text-white-50" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.7; max-height: 380px; overflow-y: auto; background: rgba(10, 4, 25, 0.85) !important;">
-                            ${formatMarkdown(session.full_plan)}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `</div>`;
-            
-            modalContent.innerHTML = html;
-            const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-            modal.show();
-        } else {
-            showToast(data.message || 'Error loading compiled archives', 'danger');
+        } catch (error) {
+            clearInterval(interval);
+            updateStatus('ERROR ENCOUNTERED', 0);
+            appendLog(`[FATAL_SYSTEM_ERROR]: ${error.message}`);
+            submitBtn.disabled = false;
+            showToast('Lab compile failure: ' + error.message, 'danger');
         }
-    } catch (error) {
-        showToast('Archive system error: ' + error.message, 'danger');
+    });
+
+    // Populate new archive session card dynamically
+    function addNewArchive(id, title) {
+        const deck = document.getElementById('archiveDeck');
+        const emptyMsg = deck.querySelector('.col-12');
+        if (emptyMsg && emptyMsg.innerText.includes('No archived')) {
+            deck.innerHTML = '';
+        }
+
+        const dateStr = new Date().toISOString().substring(0, 10);
+        const cardHTML = `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="archive-session-card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0 text-white font-monospace text-truncate" style="max-width: 80%;">${sanitizeHTML(title)}</h6>
+                            <i class="bi bi-journal-code text-cyan"></i>
+                        </div>
+                        <small class="text-white-50 font-monospace d-block mb-3" style="font-size: 0.75rem;">
+                            <i class="bi bi-calendar-event me-1 text-purple"></i> ${dateStr}
+                        </small>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge border border-info text-cyan font-monospace px-2 py-1" style="font-size: 0.65rem;">AI SYNTHESIZED</span>
+                        <button type="button" class="btn btn-sm btn-outline font-monospace py-1 px-3" style="font-size: 0.7rem; letter-spacing: 0.5px;" 
+                                onclick="viewSession('${id}')">
+                            Launch HUD
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        deck.insertAdjacentHTML('afterbegin', cardHTML);
     }
-}
 
-function sanitizeHTML(text) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return String(text).replace(/[&<>"']/g, m => map[m]);
-}
+    // Render structured results into dashboard HUD
+    function renderHUD(analysis) {
+        // Toggle HUD display
+        document.getElementById('hudPlaceholder').classList.add('d-none');
+        const hud = document.getElementById('hudDashboard');
+        hud.classList.remove('d-none');
 
-function formatMarkdown(text) {
-    if (!text) return '';
-    let html = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    
-    // Bold
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Bullet points
-    html = html.replace(/^\* (.*?)$/gm, '<li>$1</li>');
-    html = html.replace(/^  \* (.*?)$/gm, '<li class="ms-3">$1</li>');
-    // Headers
-    html = html.replace(/^#### (.*?)$/gm, '<h6 class="text-info font-monospace mt-4 mb-2"><i class="bi bi-caret-right-fill"></i> $1</h6>');
-    html = html.replace(/^### (.*?)$/gm, '<h6 class="text-primary font-monospace mt-4 mb-2"><i class="bi bi-arrow-right-short"></i> $1</h6>');
-    html = html.replace(/^## (.*?)$/gm, '<h5 class="text-info font-monospace mt-4 mb-3 border-bottom pb-2" style="border-color: var(--cyber-border) !important;">$1</h5>');
-    html = html.replace(/^# (.*?)$/gm, '<h4 class="text-primary font-monospace mt-4 mb-3 text-center" style="text-shadow: 0 0 10px var(--cyber-purple-glow);">$1</h4>');
-    
-    return html;
-}
+        // Text & titles bindings
+        document.getElementById('hudSubjectTitle').innerText = analysis.subject_name || document.getElementById('session_title').value || 'Core Subject';
+        document.getElementById('scopeBadge').innerText = analysis.scope || document.getElementById('scope').value || 'Exam Focused';
+        
+        // KPIs bindings
+        document.getElementById('kpiTime').innerText = `${analysis.prep_time_hours || 24}h`;
+        document.getElementById('kpiTopics').innerText = `${analysis.repeated_topics ? analysis.repeated_topics.length : 4}`;
+        document.getElementById('kpiModel').innerText = (analysis.model && analysis.model.includes('fallback')) ? 'LOCAL' : 'GEMINI';
+
+        // Executive summary
+        document.getElementById('hudSummaryText').innerText = analysis.summary || 'Summary blueprint successfully synthesized.';
+
+        // Difficulty analysis
+        document.getElementById('hudDifficultyText').innerText = analysis.difficulty_analysis || 'Concept learning vectors successfully indexed.';
+
+        // Render standard Chart.js metrics
+        if (analysis.chart_metrics) {
+            renderCharts(analysis.chart_metrics);
+        }
+
+        // Render Primary Concept Pillars
+        const conceptDeck = document.getElementById('hudConceptsList');
+        conceptDeck.innerHTML = '';
+        if (analysis.key_concepts && analysis.key_concepts.length > 0) {
+            analysis.key_concepts.forEach(concept => {
+                conceptDeck.innerHTML += `<li class="mb-1"><i class="bi bi-caret-right-fill text-cyan me-1"></i>${sanitizeHTML(concept)}</li>`;
+            });
+        } else {
+            conceptDeck.innerHTML = '<li class="text-white-50">Syllabi core concepts loaded inside text logs.</li>';
+        }
+
+        // Render Important PYQ Questions List
+        const questionsDeck = document.getElementById('hudQuestionsList');
+        questionsDeck.innerHTML = '';
+        const qs = analysis.important_questions || analysis.important_topics || [];
+        if (qs.length > 0) {
+            qs.forEach((q, idx) => {
+                questionsDeck.innerHTML += `
+                    <div class="p-2 border border-secondary rounded d-flex gap-3 align-items-center" style="background: rgba(255,255,255,0.015);">
+                        <span class="badge border border-purple text-purple font-monospace">Q${idx + 1}</span>
+                        <span class="text-white-50 font-monospace small" style="line-height: 1.4;">${sanitizeHTML(q)}</span>
+                    </div>
+                `;
+            });
+        } else {
+            questionsDeck.innerHTML = '<div class="text-center text-white-50 font-monospace py-3 small">No specific syllabus items isolated.</div>';
+        }
+
+        // Render Weekly Plan timetables
+        const timelineDeck = document.getElementById('hudTimelineList');
+        timelineDeck.innerHTML = '';
+        if (analysis.weekly_plan && analysis.weekly_plan.length > 0) {
+            analysis.weekly_plan.forEach(item => {
+                timelineDeck.innerHTML += `
+                    <div class="lab-timeline-item">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-white font-monospace small"><i class="bi bi-calendar-check text-cyan me-1"></i>${sanitizeHTML(item.day)}</strong>
+                            <span class="badge border border-info text-cyan font-monospace px-2 py-0" style="font-size: 0.65rem;">${item.duration_hours}h Session</span>
+                        </div>
+                        <div class="small text-white-50 font-monospace" style="font-size: 0.75rem;"><i class="bi bi-arrow-right-short text-purple"></i>Target: ${item.topics.join(' // ')}</div>
+                    </div>
+                `;
+            });
+        } else {
+            timelineDeck.innerHTML = '<div class="text-center text-white-50 font-monospace py-3 small">No schedules compiled.</div>';
+        }
+
+        // Render Important Formulas
+        const formulasDeck = document.getElementById('hudFormulasList');
+        formulasDeck.innerHTML = '';
+        if (analysis.formulas && analysis.formulas.length > 0) {
+            analysis.formulas.forEach(form => {
+                formulasDeck.innerHTML += `
+                    <div class="p-2 border border-secondary rounded font-monospace text-cyan small" style="background: #020108;">
+                        <i class="bi bi-hash text-purple me-1"></i> ${sanitizeHTML(form)}
+                    </div>
+                `;
+            });
+        } else {
+            formulasDeck.innerHTML = '<div class="text-center text-white-50 font-monospace py-3 small">No formulas or equations parsed.</div>';
+        }
+
+        // Render strategic tips text
+        const tipsDeck = document.getElementById('hudTipsText');
+        tipsDeck.innerHTML = '';
+        if (analysis.exam_tips && analysis.exam_tips.length > 0) {
+            analysis.exam_tips.forEach(tip => {
+                tipsDeck.innerHTML += `<div class="mb-1"><i class="bi bi-dot text-cyan"></i> ${sanitizeHTML(tip)}</div>`;
+            });
+        } else {
+            tipsDeck.innerHTML = `<div>Solve repeated PYQ chapters, draw priority transition diagrams, and optimize recursion trees before entering exams.</div>`;
+        }
+
+        // Smooth scroll to HUD dashboard
+        hud.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Connect past archives to HUD loader
+    async function viewSession(sessionId) {
+        showToast('Connecting to database compiler...', 'info');
+        try {
+            const response = await fetch(`/study/${sessionId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                const session = data.session;
+                let parsedPlan = null;
+                
+                try {
+                    parsedPlan = JSON.parse(session.full_plan);
+                } catch(e) {
+                    // Rebuild structured fallback object if legacy data was stored
+                    parsedPlan = {
+                        success: true,
+                        subject_name: session.title,
+                        scope: 'Exam Focused',
+                        summary: session.full_plan || "Blueprint details loaded.",
+                        key_concepts: [],
+                        formulas: [],
+                        exam_tips: [],
+                        difficulty_analysis: "Concepts and structures retrieved successfully.",
+                        prep_time_hours: 24,
+                        repeated_topics: session.priority_list || [],
+                        important_questions: session.important_topics || [],
+                        weekly_plan: session.weekly_plan || [],
+                        chart_metrics: {
+                            topic_frequency: { "PYQ Analysis": 4, "Core Syllabus": 3, "Topic Coverage": 4 },
+                            unit_importance: { "Unit 1": 25, "Unit 2": 25, "Unit 3": 25, "Unit 4": 25 },
+                            study_time_distribution: { "PYQ Solve": 10, "Concept Revision": 8, "Formula Practice": 6 }
+                        }
+                    };
+
+                    if (typeof parsedPlan.repeated_topics === 'string') {
+                        try { parsedPlan.repeated_topics = JSON.parse(parsedPlan.repeated_topics); } catch(err) {}
+                    }
+                    if (typeof parsedPlan.important_questions === 'string') {
+                        try { parsedPlan.important_questions = JSON.parse(parsedPlan.important_questions); } catch(err) {}
+                    }
+                    if (typeof parsedPlan.weekly_plan === 'string') {
+                        try { parsedPlan.weekly_plan = JSON.parse(parsedPlan.weekly_plan); } catch(err) {}
+                    }
+                }
+                
+                if (parsedPlan) {
+                    renderHUD(parsedPlan);
+                    showToast(`Restored analysis HUD for: ${session.title}`, 'success');
+                }
+            } else {
+                showToast(data.message || 'Error restoring archive', 'danger');
+            }
+        } catch (error) {
+            showToast('System restoration error: ' + error.message, 'danger');
+        }
+    }
+
+    function sanitizeHTML(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
 </script>
 {% endblock %}
