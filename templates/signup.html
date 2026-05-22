@@ -2,83 +2,379 @@
 
 {% block title %}Sign Up - Campus Cognition{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Stunning grid layout for split screen */
+    .split-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+        width: 100%;
+        background: linear-gradient(135deg, #060b19 0%, #0c1033 100%);
+        overflow-x: hidden;
+    }
+
+    @media (min-width: 992px) {
+        .split-container {
+            grid-template-columns: 1.15fr 0.85fr;
+        }
+    }
+
+    /* Left panel showing the beautiful creative illustration */
+    .creative-side {
+        position: relative;
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 4rem;
+        background: radial-gradient(circle at center, rgba(12, 16, 51, 0.4) 0%, rgba(6, 11, 25, 0.95) 100%), 
+                    url('/static/images/campus_cognition_login_art.png') no-repeat center center/cover;
+        border-right: 1px solid rgba(0, 212, 255, 0.15);
+        overflow: hidden;
+    }
+
+    @media (min-width: 992px) {
+        .creative-side {
+            display: flex;
+        }
+    }
+
+    /* Cyberpunk scanning line overlay */
+    .creative-side::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                    linear-gradient(90deg, rgba(0, 212, 255, 0.03), rgba(123, 104, 238, 0.01), rgba(0, 212, 255, 0.03));
+        background-size: 100% 4px, 6px 100%;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    /* Floating glassmorphic content container on creative side */
+    .creative-overlay-card {
+        background: rgba(10, 25, 41, 0.5);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 2px solid rgba(0, 212, 255, 0.25);
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 
+                    inset 0 1px 1px rgba(0, 212, 255, 0.1);
+        max-width: 680px;
+        margin-top: auto;
+        transform: translateY(0);
+        animation: floatCreativeCard 6s ease-in-out infinite;
+        z-index: 3;
+    }
+
+    @keyframes floatCreativeCard {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-12px) rotate(0.5deg); }
+    }
+
+    /* Right panel centered signup form */
+    .form-side {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem;
+        position: relative;
+        background: radial-gradient(circle at 80% 20%, rgba(123, 104, 238, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 50%);
+        overflow-y: auto;
+    }
+
+    /* Animated background elements */
+    .bg-glow-orb {
+        position: absolute;
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        filter: blur(130px);
+        pointer-events: none;
+        opacity: 0.12;
+        z-index: 0;
+    }
+
+    .orb-cyan {
+        background: #00d4ff;
+        top: 15%;
+        left: 20%;
+    }
+
+    .orb-purple {
+        background: #7b68ee;
+        bottom: 15%;
+        right: 20%;
+    }
+
+    /* Glowing badges */
+    .agent-pill {
+        background: rgba(0, 212, 255, 0.06);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: #00d4ff;
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 6px 14px;
+        border-radius: 50px;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+    }
+
+    .custom-auth-card {
+        width: 100%;
+        max-width: 520px;
+        background: rgba(10, 25, 41, 0.55) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px) !important;
+        border: 2px solid rgba(0, 212, 255, 0.25) !important;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 
+                    inset 0 1px 1px rgba(0, 212, 255, 0.1) !important;
+        border-radius: 24px !important;
+        z-index: 10;
+        padding: 2.5rem !important;
+    }
+
+    .form-control.glass-input {
+        background: rgba(10, 25, 41, 0.4) !important;
+        border: 2px solid rgba(0, 212, 255, 0.15) !important;
+        color: #fff !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .form-control.glass-input:focus {
+        border-color: rgba(0, 212, 255, 0.8) !important;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.25) !important;
+        background: rgba(10, 25, 41, 0.6) !important;
+    }
+
+    .input-group-text {
+        border-radius: 12px 0 0 12px !important;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+        background: transparent !important;
+        border: 2px solid rgba(0, 212, 255, 0.15) !important;
+        border-right: none !important;
+    }
+
+    .form-control.glass-input {
+        border-radius: 0 12px 12px 0 !important;
+        border-left: none !important;
+    }
+
+    /* Mobile creative banner */
+    .mobile-banner {
+        width: 100%;
+        height: 200px;
+        background: radial-gradient(circle at center, rgba(12, 16, 51, 0.2) 0%, rgba(6, 11, 25, 0.95) 100%), 
+                    url('/static/images/campus_cognition_login_art.png') no-repeat center center/cover;
+        border-bottom: 2px solid rgba(0, 212, 255, 0.25);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    @media (min-width: 992px) {
+        .mobile-banner {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="auth-container">
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
-        <div class="auth-card glass-card">
-            <div class="auth-header text-center mb-4">
-                <div class="auth-icon-container mb-3">
+<div class="split-container">
+    
+    <!-- Left panel (Desktop Only) showing illustration -->
+    <div class="creative-side">
+        <!-- Logo -->
+        <div class="logo-container" style="z-index: 10;">
+            <a href="{{ url_for('login') }}" class="text-decoration-none">
+                <span style="font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; text-shadow: 0 0 15px rgba(0,212,255,0.4);">
+                    <i class="bi bi-lightning-fill" style="color: #00d4ff;"></i> CAMPUS COGNITION
+                </span>
+            </a>
+            <p style="color: #a0a0a0; font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; margin-top: 5px; margin-left: 36px;">
+                AGENT SYSTEM FOR ACADEMIC TRIUMPH
+            </p>
+        </div>
+
+        <!-- Glassmorphic content drawer -->
+        <div class="creative-overlay-card">
+            <span class="agent-pill mb-3">
+                <i class="bi bi-person-plus-fill"></i> CREATE NEW ACCOUNT
+            </span>
+            <h2 style="color: #fff; font-size: 2.2rem; font-weight: 800; line-height: 1.2;" class="mb-3">
+                Join the <span style="color: #00d4ff;">Academic Revolution</span>
+            </h2>
+            <p style="color: #d0d0d0; font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                Create a student credentials account today to deploy personalized AI agents, analyze code schema architectures in real-time, and get recommended the highest-paying internships and scholarships.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #00d4ff;">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <span style="color: #fff; font-weight: 500; font-size: 0.95rem;"><strong>Deploy AI Agents:</strong> Access customized exam plans and schedules instantly.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(123, 104, 238, 0.1); border: 1px solid rgba(123, 104, 238, 0.3); display: flex; align-items: center; justify-content: center; color: #7b68ee;">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <span style="color: #fff; font-weight: 500; font-size: 0.95rem;"><strong>Secure Database:</strong> Student profiles are safely preserved and cryptographically locked.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(56, 239, 125, 0.1); border: 1px solid rgba(56, 239, 125, 0.3); display: flex; align-items: center; justify-content: center; color: #38ef7d;">
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <span style="color: #fff; font-weight: 500; font-size: 0.95rem;"><strong>Free & Open:</strong> Full access to all state-of-the-art GPT-4 and Gemini study features.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Top Banner (Stops split screen on mobile view) -->
+    <div class="mobile-banner">
+        <h2 style="color: #fff; font-weight: 800; font-size: 1.8rem; margin: 0; text-shadow: 0 0 10px rgba(0,212,255,0.5);">
+            <i class="bi bi-lightning-fill" style="color: #00d4ff;"></i> Campus Cognition
+        </h2>
+        <p style="color: #a0a0a0; font-size: 0.85rem; margin-top: 5px; font-weight: 500; margin-bottom: 0;">
+            Multi-Agent AI Platform for Student Success
+        </p>
+    </div>
+
+    <!-- Right panel centered form -->
+    <div class="form-side">
+        <!-- Glowing Orbs -->
+        <div class="bg-glow-orb orb-cyan"></div>
+        <div class="bg-glow-orb orb-purple"></div>
+
+        <!-- Glassmorphic Signup Form -->
+        <div class="custom-auth-card glass-card">
+            <div class="text-center mb-4">
+                <div style="width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 104, 238, 0.2)); border: 2px solid rgba(0, 212, 255, 0.4); display: inline-flex; align-items: center; justify-content: center; color: #00d4ff; font-size: 1.6rem;" class="mb-3">
                     <i class="bi bi-person-plus-fill"></i>
                 </div>
-                <h1 class="mb-2">Create Account</h1>
-                <p class="text-muted">Join Campus Cognition Today</p>
+                <h3 style="color: #fff; font-weight: 700;" class="mb-1">Create Account</h3>
+                <p style="color: #a0a0a0; font-size: 0.9rem;">Sign up to initialize student agents</p>
             </div>
 
             <form id="signupForm" class="needs-validation" novalidate>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" class="form-control glass-input" id="first_name" 
-                               name="first_name" placeholder="First name" required>
+                
+                <!-- First and Last Name row -->
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="first_name" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">First Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-person-fill" style="color: #00d4ff;"></i>
+                            </span>
+                            <input type="text" class="form-control glass-input" id="first_name" 
+                                   name="first_name" placeholder="First name" required>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control glass-input" id="last_name" 
-                               name="last_name" placeholder="Last name" required>
+                    <div class="col-md-6">
+                        <label for="last_name" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Last Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-person-fill" style="color: #00d4ff;"></i>
+                            </span>
+                            <input type="text" class="form-control glass-input" id="last_name" 
+                                   name="last_name" placeholder="Last name" required>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Username -->
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
+                    <label for="username" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Username</label>
                     <div class="input-group">
-                        <span class="input-group-text glass-input-addon">
-                            <i class="bi bi-person"></i>
+                        <span class="input-group-text">
+                            <i class="bi bi-person" style="color: #00d4ff;"></i>
                         </span>
                         <input type="text" class="form-control glass-input" id="username" 
                                name="username" placeholder="Choose a username" required>
                     </div>
                 </div>
 
+                <!-- Email -->
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Email Address</label>
                     <div class="input-group">
-                        <span class="input-group-text glass-input-addon">
-                            <i class="bi bi-envelope"></i>
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope" style="color: #00d4ff;"></i>
                         </span>
                         <input type="email" class="form-control glass-input" id="email" 
                                name="email" placeholder="your@email.com" required>
                     </div>
                 </div>
 
+                <!-- Password -->
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Password</label>
                     <div class="input-group">
-                        <span class="input-group-text glass-input-addon">
-                            <i class="bi bi-lock"></i>
+                        <span class="input-group-text">
+                            <i class="bi bi-lock" style="color: #00d4ff;"></i>
                         </span>
                         <input type="password" class="form-control glass-input" id="password" 
                                name="password" placeholder="Minimum 6 characters" required>
                     </div>
                 </div>
 
+                <!-- Confirm Password -->
                 <div class="mb-4">
-                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <label for="confirm_password" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Confirm Password</label>
                     <div class="input-group">
-                        <span class="input-group-text glass-input-addon">
-                            <i class="bi bi-lock-check"></i>
+                        <span class="input-group-text">
+                            <i class="bi bi-shield-lock" style="color: #00d4ff;"></i>
                         </span>
                         <input type="password" class="form-control glass-input" id="confirm_password" 
-                               name="confirm_password" placeholder="Confirm password" required>
+                               name="confirm_password" placeholder="Verify password credentials" required>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold gradient-btn mb-3">
-                    <i class="bi bi-person-check"></i> Create Account
+                <!-- Register Button -->
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold gradient-btn mb-3 rounded-3" style="font-size: 1rem; border-radius: 12px !important; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);">
+                    <i class="bi bi-person-check-fill me-2"></i>Register & Initialize
                 </button>
 
+                <!-- Login Redirect Link -->
                 <div class="text-center">
-                    <p class="mb-0">Already have an account? 
-                        <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">Login here</a>
+                    <p style="color: #a0a0a0; font-size: 0.9rem;" class="mb-0">Already have an account? 
+                        <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.2);">Login here</a>
+                    </p>
+                </div>
+
+                <!-- Trouble Shoot Trigger -->
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-link text-decoration-none p-0 fw-bold" 
+                            style="color: #7b68ee; font-size: 0.85rem;" 
+                            onclick="toggleTroubleshoot()">
+                        <i class="bi bi-question-circle me-1"></i>Trouble registering? Contact support
+                    </button>
+                </div>
+
+                <!-- Troubleshooting Drawer -->
+                <div id="troubleshootPanel" class="mt-3 p-3 rounded-3" 
+                     style="display: none; background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(123, 104, 238, 0.05) 100%); border: 2px dashed rgba(123, 104, 238, 0.25);">
+                    <h6 style="color: #00d4ff; font-weight: 600; font-size: 0.9rem;" class="mb-2">
+                        <i class="bi bi-envelope-exclamation me-1"></i>Registration Support
+                    </h6>
+                    <p style="color: #d0d0d0; font-size: 0.8rem; line-height: 1.4; margin-bottom: 0;">
+                        Experiencing problems creating an account? Write to our manual support desk at:
+                        <a href="mailto:divyanshsingh74178@gmail.com" style="color: #00d4ff; font-weight: 700; text-decoration: underline;">divyanshsingh74178@gmail.com</a>
+                        for live onboarding troubleshooting.
                     </p>
                 </div>
             </form>
@@ -90,13 +386,25 @@
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (password !== confirmPassword) {
+        showToast('Password credentials do not match!', 'danger');
+        return;
+    }
+
+    if (password.length < 6) {
+        showToast('Password must be at least 6 characters long!', 'danger');
+        return;
+    }
+    
     const formData = {
         first_name: document.getElementById('first_name').value,
         last_name: document.getElementById('last_name').value,
         username: document.getElementById('username').value,
         email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
-        confirm_password: document.getElementById('confirm_password').value
+        password: password
     };
 
     try {
@@ -122,5 +430,15 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         showToast('Error during signup: ' + error.message, 'danger');
     }
 });
+
+function toggleTroubleshoot() {
+    const panel = document.getElementById('troubleshootPanel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        panel.style.display = 'none';
+    }
+}
 </script>
 {% endblock %}
