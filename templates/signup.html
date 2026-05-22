@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Campus Cognition{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="auth-card glass-card">
+            <div class="auth-header text-center mb-4">
+                <div class="auth-icon-container mb-3">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <h1 class="mb-2">Create Account</h1>
+                <p class="text-muted">Join Campus Cognition Today</p>
+            </div>
+
+            <form id="signupForm" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control glass-input" id="first_name" 
+                               name="first_name" placeholder="First name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control glass-input" id="last_name" 
+                               name="last_name" placeholder="Last name" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text glass-input-addon">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input type="text" class="form-control glass-input" id="username" 
+                               name="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text glass-input-addon">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input type="email" class="form-control glass-input" id="email" 
+                               name="email" placeholder="your@email.com" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text glass-input-addon">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input type="password" class="form-control glass-input" id="password" 
+                               name="password" placeholder="Minimum 6 characters" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text glass-input-addon">
+                            <i class="bi bi-lock-check"></i>
+                        </span>
+                        <input type="password" class="form-control glass-input" id="confirm_password" 
+                               name="confirm_password" placeholder="Confirm password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold gradient-btn mb-3">
+                    <i class="bi bi-person-check"></i> Create Account
+                </button>
+
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? 
+                        <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">Login here</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        first_name: document.getElementById('first_name').value,
+        last_name: document.getElementById('last_name').value,
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        confirm_password: document.getElementById('confirm_password').value
+    };
+
+    try {
+        const response = await fetch('{{ url_for("signup") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Account created successfully! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = '{{ url_for("dashboard") }}';
+            }, 1000);
+        } else {
+            showToast(data.message, 'danger');
+        }
+    } catch (error) {
+        showToast('Error during signup: ' + error.message, 'danger');
+    }
+});
+</script>
+{% endblock %}

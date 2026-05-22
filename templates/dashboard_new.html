@@ -1,0 +1,182 @@
+{% extends "base_new.html" %}
+
+{% block title %}Dashboard - Campus Cognition{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1><i class="bi bi-lightning-charge"></i> Welcome Back, {{ user['first_name'] or user['username'] }}!</h1>
+        <p>Let's accelerate your journey to success with AI-powered insights and opportunities</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">📚 Study Sessions</div>
+                        <div class="stat-value" data-target="{{ recent_sessions|length }}">0</div>
+                    </div>
+                    <i class="bi bi-book-fill" style="font-size: 2rem; color: var(--accent-blue); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">💼 Opportunities</div>
+                        <div class="stat-value" data-target="{{ user_opportunities|length }}">0</div>
+                    </div>
+                    <i class="bi bi-briefcase-fill" style="font-size: 2rem; color: var(--accent-cyan); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">🎓 Scholarships</div>
+                        <div class="stat-value" data-target="0">0</div>
+                    </div>
+                    <i class="bi bi-mortarboard-fill" style="font-size: 2rem; color: var(--accent-green); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">💻 Code Analyses</div>
+                        <div class="stat-value" data-target="0">0</div>
+                    </div>
+                    <i class="bi bi-code-square" style="font-size: 2rem; color: var(--accent-purple); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-8 mb-4">
+            <div class="glass-card">
+                <h4 class="mb-3 text-gradient">📊 Recent Activities</h4>
+                <div>
+                    {% if recent_activities %}
+                        {% for activity in recent_activities[:5] %}
+                        <div class="list-item">
+                            <div>
+                                <div style="color: var(--accent-blue); font-weight: 700;">{{ activity['action'] }}</div>
+                                <div style="color: var(--text-tertiary); font-size: 0.85rem;">{{ activity['description'] }}</div>
+                            </div>
+                            <span class="badge badge-success">{{ activity['created_at'] }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div style="text-align: center; color: var(--text-tertiary); padding: 2rem;">
+                        <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        No activities yet
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-lg-4 mb-4">
+            <div class="glass-card">
+                <h4 class="mb-3 text-gradient">🚀 Quick Actions</h4>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('study') }}" class="btn btn-primary">
+                        <i class="bi bi-upload"></i> Upload Study Material
+                    </a>
+                    <a href="{{ url_for('scholarships') }}" class="btn btn-secondary">
+                        <i class="bi bi-search"></i> Find Scholarships
+                    </a>
+                    <a href="{{ url_for('internships') }}" class="btn btn-secondary">
+                        <i class="bi bi-briefcase"></i> Find Internships
+                    </a>
+                    <a href="{{ url_for('code_assistant') }}" class="btn btn-success">
+                        <i class="bi bi-robot"></i> Analyze Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Opportunities -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="glass-card">
+                <h4 class="mb-3 text-gradient">⭐ Top Matched Opportunities</h4>
+                <div class="row">
+                    {% if user_opportunities %}
+                        {% for opp in user_opportunities[:3] %}
+                        <div class="col-md-4 mb-3">
+                            <div style="border-left: 4px solid var(--accent-blue); padding: 1.5rem; background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
+                                <h6 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">{{ opp['opportunity']['title'] }}</h6>
+                                <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-bottom: 1rem;">{{ opp['opportunity']['company'] }}</p>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar" style="width: {{ opp['match_percentage'] }}%"></div>
+                                </div>
+                                <p style="font-size: 0.8rem; color: var(--accent-green);">Match: {{ opp['match_percentage'] }}%</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Completion -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="glass-card">
+                <h4 class="mb-3 text-gradient">📝 Profile Status</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Branch: <span class="badge badge-success" style="margin-left: 0.5rem;">{{ user['branch'] or 'Not Set' }}</span></p>
+                        <p>CGPA: <span class="badge badge-warning" style="margin-left: 0.5rem;">{{ user['cgpa'] or 'Not Set' }}</span></p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline">
+                            <i class="bi bi-pencil"></i> Complete Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Animate counters
+    const counterElements = document.querySelectorAll('[data-target]');
+    counterElements.forEach(el => {
+        const target = parseInt(el.getAttribute('data-target'));
+        const increment = target / 30;
+        let current = 0;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                el.textContent = target;
+                clearInterval(timer);
+            } else {
+                el.textContent = Math.floor(current);
+            }
+        }, 30);
+    });
+
+    // Fade in animation
+    window.addEventListener('load', () => {
+        document.querySelector('.fade-in').classList.add('fade-in');
+    });
+</script>
+{% endblock %}

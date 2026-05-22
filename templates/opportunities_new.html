@@ -1,0 +1,221 @@
+{% extends "base_new.html" %}
+
+{% block title %}Opportunities - Campus Cognition{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1><i class="bi bi-star-fill"></i> AI-Recommended Opportunities</h1>
+        <p>Unified view of scholarships, internships, and exclusive opportunities tailored for you</p>
+    </div>
+
+    <!-- Filters and Sort -->
+    <div class="glass-card mb-4">
+        <h4 class="mb-3">🔍 Smart Filtering</h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Type</label>
+                <select class="form-select" id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="scholarship">Scholarships</option>
+                    <option value="internship">Internships</option>
+                    <option value="event">Events</option>
+                    <option value="hackathon">Hackathons</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sort By</label>
+                <select class="form-select" id="sortFilter">
+                    <option value="match">Match Score (Highest)</option>
+                    <option value="deadline">Deadline (Nearest)</option>
+                    <option value="recent">Recently Added</option>
+                    <option value="popular">Most Popular</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Min Match</label>
+                <input type="range" class="form-range" id="matchFilter" min="0" max="100" value="0">
+                <small style="color: var(--text-tertiary);">Threshold: <span id="matchValue">0</span>%</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opportunities Grid -->
+    <div class="row" id="opportunitiesContainer">
+        {% if opportunities %}
+            {% for opp in opportunities %}
+            <div class="col-lg-6 col-xl-4 mb-4 opportunity-card" data-type="scholarship" data-match="{{ opp['match_percentage'] }}">
+                <div class="glass-card h-100 position-relative">
+                    <!-- Priority Badge -->
+                    <div style="position: absolute; top: 1rem; right: 1rem;">
+                        {% if opp['match_percentage'] >= 90 %}
+                        <span class="badge" style="background: linear-gradient(135deg, #10B981, #34D399); border: 2px solid var(--accent-green); color: white;">
+                            🔥 Perfect Match
+                        </span>
+                        {% elif opp['match_percentage'] >= 75 %}
+                        <span class="badge" style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); border: 2px solid var(--accent-cyan); color: white;">
+                            ⭐ Great Match
+                        </span>
+                        {% elif opp['match_percentage'] >= 50 %}
+                        <span class="badge badge-warning">⚡ Good Match</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Header -->
+                    <h5 style="color: var(--accent-cyan); margin-bottom: 0.5rem; padding-right: 8rem;">{{ opp['opportunity']['title'] }}</h5>
+                    <p style="color: var(--accent-blue); font-weight: 700; margin-bottom: 1rem;">
+                        <i class="bi bi-building"></i> {{ opp['opportunity']['company'] }}
+                    </p>
+
+                    <!-- Type Badge -->
+                    {% if opp['opportunity']['type'] == 'Scholarship' %}
+                    <span class="badge badge-success" style="margin-bottom: 1rem;">🎓 Scholarship</span>
+                    {% elif opp['opportunity']['type'] == 'Internship' %}
+                    <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border: 2px solid var(--accent-blue); color: var(--accent-blue); margin-bottom: 1rem;">💼 Internship</span>
+                    {% endif %}
+
+                    <!-- Key Details -->
+                    <div style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
+                            <div>
+                                <span style="color: var(--text-tertiary);">Deadline</span>
+                                <div style="color: var(--neon-pink); font-weight: 700; margin-top: 0.25rem;">{{ opp['opportunity']['deadline'] }}</div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-tertiary);">Min CGPA</span>
+                                <div style="color: var(--accent-cyan); font-weight: 700; margin-top: 0.25rem;">{{ opp['opportunity']['min_cgpa'] }}+</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Percentage -->
+                    <div class="mb-3">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">AI Match Score</span>
+                            <span class="badge badge-success" style="font-size: 0.9rem;">{{ opp['match_percentage'] }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: {{ opp['match_percentage'] }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        {{ opp['opportunity']['description'][:100] }}...
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        <a href="{{ opp['opportunity']['link'] }}" target="_blank" class="btn btn-primary">
+                            <i class="bi bi-arrow-up-right"></i> Apply Now
+                        </a>
+                        <button class="btn btn-outline" onclick="saveOpportunity(this, {{ opp['opportunity']['id'] }})">
+                            <i class="bi bi-bookmark"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="glass-card text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
+                <h4 style="color: var(--text-secondary);">No Opportunities Found</h4>
+                <p style="color: var(--text-tertiary);">Complete your profile to see personalized opportunities</p>
+                <a href="{{ url_for('profile') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-pencil"></i> Complete Profile
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Empty State CTA -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="glass-card" style="text-align: center; padding: 2.5rem;">
+                <h5 class="mb-2">📊 Want better recommendations?</h5>
+                <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Complete your profile and upload study materials for AI-powered opportunity matching</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{{ url_for('profile') }}" class="btn btn-primary">
+                        <i class="bi bi-person-fill"></i> Update Profile
+                    </a>
+                    <a href="{{ url_for('study') }}" class="btn btn-secondary">
+                        <i class="bi bi-book-fill"></i> Upload Materials
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Filter functionality
+    const typeFilter = document.getElementById('typeFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const matchFilter = document.getElementById('matchFilter');
+    const matchValue = document.getElementById('matchValue');
+    const cards = document.querySelectorAll('.opportunity-card');
+
+    // Update match threshold display
+    matchFilter.addEventListener('input', (e) => {
+        matchValue.textContent = e.target.value;
+        filterCards();
+    });
+
+    function filterCards() {
+        const type = typeFilter.value;
+        const minMatch = parseInt(matchFilter.value);
+
+        let visibleCards = [];
+
+        cards.forEach(card => {
+            let visible = true;
+            const cardMatch = parseInt(card.getAttribute('data-match')) || 0;
+            const cardType = card.getAttribute('data-type');
+
+            if (type && cardType !== type) {
+                visible = false;
+            }
+
+            if (cardMatch < minMatch) {
+                visible = false;
+            }
+
+            card.style.display = visible ? '' : 'none';
+            if (visible) visibleCards.push({ card, match: cardMatch });
+        });
+
+        // Sort
+        const sortBy = sortFilter.value;
+        if (sortBy === 'match') {
+            visibleCards.sort((a, b) => b.match - a.match);
+        }
+
+        // Reorder DOM
+        visibleCards.forEach((item, index) => {
+            item.card.style.order = index;
+        });
+    }
+
+    typeFilter.addEventListener('change', filterCards);
+    sortFilter.addEventListener('change', filterCards);
+
+    // Save opportunity
+    function saveOpportunity(btn, id) {
+        btn.innerHTML = '<i class="bi bi-bookmark-fill"></i> Saved!';
+        btn.disabled = true;
+        showToast('Opportunity saved to your list!', 'success');
+    }
+
+    // Animate cards on load
+    window.addEventListener('load', () => {
+        cards.forEach((card, index) => {
+            if (card.style.display !== 'none') {
+                card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
+            }
+        });
+    });
+</script>
+{% endblock %}

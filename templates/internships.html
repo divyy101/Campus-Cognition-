@@ -1,0 +1,182 @@
+{% extends "base_new.html" %}
+
+{% block title %}Internships - Campus Cognition{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1><i class="bi bi-briefcase-fill"></i> Internship Opportunities</h1>
+        <p>Launch your career with amazing internship programs from top companies</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="glass-card mb-4">
+        <h4 class="mb-3">🔍 Filter Internships</h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search Company/Role</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Type</label>
+                <select class="form-select" id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="summer">Summer Internship</option>
+                    <option value="winter">Winter Internship</option>
+                    <option value="permanent">Permanent Role</option>
+                    <option value="remote">Remote</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Skill Required</label>
+                <input type="text" class="form-control" id="skillFilter" placeholder="e.g., Python, React">
+            </div>
+        </div>
+    </div>
+
+    <!-- Internships Grid -->
+    <div class="row" id="internshipsContainer">
+        {% if internships %}
+            {% for internship in internships %}
+            <div class="col-lg-6 col-xl-4 mb-4 internship-card" data-type="{{ internship.get('type', 'summer') }}">
+                <div class="glass-card h-100">
+                    <!-- Header with Company -->
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h5 style="color: var(--accent-cyan); margin-bottom: 0.25rem;">{{ internship['title'] }}</h5>
+                            <p style="color: var(--accent-blue); font-weight: 700; font-size: 0.95rem;">{{ internship.get('company', 'Company') }}</p>
+                        </div>
+                        <i class="bi bi-heart" style="cursor: pointer; color: var(--text-tertiary); font-size: 1.5rem;"></i>
+                    </div>
+
+                    <!-- Quick Info -->
+                    <div class="mb-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
+                        <div>
+                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Duration</span>
+                            <span style="color: var(--accent-blue); font-weight: 700;">{{ internship.get('duration', '3 months') }}</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Location</span>
+                            <span style="color: var(--accent-green); font-weight: 700;">{{ internship.get('location', 'Remote') }}</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Stipend</span>
+                            <span style="color: var(--neon-pink); font-weight: 700;">₹{{ internship.get('stipend', '0') }}/month</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Deadline</span>
+                            <span style="color: #FBBF24; font-weight: 700;">{{ internship.get('deadline', 'N/A') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Skills Required -->
+                    <div class="mb-3">
+                        <span style="color: var(--text-tertiary); font-size: 0.85rem;">Required Skills</span>
+                        <div style="margin-top: 0.5rem;">
+                            {% for skill in internship.get('required_skills', '').split(',')[:3] %}
+                            <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border: 2px solid var(--accent-blue); color: var(--accent-blue); margin-right: 0.5rem; margin-bottom: 0.5rem;">
+                                {{ skill.strip() }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Match Score -->
+                    <div class="mb-3">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Your Match</span>
+                            <span class="badge badge-success">{{ internship.get('match_percentage', 0) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: {{ internship.get('match_percentage', 0) }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        {{ internship.get('description', 'Great opportunity to learn and grow')[:80] }}...
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        <a href="{{ internship.get('link', '#') }}" target="_blank" class="btn btn-primary">
+                            <i class="bi bi-send-fill"></i> Apply Now
+                        </a>
+                        <button class="btn btn-outline" onclick="toggleSave(this)">
+                            <i class="bi bi-heart"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="glass-card text-center py-5">
+                <i class="bi bi-briefcase" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
+                <h4 style="color: var(--text-secondary);">No Internships Found</h4>
+                <p style="color: var(--text-tertiary);">Try adjusting your filters or check back later</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Filter functionality
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const skillFilter = document.getElementById('skillFilter');
+    const cards = document.querySelectorAll('.internship-card');
+
+    function filterCards() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const type = typeFilter.value;
+        const skill = skillFilter.value.toLowerCase();
+
+        cards.forEach(card => {
+            let visible = true;
+            const cardText = card.textContent.toLowerCase();
+            
+            if (type && card.getAttribute('data-type') !== type) {
+                visible = false;
+            }
+            
+            if (searchTerm && !cardText.includes(searchTerm)) {
+                visible = false;
+            }
+
+            if (skill && !cardText.includes(skill)) {
+                visible = false;
+            }
+
+            card.style.display = visible ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterCards);
+    typeFilter.addEventListener('change', filterCards);
+    skillFilter.addEventListener('input', filterCards);
+
+    // Save functionality
+    function toggleSave(btn) {
+        const isSaved = btn.classList.contains('saved');
+        if (isSaved) {
+            btn.classList.remove('saved');
+            btn.innerHTML = '<i class="bi bi-heart"></i> Save';
+            showToast('Removed from saved', 'info');
+        } else {
+            btn.classList.add('saved');
+            btn.innerHTML = '<i class="bi bi-heart-fill" style="color: var(--neon-pink);"></i> Saved!';
+            showToast('Internship saved!', 'success');
+        }
+    }
+
+    // Animate cards on load
+    window.addEventListener('load', () => {
+        cards.forEach((card, index) => {
+            card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
+        });
+    });
+</script>
+{% endblock %}

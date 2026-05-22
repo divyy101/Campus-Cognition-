@@ -1,0 +1,173 @@
+{% extends "base_new.html" %}
+
+{% block title %}Study Agent - Campus Cognition{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1><i class="bi bi-book-fill"></i> Study Agent</h1>
+        <p>Upload your study materials and let AI analyze them for you</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="glass-card">
+                <h4 class="mb-3 text-gradient">📤 Upload Study Materials</h4>
+                <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                    <!-- Session Title -->
+                    <div class="mb-3">
+                        <label class="form-label">Session Title</label>
+                        <input type="text" class="form-control" name="session_title" 
+                               placeholder="e.g., Python Basics Study Session" required>
+                    </div>
+
+                    <!-- File Uploads -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📚 Syllabus (PDF)</label>
+                            <div class="upload-area">
+                                <i class="bi bi-file-pdf upload-icon"></i>
+                                <p style="margin-bottom: 0; color: var(--text-secondary);">Drag & drop or click</p>
+                                <input type="file" name="syllabus" class="form-control" accept=".pdf" 
+                                       style="display: none;" onchange="updateFileName(this)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📋 Previous Year Questions (PDF)</label>
+                            <div class="upload-area">
+                                <i class="bi bi-file-pdf upload-icon"></i>
+                                <p style="margin-bottom: 0; color: var(--text-secondary);">Drag & drop or click</p>
+                                <input type="file" name="pqp" class="form-control" accept=".pdf"
+                                       style="display: none;" onchange="updateFileName(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-lightning-charge"></i> Analyze with AI
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <h4 class="mb-3 text-gradient">📚 Your Study Sessions</h4>
+                
+                {% if sessions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-book"></i> Title</th>
+                                <th>Created</th>
+                                <th>Topics</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td>
+                                    <span style="color: var(--accent-cyan); font-weight: 700;">{{ session['title'] }}</span>
+                                </td>
+                                <td>
+                                    <span style="color: var(--text-tertiary);">{{ session['created_at'] }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border: 2px solid var(--accent-blue); color: var(--accent-blue);">
+                                        {{ (session['important_topics']|length or 0) if session['important_topics'] else 0 }} topics
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline" onclick="viewSession({{ session['id'] }})">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 3rem; color: var(--text-tertiary);">
+                    <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                    <p>No study sessions yet. Start by uploading your first material!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag and drop handling
+    document.querySelectorAll('.upload-area').forEach(area => {
+        area.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            area.classList.add('dragover');
+        });
+
+        area.addEventListener('dragleave', () => {
+            area.classList.remove('dragover');
+        });
+
+        area.addEventListener('drop', (e) => {
+            e.preventDefault();
+            area.classList.remove('dragover');
+            const input = area.querySelector('input[type="file"]');
+            input.files = e.dataTransfer.files;
+        });
+
+        area.addEventListener('click', () => {
+            area.querySelector('input[type="file"]').click();
+        });
+    });
+
+    // Update file name display
+    function updateFileName(input) {
+        if (input.files && input.files[0]) {
+            const fileName = input.files[0].name;
+            input.parentElement.querySelector('p').textContent = `📄 ${fileName}`;
+        }
+    }
+
+    // Form submission
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch('{{ url_for("study") }}', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                showToast('Study session created successfully!', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast(data.message || 'Failed to create session', 'error');
+            }
+        } catch (error) {
+            showToast('An error occurred', 'error');
+        }
+    });
+
+    // View session details
+    function viewSession(sessionId) {
+        showToast(`Viewing session ${sessionId}`, 'info');
+        // Implementation for viewing session details
+    }
+</script>
+{% endblock %}

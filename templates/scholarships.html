@@ -1,0 +1,165 @@
+{% extends "base_new.html" %}
+
+{% block title %}Scholarships - Campus Cognition{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1><i class="bi bi-mortarboard-fill"></i> Scholarships & Grants</h1>
+        <p>Discover and apply for exclusive scholarships tailored to your profile</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="glass-card mb-4">
+        <h4 class="mb-3">🔍 Filter Scholarships</h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by name or company...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="merit">Merit-Based</option>
+                    <option value="need">Need-Based</option>
+                    <option value="special">Special Programs</option>
+                    <option value="women">Women's Scholarship</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Min Award</label>
+                <input type="number" class="form-control" id="minAwardFilter" placeholder="Minimum amount">
+            </div>
+        </div>
+    </div>
+
+    <!-- Scholarships Grid -->
+    <div class="row" id="scholarshipsContainer">
+        {% if scholarships %}
+            {% for scholarship in scholarships %}
+            <div class="col-lg-6 col-xl-4 mb-4 scholarship-card" data-category="{{ scholarship.get('category', 'merit') }}">
+                <div class="glass-card h-100">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 style="color: var(--accent-cyan);">{{ scholarship['title'] }}</h5>
+                        <i class="bi bi-bookmark-fill" style="cursor: pointer; color: var(--accent-blue); font-size: 1.5rem;"></i>
+                    </div>
+
+                    <!-- Organization -->
+                    <p style="color: var(--text-tertiary); margin-bottom: 1rem;">
+                        <i class="bi bi-building"></i> {{ scholarship.get('organization', 'Organization') }}
+                    </p>
+
+                    <!-- Details -->
+                    <div class="mb-3">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Award Amount</span>
+                            <span style="color: var(--accent-green); font-weight: 700;">₹{{ scholarship.get('award_amount', '0') }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Eligibility</span>
+                            <span style="color: var(--accent-blue); font-weight: 600;">CGPA: {{ scholarship.get('min_cgpa', '0') }}+</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Deadline</span>
+                            <span style="color: var(--neon-pink); font-weight: 600;">{{ scholarship.get('deadline', 'N/A') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Match Badge -->
+                    <div class="mb-3">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Your Match</span>
+                            <span class="badge badge-success">{{ scholarship.get('match_percentage', 0) }}%</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 6px;">
+                            <div class="progress-bar" style="width: {{ scholarship.get('match_percentage', 0) }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border-color: var(--accent-blue); color: var(--accent-blue); margin-right: 0.5rem;">
+                            {{ scholarship.get('category', 'Merit') }}
+                        </span>
+                        {% if scholarship.get('international') %}
+                        <span class="badge badge-warning" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.15)); border-color: #F59E0B; color: #FBBF24;">
+                            International
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        {{ scholarship.get('description', 'Exceptional scholarship opportunity for deserving students')[:100] }}...
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        <a href="{{ scholarship.get('link', '#') }}" target="_blank" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-up-right"></i> Apply Now
+                        </a>
+                        <button class="btn btn-outline" onclick="saveScholarship(this, {{ scholarship.get('id', 0) }})">
+                            <i class="bi bi-bookmark"></i> Save for Later
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="glass-card text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
+                <h4 style="color: var(--text-secondary);">No Scholarships Found</h4>
+                <p style="color: var(--text-tertiary);">Check back soon or adjust your filters</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Filter functionality
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const cards = document.querySelectorAll('.scholarship-card');
+
+    function filterCards() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const category = categoryFilter.value;
+
+        cards.forEach(card => {
+            let visible = true;
+            
+            if (category && card.getAttribute('data-category') !== category) {
+                visible = false;
+            }
+            
+            if (searchTerm && !card.textContent.toLowerCase().includes(searchTerm)) {
+                visible = false;
+            }
+
+            card.style.display = visible ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterCards);
+    categoryFilter.addEventListener('change', filterCards);
+
+    // Save scholarship
+    function saveScholarship(btn, id) {
+        btn.innerHTML = '<i class="bi bi-check2"></i> Saved!';
+        btn.disabled = true;
+        showToast('Scholarship saved to your list', 'success');
+    }
+
+    // Animate on load
+    window.addEventListener('load', () => {
+        cards.forEach((card, index) => {
+            card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
+        });
+    });
+</script>
+{% endblock %}
