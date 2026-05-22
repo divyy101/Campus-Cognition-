@@ -40,15 +40,13 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'campus-cognition-secret-key-
 
 # Vercel Serverless configurations
 if os.environ.get('VERCEL'):
-    app.config['SESSION_TYPE'] = 'null'  # Use client-side signed cookie sessions to be stateless on Vercel
     app.config['UPLOAD_FOLDER'] = '/tmp'  # Use writeable /tmp folder
 else:
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['UPLOAD_FOLDER'] = 'static/uploads'
+    Session(app)
 
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
-
-Session(app)
 
 # Initialize database
 with app.app_context():

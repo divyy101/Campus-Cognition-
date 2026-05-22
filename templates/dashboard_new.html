@@ -120,8 +120,8 @@
                         {% for opp in user_opportunities[:3] %}
                         <div class="col-md-4 mb-3">
                             <div style="border-left: 4px solid var(--accent-blue); padding: 1.5rem; background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
-                                <h6 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">{{ opp['opportunity']['title'] }}</h6>
-                                <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-bottom: 1rem;">{{ opp['opportunity']['company'] }}</p>
+                                <h6 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">{{ opp['title'] }}</h6>
+                                <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-bottom: 1rem;">{{ opp['company'] }}</p>
                                 <div class="progress mb-2">
                                     <div class="progress-bar" style="width: {{ opp['match_percentage'] }}%"></div>
                                 </div>
