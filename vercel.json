@@ -19,10 +19,5 @@
       "src": "/(.*)",
       "dest": "/app.py"
     }
-  ],
-  "env": {
-    "FLASK_ENV": "production",
-    "SECRET_KEY": "@RANDOM_SECRET",
-    "GEMINI_API_KEY": "@GEMINI_API_KEY"
-  }
+  ]
 }
