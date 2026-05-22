@@ -91,7 +91,7 @@
     }
 
     /* Cyber Custom Form Inputs */
-    .glass-input, .form-select.glass-input {
+    .glass-input {
         background: rgba(15, 8, 38, 0.6) !important;
         border: 1px solid rgba(157, 78, 221, 0.35) !important;
         color: #fff !important;
@@ -100,7 +100,7 @@
         transition: all 0.3s ease;
     }
 
-    .glass-input:focus, .form-select.glass-input:focus {
+    .glass-input:focus {
         background: rgba(15, 8, 38, 0.85) !important;
         border-color: var(--cyber-blue) !important;
         box-shadow: 0 0 15px var(--cyber-blue-glow) !important;
@@ -140,7 +140,7 @@
     .upload-area i {
         font-size: 2.5rem;
         color: var(--cyber-purple);
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
         transition: all 0.3s ease;
     }
 
@@ -230,14 +230,14 @@
                 <div class="cyber-banner-overlay">
                     <span class="cyber-tag"><i class="bi bi-cpu"></i> Cognitive Academic Portal // active</span>
                     <h1 class="cyber-title mb-1"><i class="bi bi-book"></i> Study Agent</h1>
-                    <p class="text-white-50 mb-0">Improvise your target subjects, syllabus structures, and daily slots using our multi-agent AI engine.</p>
+                    <p class="text-white-50 mb-0">Improvise your target subjects, syllabus structures, and study timestamps using our multi-agent AI engine.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- Technical Configuration Form Section -->
+        <!-- Simplified PDF & PYQ Upload Form -->
         <div class="col-lg-6 mb-4">
             <div class="glass-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -246,78 +246,43 @@
                 </div>
                 
                 <form id="studyForm" enctype="multipart/form-data" class="needs-validation" novalidate>
-                    <!-- Title -->
-                    <div class="mb-3">
-                        <label for="session_title" class="form-label">Session Name</label>
+                    <!-- Subject Name -->
+                    <div class="mb-4">
+                        <label for="session_title" class="form-label"><i class="bi bi-tag text-info me-1"></i> Subject Name</label>
                         <input type="text" class="form-control glass-input" id="session_title" 
-                               name="session_title" placeholder="e.g., Algorithms exam revision" required>
+                               name="session_title" placeholder="e.g., Algorithms & Data Structures" required>
                     </div>
 
-                    <!-- Comma-Separated Focus Topics -->
-                    <div class="mb-3">
-                        <label for="topic_names" class="form-label">Focused Topics (Optional)</label>
-                        <input type="text" class="form-control glass-input" id="topic_names" name="topic_names"
-                               placeholder="e.g., Recursion, Linked Lists, DFS, Hash Tables">
-                        <small class="text-muted" style="font-size: 0.75rem;">Comma separated keywords you want to prioritize in your plan</small>
-                    </div>
-
-                    <div class="row">
-                        <!-- Unit Breakdown level -->
-                        <div class="col-md-6 mb-3">
-                            <label for="unit_analysis" class="form-label">Target Syllabus Unit</label>
-                            <input type="text" class="form-control glass-input" id="unit_analysis" name="unit_analysis"
-                                   placeholder="e.g., Unit 3: Graphs, or All Units">
-                        </div>
-
-                        <!-- Preferred study daily hours / Time slot -->
-                        <div class="col-md-6 mb-3">
-                            <label for="time_slot" class="form-label">Daily Time Slot Commitment</label>
-                            <select class="form-select glass-input" id="time_slot" name="time_slot">
-                                <option value="1-2 Hours/Day (Light Revision)">1-2 Hours/Day (Light)</option>
-                                <option value="3-4 Hours/Day (Medium Exam Prep)" selected>3-4 Hours/Day (Medium)</option>
-                                <option value="5+ Hours/Day (Intense Bootcamp)">5+ Hours/Day (Intense)</option>
-                            </select>
+                    <!-- Syllabus PDF -->
+                    <div class="mb-4">
+                        <label for="syllabus" class="form-label"><i class="bi bi-file-earmark-text text-info me-1"></i> Syllabus PDF (Optional)</label>
+                        <div class="upload-area" id="syllabusDropZone">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            <p class="small text-muted mb-0">Drop syllabus PDF here or click to load</p>
+                            <input type="file" class="form-control" id="syllabus" name="syllabus" 
+                                   accept=".pdf" style="display: none;">
                         </div>
                     </div>
 
-                    <!-- Custom Important questions/formulas to cover -->
-                    <div class="mb-3">
-                        <label for="important_topics_custom" class="form-label">Critical Concepts / Questions</label>
-                        <textarea class="form-control glass-input" id="important_topics_custom" name="important_topics_custom" rows="2"
-                                  placeholder="e.g. Master theorem proofs, Dijkstra's code syntax, Red-black trees rotation rules"></textarea>
-                    </div>
-
-                    <!-- PDF Uploaders -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="syllabus" class="form-label">Syllabus PDF (Optional)</label>
-                            <div class="upload-area" id="syllabusDropZone">
-                                <i class="bi bi-file-earmark-pdf"></i>
-                                <p class="small text-muted mb-0">Drop or click to load syllabus</p>
-                                <input type="file" class="form-control" id="syllabus" name="syllabus" 
-                                       accept=".pdf" style="display: none;">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="pqp" class="form-label">PYQ Paper PDF (Optional)</label>
-                            <div class="upload-area" id="pqpDropZone">
-                                <i class="bi bi-file-earmark-pdf"></i>
-                                <p class="small text-muted mb-0">Drop or click to load PYQs</p>
-                                <input type="file" class="form-control" id="pqp" name="pqp" 
-                                       accept=".pdf" style="display: none;">
-                            </div>
+                    <!-- PYQ PDF -->
+                    <div class="mb-4">
+                        <label for="pqp" class="form-label"><i class="bi bi-file-earmark-check text-info me-1"></i> Previous Year Questions (Required)</label>
+                        <div class="upload-area" id="pqpDropZone">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            <p class="small text-muted mb-0">Drop PYQ PDF here or click to load</p>
+                            <input type="file" class="form-control" id="pqp" name="pqp" 
+                                   accept=".pdf" required style="display: none;">
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 cyber-btn mt-3">
-                        <i class="bi bi-arrow-repeat"></i> Start AI Engineering
+                    <button type="submit" class="btn btn-primary w-100 cyber-btn mt-2">
+                        <i class="bi bi-arrow-repeat"></i> Analyze Materials & Suggest Questions
                     </button>
                 </form>
 
                 <div id="uploadProgress" style="display: none;" class="mt-4 align-items-center justify-content-center p-3 glass-card text-center border-0" style="background: rgba(22, 10, 42, 0.6) !important;">
                     <div class="spinner-border text-info spinner-border-sm" role="status"></div>
-                    <span class="ms-2 font-monospace" style="color: var(--cyber-blue); font-size: 0.9rem;">[PROCESSING: COMMENCING CONCEPT SYNTHESIS...]</span>
+                    <span class="ms-2 font-monospace" style="color: var(--cyber-blue); font-size: 0.9rem;">[PROCESSING: COMMENCING QUESTION SYNTHESIS...]</span>
                 </div>
             </div>
         </div>
@@ -333,7 +298,7 @@
                 <div id="resultsContainer" class="flex-grow-1 d-flex flex-column justify-content-center">
                     <div class="text-center text-muted py-5">
                         <i class="bi bi-cpu" style="font-size: 3rem; color: var(--cyber-purple); opacity: 0.5;"></i>
-                        <p class="mt-3 font-monospace">Engine ready for processing parameters.<br>Configure targets on the left side to compile.</p>
+                        <p class="mt-3 font-monospace">Engine ready for processing parameters.<br>Provide Subject Name & upload PYQs to compile.</p>
                     </div>
                 </div>
             </div>
@@ -439,13 +404,10 @@ document.getElementById('studyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const topicFocus = document.getElementById('topic_names').value.trim();
-    const syllabusInput = document.getElementById('syllabus');
     const pqpInput = document.getElementById('pqp');
 
-    // Make file uploads optional if topicFocus or session_title is active!
-    if (!syllabusInput.files[0] && !pqpInput.files[0] && !topicFocus) {
-        showToast('Please upload a syllabus/PYQ PDF or type Focus Topics to proceed.', 'warning');
+    if (!pqpInput.files[0]) {
+        showToast('Please upload a PYQ PDF to compile your exam questions.', 'warning');
         return;
     }
 
@@ -466,7 +428,7 @@ document.getElementById('studyForm').addEventListener('submit', async (e) => {
             showAnalysisResults(data.analysis);
             document.getElementById('engineStatus').className = 'badge cyber-badge-blue font-monospace';
             document.getElementById('engineStatus').innerText = '[ENGINE: COMPILED]';
-            showToast('Personalized plan successfully engineered!', 'success');
+            showToast('Personalized questions and timestamps successfully compiled!', 'success');
         } else {
             document.getElementById('engineStatus').className = 'badge bg-danger font-monospace';
             document.getElementById('engineStatus').innerText = '[ENGINE: FAILED]';
@@ -487,34 +449,15 @@ function showAnalysisResults(analysis) {
     let html = `
         <div class="p-1 animate-fade-in text-start">
             <div class="mb-4">
-                <h6 class="font-monospace text-primary mb-2"><i class="bi bi-tag-fill"></i> Prioritized Topics Badges</h6>
-                <div class="d-flex flex-wrap gap-2">
+                <h6 class="font-monospace text-primary mb-2"><i class="bi bi-patch-check-fill"></i> Suggested Important Exam Questions</h6>
+                <div class="d-flex flex-column gap-2">
     `;
     
     analysis.important_topics.forEach((topic, idx) => {
-        const badgeClass = idx < 3 ? 'cyber-badge-pink' : idx < 7 ? 'cyber-badge-blue' : 'cyber-badge-purple';
-        html += `<span class="badge ${badgeClass} font-monospace py-2 px-3">${topic}</span>`;
-    });
-    
-    html += `
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <h6 class="font-monospace text-info mb-3"><i class="bi bi-bar-chart-fill"></i> Core Concept Priority Analysis</h6>
-                <div class="priority-list">
-    `;
-    
-    analysis.priority_list.slice(0, 5).forEach(item => {
         html += `
-            <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-0 glass-card" style="background: rgba(14, 4, 30, 0.4) !important;">
-                <span class="font-monospace text-white-50"><i class="bi bi-chevron-right text-info"></i> ${item.topic}</span>
-                <div class="d-flex align-items-center gap-3" style="width: 40%;">
-                    <div class="progress w-100" style="height: 6px; background: rgba(157, 78, 221, 0.15);">
-                        <div class="progress-bar bg-info" style="width: ${item.priority_score}%"></div>
-                    </div>
-                    <span class="badge cyber-badge-blue font-monospace">${item.priority_score}%</span>
-                </div>
+            <div class="p-2 border-0 glass-card d-flex gap-3 align-items-center" style="background: rgba(14, 4, 30, 0.4) !important;">
+                <span class="badge cyber-badge-pink font-monospace">Q${idx + 1}</span>
+                <span class="text-white-50 font-monospace" style="font-size: 0.9rem;">${topic}</span>
             </div>
         `;
     });
@@ -524,7 +467,7 @@ function showAnalysisResults(analysis) {
             </div>
 
             <div class="mb-4">
-                <h6 class="font-monospace text-primary mb-3"><i class="bi bi-calendar-range"></i> Dynamic Weekly Study Slot Grid</h6>
+                <h6 class="font-monospace text-info mb-3"><i class="bi bi-alarm-fill"></i> Allocated Study Timestamps</h6>
                 <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
     `;
     
@@ -532,10 +475,10 @@ function showAnalysisResults(analysis) {
         html += `
             <div class="mb-2 p-2 glass-card border-0" style="background: rgba(14, 4, 30, 0.4) !important;">
                 <div class="d-flex justify-content-between align-items-center">
-                    <strong class="text-white font-monospace"><i class="bi bi-check-square text-primary me-2"></i>${day.day}</strong>
-                    <span class="badge cyber-badge-purple font-monospace">${day.duration_hours} Hours Allocated</span>
+                    <strong class="text-white font-monospace"><i class="bi bi-clock-history text-info me-2"></i>${day.day}</strong>
+                    <span class="badge cyber-badge-blue font-monospace">${day.duration_hours}h Session</span>
                 </div>
-                <div class="small text-muted font-monospace mt-1 ms-4"><i class="bi bi-arrow-right text-muted me-1"></i>${day.topics.join(' // ')}</div>
+                <div class="small text-muted font-monospace mt-1 ms-4"><i class="bi bi-caret-right text-muted me-1"></i>Target: ${day.topics.join(' // ')}</div>
             </div>
         `;
     });
@@ -546,7 +489,7 @@ function showAnalysisResults(analysis) {
             
             <div class="text-center mt-3">
                 <button type="button" class="btn btn-sm cyber-btn font-monospace px-4 w-100" onclick="launchDetailedPlanView()">
-                    <i class="bi bi-eye"></i> Launch Interactive AI Detailed Plan
+                    <i class="bi bi-eye"></i> Launch Detailed AI Syllabus Report
                 </button>
             </div>
         </div>
@@ -563,7 +506,7 @@ function launchDetailedPlanView() {
         const modalContent = document.getElementById('modalContent');
         let html = `
             <div class="p-3">
-                <h4 class="mb-3 text-info font-monospace"><i class="bi bi-chat-left-text"></i> Interactive Academic Plan</h4>
+                <h4 class="mb-3 text-info font-monospace"><i class="bi bi-chat-left-text"></i> Interactive Academic Report</h4>
                 <div class="p-4 glass-card text-white-50" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.7; max-height: 480px; overflow-y: auto; background: rgba(10, 4, 25, 0.85) !important;">
                     ${formatMarkdown(window.lastCompiledPlan)}
                 </div>
@@ -573,7 +516,7 @@ function launchDetailedPlanView() {
         const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
         modal.show();
     } else {
-        showToast('No active detailed plan generated.', 'warning');
+        showToast('No active detailed report generated.', 'warning');
     }
 }
 
@@ -600,12 +543,16 @@ async function viewSession(sessionId) {
             if (session.important_topics && session.important_topics.length > 0) {
                 html += `
                     <div class="mb-4">
-                        <h6 class="font-monospace text-primary mb-2"><i class="bi bi-tag-fill"></i> Core Topics focus</h6>
-                        <div class="d-flex flex-wrap gap-2">
+                        <h6 class="font-monospace text-primary mb-2"><i class="bi bi-patch-check-fill"></i> Suggested Important Exam Questions</h6>
+                        <div class="d-flex flex-column gap-2">
                 `;
                 session.important_topics.forEach((topic, idx) => {
-                    const badgeClass = idx < 3 ? 'cyber-badge-pink' : idx < 7 ? 'cyber-badge-blue' : 'cyber-badge-purple';
-                    html += `<span class="badge ${badgeClass} font-monospace">${sanitizeHTML(topic)}</span>`;
+                    html += `
+                        <div class="p-2 border-0 glass-card d-flex gap-3 align-items-center" style="background: rgba(14, 4, 30, 0.4) !important;">
+                            <span class="badge cyber-badge-pink font-monospace">Q${idx + 1}</span>
+                            <span class="text-white-50 font-monospace" style="font-size: 0.9rem;">${sanitizeHTML(topic)}</span>
+                        </div>
+                    `;
                 });
                 html += `
                         </div>
@@ -613,43 +560,20 @@ async function viewSession(sessionId) {
                 `;
             }
             
-            // Priority list
-            if (session.priority_list && session.priority_list.length > 0) {
-                html += `
-                    <div class="mb-4">
-                        <h6 class="font-monospace text-info mb-3"><i class="bi bi-bar-chart-fill"></i> Priority breakdown</h6>
-                        <div class="priority-list">
-                `;
-                session.priority_list.slice(0, 5).forEach(item => {
-                    html += `
-                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 glass-card border-0" style="background: rgba(14, 4, 30, 0.4) !important;">
-                            <span class="font-monospace text-white-50"><i class="bi bi-chevron-right text-info"></i> ${sanitizeHTML(item.topic)}</span>
-                            <div class="d-flex align-items-center gap-3" style="width: 40%;">
-                                <div class="progress w-100" style="height: 6px; background: rgba(157, 78, 221, 0.15);">
-                                    <div class="progress-bar bg-info" style="width: ${item.priority_score}%"></div>
-                                </div>
-                                <span class="badge cyber-badge-blue font-monospace">${item.priority_score}%</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div></div>`;
-            }
-            
             // Weekly plan
             if (session.weekly_plan && session.weekly_plan.length > 0) {
                 html += `
                     <div class="mb-4">
-                        <h6 class="font-monospace text-primary mb-3"><i class="bi bi-calendar-range"></i> Dynamic Weekly Study Grid</h6>
+                        <h6 class="font-monospace text-info mb-3"><i class="bi bi-alarm-fill"></i> Allocated Study Timestamps</h6>
                 `;
                 session.weekly_plan.forEach(day => {
                     html += `
                         <div class="mb-2 p-2 glass-card border-0" style="background: rgba(14, 4, 30, 0.4) !important;">
                             <div class="d-flex justify-content-between align-items-center">
-                                <strong class="text-white font-monospace"><i class="bi bi-check-square text-primary me-2"></i>${sanitizeHTML(day.day)}</strong>
-                                <span class="badge cyber-badge-purple font-monospace">${day.duration_hours} Hours Allocated</span>
+                                <strong class="text-white font-monospace"><i class="bi bi-clock-history text-info me-2"></i>${sanitizeHTML(day.day)}</strong>
+                                <span class="badge cyber-badge-blue font-monospace">${day.duration_hours}h Session</span>
                             </div>
-                            <div class="small text-muted font-monospace mt-1 ms-4"><i class="bi bi-arrow-right text-muted me-1"></i>${day.topics.map(t => sanitizeHTML(t)).join(' // ')}</div>
+                            <div class="small text-muted font-monospace mt-1 ms-4"><i class="bi bi-caret-right text-muted me-1"></i>Target: ${day.topics.map(t => sanitizeHTML(t)).join(' // ')}</div>
                         </div>
                     `;
                 });

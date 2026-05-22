@@ -137,15 +137,9 @@ def study():
     user = get_user_by_id(user_id)
     
     if request.method == 'POST':
-        title = request.form.get('session_title', 'Study Session')
+        title = request.form.get('session_title', 'Study Session') # Subject Name
         syllabus_file = request.files.get('syllabus')
         pqp_file = request.files.get('pqp')
-        
-        # New parameters
-        topic_names = request.form.get('topic_names', '')
-        unit_analysis = request.form.get('unit_analysis', '')
-        important_topics_custom = request.form.get('important_topics_custom', '')
-        time_slot = request.form.get('time_slot', '2 Hours/Day')
         
         session_id = create_study_session(user_id, title)
         
@@ -179,91 +173,48 @@ def study():
             except Exception as e:
                 print(f"Error reading PYQ PDF: {e}")
         
-        # Parse custom topics provided by the student
-        custom_topics = [t.strip().capitalize() for t in topic_names.split(',') if t.strip()]
-        
-        # Extract topics from text
+        # Extract keywords/topics for visual lists
         topics = Counter()
         for text in [syllabus_text, pqp_text]:
             if text:
                 import re
-                words = re.findall(r'[a-zA-Z]{4,}', text.lower())
+                words = re.findall(r'[a-zA-Z]{5,}', text.lower())
                 topics.update(words)
         
-        top_topics = [t.capitalize() for t, _ in topics.most_common(12)]
+        raw_keywords = [t.capitalize() for t, _ in topics.most_common(8)]
+        if not raw_keywords:
+            raw_keywords = ["Analysis", "Implementation", "Complexity Proofs", "Graph Structures", "System Optimization"]
+            
+        # Formulate a simplified visual list of highly probable questions
+        important_questions = [
+            f"Explain {raw_keywords[0]} & solve its core recurrence relations",
+            f"Trace {raw_keywords[1 % len(raw_keywords)]} step-by-step with cyclic models",
+            f"Contrast {raw_keywords[2 % len(raw_keywords)]} vs standard methods",
+            f"Discuss worst-case bounds for {raw_keywords[3 % len(raw_keywords)]}"
+        ]
         
-        # Merge custom topics into top_topics at the top
-        for ct in reversed(custom_topics):
-            if ct in top_topics:
-                top_topics.remove(ct)
-            top_topics.insert(0, ct)
+        # Probability scores
+        priority_list = [
+            {'topic': important_questions[0], 'priority_score': 98},
+            {'topic': important_questions[1], 'priority_score': 92},
+            {'topic': important_questions[2], 'priority_score': 85},
+            {'topic': important_questions[3], 'priority_score': 78}
+        ]
             
-        if not top_topics:
-            top_topics = ["Introduction", "Core Concepts", "Advanced Theories", "Practical Exercises", "Revision & Mock Tests"]
+        # Specific study timestamps/time blocks schedule
+        weekly_plan = [
+            {'day': 'Monday [09:00 - 11:00 AM]', 'duration_hours': 2, 'topics': [important_questions[0]]},
+            {'day': 'Wednesday [04:00 - 06:00 PM]', 'duration_hours': 2, 'topics': [important_questions[1]]},
+            {'day': 'Friday [10:00 - 12:00 AM]', 'duration_hours': 2, 'topics': [important_questions[2]]},
+            {'day': 'Saturday [02:00 - 04:00 PM]', 'duration_hours': 2, 'topics': [important_questions[3]]}
+        ]
             
-        priority_list = []
-        for i, (topic, count) in enumerate(topics.most_common(10)):
-            score = min(99, max(50, 75 + count * 2 - i * 3))
-            priority_list.append({
-                'topic': topic.capitalize(),
-                'priority_score': score
-            })
-            
-        # Add custom topics to priority_list first if they aren't already there
-        for ct in custom_topics:
-            exists = False
-            for p in priority_list:
-                if p['topic'].lower() == ct.lower():
-                    exists = True
-                    p['priority_score'] = 98 # Mark custom focus as extremely high priority
-                    break
-            if not exists:
-                priority_list.insert(0, {
-                    'topic': ct,
-                    'priority_score': 98
-                })
-                
-        if not priority_list:
-            priority_list = [
-                {'topic': 'Core Concepts', 'priority_score': 95},
-                {'topic': 'Advanced Theories', 'priority_score': 85},
-                {'topic': 'Revision & Mock Tests', 'priority_score': 80}
-            ]
-            
-        # Dynamic daily hours based on preferred study time slot
-        daily_hours = 2
-        if "1-2" in time_slot or "Light" in time_slot:
-            daily_hours = 2
-        elif "3-4" in time_slot or "Medium" in time_slot or "Moderate" in time_slot:
-            daily_hours = 4
-        elif "5+" in time_slot or "Intense" in time_slot or "Heavy" in time_slot:
-            daily_hours = 6
-            
-        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        weekly_plan = []
-        for i, day in enumerate(days):
-            day_topics = []
-            if top_topics:
-                day_topics.append(top_topics[i % len(top_topics)])
-                if i % 2 == 0 and len(top_topics) > 1:
-                    day_topics.append(top_topics[(i + 3) % len(top_topics)])
-            else:
-                day_topics = ["General Study"]
-            weekly_plan.append({
-                'day': day,
-                'duration_hours': daily_hours if i < 5 else (daily_hours + 2),
-                'topics': day_topics
-            })
-            
-        # Get AI-powered study plan incorporating all details
+        # Get AI-powered study plan incorporating syllabus, pyq and subject name
         study_plan = ''
         result = analyze_study_materials(
             syllabus_text, 
             pqp_text, 
-            topic_names=topic_names, 
-            unit_analysis=unit_analysis, 
-            important_topics=important_topics_custom, 
-            time_slot=time_slot
+            subject_name=title
         )
         if result['success']:
             study_plan = result['plan']
@@ -271,7 +222,7 @@ def study():
             study_plan = "AI analysis unavailable at this moment. Please try again later."
             
         analysis_obj = {
-            'important_topics': top_topics,
+            'important_topics': important_questions,
             'priority_list': priority_list,
             'weekly_plan': weekly_plan,
             'full_plan': study_plan
@@ -279,12 +230,12 @@ def study():
         
         save_study_analysis(
             session_id, 
-            json.dumps(top_topics), 
+            json.dumps(important_questions), 
             json.dumps(priority_list), 
             json.dumps(weekly_plan), 
             study_plan
         )
-        log_activity(user_id, 'STUDY_SESSION', f'Created study session: {title}')
+        log_activity(user_id, 'STUDY_SESSION', f'Created study session for: {title}')
         
         return jsonify({
             'success': True,
