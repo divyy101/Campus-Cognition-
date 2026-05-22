@@ -52,9 +52,23 @@
                     </div>
                 </div>
 
-                <div class="text-center">
-                    <p style="color: #a0a0a0;" class="mb-0">Don't have an account? 
-                        <a href="{{ url_for('signup') }}" class="text-decoration-none fw-bold" style="color: #00d4ff;">Sign up here</a>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-link text-decoration-none p-0 fw-bold" 
+                            style="color: #7b68ee; font-size: 0.9rem;" 
+                            onclick="toggleTroubleshoot()">
+                        <i class="bi bi-question-circle me-1"></i>Forgot Credentials / Troubleshooting
+                    </button>
+                </div>
+
+                <div id="troubleshootPanel" class="mt-3 p-3 rounded-3" 
+                     style="display: none; background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(123, 104, 238, 0.05) 100%); border: 2px dashed rgba(123, 104, 238, 0.3);">
+                    <h6 style="color: #00d4ff; font-weight: 600; font-size: 0.95rem;" class="mb-2">
+                        <i class="bi bi-envelope-exclamation me-1"></i>Manual Account Recovery
+                    </h6>
+                    <p style="color: #d0d0d0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 0;">
+                        Forgot your username, password, or email? Contact our troubleshooting support line at:
+                        <a href="mailto:divyanshsingh74178@gmail.com" style="color: #00d4ff; font-weight: 700; text-decoration: underline;">divyanshsingh74178@gmail.com</a>
+                        for prompt manual verification and credentials recovery.
                     </p>
                 </div>
             </form>
@@ -99,5 +113,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         showToast('Error during login: ' + error.message, 'danger');
     }
 });
+
+function toggleTroubleshoot() {
+    const panel = document.getElementById('troubleshootPanel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        panel.style.display = 'none';
+    }
+}
 </script>
 {% endblock %}

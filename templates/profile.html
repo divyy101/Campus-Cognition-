@@ -69,7 +69,7 @@
                             <option value="IT" {% if user['branch'] == 'IT' %}selected{% endif %}>Information Technology</option>
                             <option value="ECE" {% if user['branch'] == 'ECE' %}selected{% endif %}>Electronics & Communication</option>
                             <option value="ME" {% if user['branch'] == 'ME' %}selected{% endif %}>Mechanical Engineering</option>
-                            <option value="CE" {% if user['branch'] == 'CE' %}selected{% endif %}>Civil Engineering</option>
+                            <option value="CE" {% if user['branch'] == 'CE' or user['branch'] == 'CIVIL' %}selected{% endif %}>Civil Engineering</option>
                             <option value="EE" {% if user['branch'] == 'EE' %}selected{% endif %}>Electrical Engineering</option>
                             <option value="BE" {% if user['branch'] == 'BE' %}selected{% endif %}>Biotechnology Engineering</option>
                         </select>

@@ -46,14 +46,16 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Branch/Field</label>
-                            <select class="form-select" name="branch">
+                            <label class="form-label" for="branch">Branch/Field</label>
+                            <select class="form-select" id="branch" name="branch">
                                 <option value="">Select Branch</option>
                                 <option value="CSE" {% if user['branch'] == 'CSE' %}selected{% endif %}>Computer Science (CSE)</option>
                                 <option value="IT" {% if user['branch'] == 'IT' %}selected{% endif %}>Information Technology (IT)</option>
                                 <option value="ECE" {% if user['branch'] == 'ECE' %}selected{% endif %}>Electronics (ECE)</option>
                                 <option value="ME" {% if user['branch'] == 'ME' %}selected{% endif %}>Mechanical (ME)</option>
-                                <option value="CIVIL" {% if user['branch'] == 'CIVIL' %}selected{% endif %}>Civil</option>
+                                <option value="CE" {% if user['branch'] == 'CE' or user['branch'] == 'CIVIL' %}selected{% endif %}>Civil Engineering (CE)</option>
+                                <option value="EE" {% if user['branch'] == 'EE' %}selected{% endif %}>Electrical Engineering (EE)</option>
+                                <option value="BE" {% if user['branch'] == 'BE' %}selected{% endif %}>Biotechnology Engineering (BE)</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">

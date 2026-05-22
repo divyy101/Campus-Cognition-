@@ -116,13 +116,14 @@
 
         // Theme toggle
         const themeToggle = document.getElementById('themeToggle');
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-        if (currentTheme === 'light') {
+        const initialTheme = localStorage.getItem('theme') || 'dark';
+        if (initialTheme === 'light') {
             document.body.style.filter = 'invert(1)';
         }
         
         themeToggle.addEventListener('click', () => {
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const activeTheme = localStorage.getItem('theme') || 'dark';
+            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
             localStorage.setItem('theme', newTheme);
             document.body.style.filter = newTheme === 'light' ? 'invert(1)' : 'none';
         });
