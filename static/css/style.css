@@ -1144,3 +1144,48 @@ body.theme-dashboard .glass-card:hover {
     box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
 }
 
+/* ==========================================
+   SELECT DROPDOWN OPTIONS ACCESSIBILITY FIX
+   ========================================== */
+select option {
+    background-color: #ffffff !important;
+    color: #121a2b !important;
+}
+
+/* Force dark-mode dropdown backgrounds if the browser/OS supports it */
+@media (prefers-color-scheme: dark) {
+    select option {
+        background-color: #121a2b !important;
+        color: #ffffff !important;
+    }
+}
+
+/* Theme-specific custom select options */
+body.theme-code select option,
+body.theme-code .form-select option {
+    background-color: #020408 !important;
+    color: #39ff14 !important;
+    font-family: 'Fira Code', monospace !important;
+}
+
+body.theme-study select option,
+body.theme-study .form-select option {
+    background-color: #0f172a !important;
+    color: #38bdf8 !important;
+}
+
+body.theme-opportunities select option,
+body.theme-opportunities .form-select option {
+    background-color: #111827 !important;
+    color: #f3f4f6 !important;
+}
+
+/* Light mode overrides */
+body.light-mode select option,
+body.light-mode .form-select option,
+body.light-mode .glass-input option {
+    background-color: #ffffff !important;
+    color: #121a2b !important;
+}
+
+

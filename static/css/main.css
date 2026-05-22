@@ -869,3 +869,32 @@ footer p {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(102, 126, 234, 0.8);
 }
+
+/* ==========================================
+   SELECT DROPDOWN OPTIONS ACCESSIBILITY FIX
+   ========================================== */
+select option,
+.form-select option,
+.glass-input option {
+    background-color: #ffffff !important;
+    color: #121a2b !important;
+}
+
+/* Force dark-mode dropdown backgrounds if the browser/OS supports it */
+@media (prefers-color-scheme: dark) {
+    select option,
+    .form-select option,
+    .glass-input option {
+        background-color: #0b1528 !important;
+        color: #ffffff !important;
+    }
+}
+
+/* Light mode overrides */
+body.light-mode select option,
+body.light-mode .form-select option,
+body.light-mode .glass-input option {
+    background-color: #ffffff !important;
+    color: #121a2b !important;
+}
+
