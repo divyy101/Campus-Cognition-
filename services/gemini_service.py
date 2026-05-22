@@ -398,79 +398,254 @@ def analyze_study_materials(syllabus_text: str, pyq_text: str, subject_name: str
     """
     subject = subject_name if subject_name else "Core Subject"
     
-    # Pre-generate dynamic local fallbacks to ensure consistency
-    repeated_topics = [
-        {"topic": "Asymptotic Time Complexity & Master Theorem", "frequency": 5},
-        {"topic": "Graph Algorithms & Shortest Path (Dijkstra/Bellman-Ford)", "frequency": 4},
-        {"topic": "Dynamic Programming & Knapsack Optimization", "frequency": 3},
-        {"topic": "Recursion, Tree Traversals & Depth-First Backtracking", "frequency": 3},
-        {"topic": "Sorting & Searching Pivot Partitioning (Quick/Merge Sort)", "frequency": 2}
-    ]
+    # Pre-generate dynamic local fallbacks to ensure consistency matching the subject
+    subject_lower = subject.lower()
+    text_combined = (syllabus_text + " " + pyq_text + " " + subject).lower()
     
-    important_questions = [
-        f"Unit 1: Prove the Master Theorem bounds for divide-and-conquer recurrences with mathematical proof cases matching {scope} guidelines.",
-        f"Unit 2: Trace Dijkstra's algorithm relaxed weight tables and priority queue transitions step-by-step for a directed cyclic graph.",
-        f"Unit 3: Formulate a Dynamic Programming bottom-up state transition table for the 0/1 Knapsack problem and show auxiliary memory optimization.",
-        f"Unit 4: Discuss and compare Depth-First Search vs Breadth-First Search traversals, explaining stack and queue usage in edge cycle detection."
-    ]
-    
-    weekly_plan = [
-        {"day": "Monday [09:00 - 11:00 AM]", "duration_hours": 2, "topics": [f"Master Theorem proofs matching {scope}", "Recurrence relations exercises"]},
-        {"day": "Wednesday [04:00 - 06:00 PM]", "duration_hours": 2, "topics": ["Dijkstra shortest path graphs", "Draw relaxed tables"]},
-        {"day": "Friday [10:00 - 12:00 AM]", "duration_hours": 2, "topics": ["Knapsack DP state tables", "Bottom-up recursion matrix"]},
-        {"day": "Saturday [02:00 - 04:00 PM]", "duration_hours": 2, "topics": ["Cycle detection in graph structures", "Stack frame visualizations"]}
-    ]
-    
-    chart_metrics = {
-        "topic_frequency": {
-            "Asymptotic Proofs": 5,
-            "Shortest Paths": 4,
-            "DP Matrices": 3,
-            "DFS/BFS Traversals": 3,
-            "Sorting Recurrences": 2
-        },
-        "unit_importance": {
-            "Unit 1 (Analysis)": 20,
-            "Unit 2 (Sorting & Searching)": 20,
-            "Unit 3 (Graph Algorithms)": 35,
-            "Unit 4 (Dynamic Programming)": 25
-        },
-        "study_time_distribution": {
-            "Theoretical Study": 8,
-            "Practical Coding & Traces": 12,
-            "Mock PYQ Solving": 10
+    # 1. Computer Networks (CN)
+    if 'network' in subject_lower or 'cn' in subject_lower or 'tcp' in subject_lower or 'ip' in subject_lower or 'routing' in text_combined or 'protocol' in text_combined:
+        repeated_topics = [
+            {"topic": "TCP Congestion Control (Slow Start, Congestion Avoidance)", "frequency": 5},
+            {"topic": "IP Subnetting & CIDR Address Allocation", "frequency": 4},
+            {"topic": "OSI & TCP/IP Layer Architecture Functions", "frequency": 4},
+            {"topic": "Routing Algorithms (Dijkstra Link State vs Distance Vector)", "frequency": 3},
+            {"topic": "DNS Domain Name Resolution & Application Protocols", "frequency": 2}
+        ]
+        important_questions = [
+            f"Unit 1: Draw and trace the sequence number exchanges, window size variations, and ssthresh transitions during a TCP congestion control session matching {scope}.",
+            f"Unit 2: Design an optimal subnet allocation using CIDR block notation for three distinct department networks of sizes 60, 30, and 12 hosts.",
+            f"Unit 3: Compare Link-State (OSPF) and Distance-Vector (RIP) routing protocols, highlighting how the count-to-infinity problem is resolved.",
+            f"Unit 4: Explain the structural and protocol details of the Data Link, Network, Transport, and Application layers."
+        ]
+        weekly_plan = [
+            {"day": "Monday [09:00 - 11:00 AM]", "duration_hours": 2, "topics": [f"TCP Congestion Control & Slow Start curves matching {scope}", "Window sizing rules"]},
+            {"day": "Wednesday [04:00 - 06:00 PM]", "duration_hours": 2, "topics": ["IP Subnetting calculations", "CIDR mask splitting"]},
+            {"day": "Friday [10:00 - 12:00 AM]", "duration_hours": 2, "topics": ["Dijkstra routing algorithms", "OSPF vs RIP parameters"]},
+            {"day": "Saturday [02:00 - 04:00 PM]", "duration_hours": 2, "topics": ["DNS resolving structures", "HTTP & Application layer protocols"]}
+        ]
+        chart_metrics = {
+            "topic_frequency": {"TCP Congestion": 5, "CIDR Subnetting": 4, "Routing Algorithms": 3, "Layered Protocols": 4, "DNS Domain": 2},
+            "unit_importance": {"Unit 1 (Link Layer)": 15, "Unit 2 (Network Layer)": 35, "Unit 3 (Transport Layer)": 35, "Unit 4 (Application Layer)": 15},
+            "study_time_distribution": {"Theoretical Protocols": 10, "Subnetting Math": 12, "Mock Packet Tracing": 8}
         }
-    }
+        fallback_data = {
+            'success': True,
+            'summary': f"Synthesized high-grade AI academic blueprint for the subject **{subject}** tailored to **{scope}** standards. This plan prioritizes TCP Congestion Control protocols, CIDR address subnet allocations, and distance-vector vs link-state routing convergence algorithms. Allocate recommended time slots to master structural protocol interactions.",
+            'key_concepts': [
+                "OSI and TCP/IP reference architectures",
+                "Sliding Window protocols (Go-Back-N, Selective Repeat)",
+                "CIDR IPv4 routing and Address aggregation",
+                "Link-State (OSPF) vs Distance-Vector (RIP) routing tables",
+                "Domain Name System (DNS) recursive resolution"
+            ],
+            'formulas': [
+                "Nyquist Max Data Rate: C = 2 * B * log2(L)",
+                "Shannon Channel Capacity: C = B * log2(1 + SNR)",
+                "Propagation Delay: Tp = Distance / Speed",
+                "Transmission Delay: Tt = PacketSize / Bandwidth"
+            ],
+            'exam_tips': [
+                "Always draw the ssthresh state transitions on TCP congestion charts.",
+                "Verify host boundary ranges (excluding network and broadcast addresses) in subnetting.",
+                "Write exact OSI layer names in sequential order during architecture questions."
+            ],
+            'difficulty_analysis': "Network Layer CIDR splits and Transport Layer TCP flow-congestion equations require algebraic precision. Layer theory holds moderate memorization weight.",
+            'prep_time_hours': 30,
+            'repeated_topics': repeated_topics,
+            'important_questions': important_questions,
+            'weekly_plan': weekly_plan,
+            'chart_metrics': chart_metrics,
+            'model': 'local-fallback',
+            'timestamp': json.dumps({'generated': False})
+        }
     
-    fallback_data = {
-        'success': True,
-        'summary': f"Synthesized high-grade AI academic blueprint for the subject **{subject}** tailored to **{scope}** standards. This plan prioritizes recurring structural patterns, asymptotic complexity proofs, and dynamic programming formulations. Allocate recommended time slots to solidify logical traversal mechanisms.",
-        'key_concepts': [
-            "Asymptotic analysis (Big O, Omega, Theta notations)",
-            "Priority Queue relaxation logic in Shortest Paths",
-            "Bottom-up Dynamic Programming state transitions",
-            "Depth-First backtracking search constraints",
-            "Divide-and-Conquer recurrence tree splits"
-        ],
-        'formulas': [
-            "Master Theorem: T(n) = aT(n/b) + f(n)",
-            "Dijkstra Edge Relaxation: d(v) = min(d(v), d(u) + w(u, v))",
-            "Knapsack Recurrence: DP[i][w] = max(DP[i-1][w], DP[i-1][w-wi] + vi)"
-        ],
-        'exam_tips': [
-            "Always draw relaxed priority state transitions for Dijkstra questions.",
-            "Write the base cases clearly before initiating Dynamic Programming loops.",
-            "Solve the three Master Theorem boundary inequalities in analysis questions."
-        ],
-        'difficulty_analysis': "Graph algorithms and Dynamic Programming contain high-weightage sections but hold a steep conceptual learning curve. Sorting recurrences require heavy algebraic manipulations.",
-        'prep_time_hours': 30,
-        'repeated_topics': repeated_topics,
-        'important_questions': important_questions,
-        'weekly_plan': weekly_plan,
-        'chart_metrics': chart_metrics,
-        'model': 'local-fallback',
-        'timestamp': json.dumps({'generated': False})
-    }
+    # 2. Operating Systems (OS)
+    elif 'operating' in subject_lower or 'os' in subject_lower or 'process' in text_combined or 'scheduling' in text_combined or 'semaphore' in text_combined or 'paging' in text_combined or 'kernel' in text_combined:
+        repeated_topics = [
+            {"topic": "CPU Scheduling Algorithms (SJF, RR, SRTF)", "frequency": 5},
+            {"topic": "Page Replacement Algorithms (LRU, FIFO, Optimal)", "frequency": 4},
+            {"topic": "Deadlock Avoidance using Banker's Algorithm", "frequency": 4},
+            {"topic": "Process Synchronization (Semaphores, Producer-Consumer)", "frequency": 3},
+            {"topic": "Virtual Memory Paging & TLB Transactions", "frequency": 3}
+        ]
+        important_questions = [
+            f"Unit 1: Draw Gantt charts and compute average waiting and turnaround times using Shortest Job First (SJF) and Round Robin (RR) schedulers matching {scope}.",
+            f"Unit 2: Apply the Banker's safety algorithm to evaluate safe resource allocation states for a given resource request matrix.",
+            f"Unit 3: Trace and count page faults using FIFO, LRU, and Optimal substitution sequences for a given frames size.",
+            f"Unit 4: Formulate Semaphore synchronization rules for the Producer-Consumer or Reader-Writer boundary conditions."
+        ]
+        weekly_plan = [
+            {"day": "Monday [09:00 - 11:00 AM]", "duration_hours": 2, "topics": [f"CPU Schedulers and Gantt charts matching {scope}", "Process state lifecycles"]},
+            {"day": "Wednesday [04:00 - 06:00 PM]", "duration_hours": 2, "topics": ["Banker's Safety matrices", "Deadlock detection graphs"]},
+            {"day": "Friday [10:00 - 12:00 AM]", "duration_hours": 2, "topics": ["Page Replacement algorithms", "Virtual to physical conversions"]},
+            {"day": "Saturday [02:00 - 04:00 PM]", "duration_hours": 2, "topics": ["Semaphores and Mutex locks", "IPC Bounded buffer synchronization"]}
+        ]
+        chart_metrics = {
+            "topic_frequency": {"CPU Scheduling": 5, "Page Replacement": 4, "Deadlock Safety": 4, "Process Sync": 3, "Memory Paging": 3},
+            "unit_importance": {"Unit 1 (CPU & Processes)": 25, "Unit 2 (Deadlocks & Concurrency)": 25, "Unit 3 (Memory Management)": 30, "Unit 4 (File Systems & IO)": 20},
+            "study_time_distribution": {"CPU Gantt Calculations": 10, "Semaphore Logic Proofs": 8, "Page Memory Tracing": 12}
+        }
+        fallback_data = {
+            'success': True,
+            'summary': f"Synthesized high-grade AI academic blueprint for the subject **{subject}** tailored to **{scope}** standards. This plan prioritizes CPU Scheduling algorithms, Bankers deadlock avoidance safeties, and LRU/Optimal page replacements. Allocate recommended time slots to master system kernel policies.",
+            'key_concepts': [
+                "Process Control Block (PCB) & context switches",
+                "Mutex locks vs Counting Semaphores",
+                "Banker's Resource allocation safety sequence",
+                "Demand paging, Page faults, and TLB translations",
+                "Disk Scheduling Algorithms (SCAN, C-SCAN, FCFS)"
+            ],
+            'formulas': [
+                "Turnaround Time: TAT = CompletionTime - ArrivalTime",
+                "Waiting Time: WT = TurnaroundTime - BurstTime",
+                "Effective Memory Access Time: EMAT = HitRate * TLBTime + MissRate * (2 * MemoryAccess)",
+                "Safe Allocation Check: Need = Max - Allocation"
+            ],
+            'exam_tips': [
+                "Always write the remaining need vectors explicitly before running Bankers loops.",
+                "Draw beautiful horizontal CPU Gantt timeline partitions with time labels.",
+                "State page hits as well as page faults explicitly in LRU cache arrays."
+            ],
+            'difficulty_analysis': "Semaphore race condition coding and Banker's safety matrix computations require high algebraic accuracy. File directory trees are theoretical.",
+            'prep_time_hours': 30,
+            'repeated_topics': repeated_topics,
+            'important_questions': important_questions,
+            'weekly_plan': weekly_plan,
+            'chart_metrics': chart_metrics,
+            'model': 'local-fallback',
+            'timestamp': json.dumps({'generated': False})
+        }
+    
+    # 3. Database Management Systems (DBMS)
+    elif 'database' in subject_lower or 'dbms' in subject_lower or 'sql' in text_combined or 'schema' in text_combined or 'normalization' in text_combined or 'transaction' in text_combined:
+        repeated_topics = [
+            {"topic": "Relational Database Normalization (1NF to BCNF)", "frequency": 5},
+            {"topic": "SQL Joins, Subqueries & Correlated Clauses", "frequency": 4},
+            {"topic": "Transaction Serializability (Conflict & View Precedence)", "frequency": 4},
+            {"topic": "Two-Phase Locking (2PL) Concurrency Controls", "frequency": 3},
+            {"topic": "B & B+ Tree Indexing Node Splits", "frequency": 3}
+        ]
+        important_questions = [
+            f"Unit 1: Given a database schema and set of functional dependencies, identify candidate keys and decompose relations into 3NF and BCNF schemas matching {scope}.",
+            f"Unit 2: Write advanced SQL queries utilizing OUTER JOINS, nested correlated subqueries, and GROUP BY HAVING filters.",
+            f"Unit 3: Construct transactional schedules precedence graphs to check for conflict serializability.",
+            f"Unit 4: Trace search key insertions, node capacity limits, and splitting sequences inside a B+ Tree index."
+        ]
+        weekly_plan = [
+            {"day": "Monday [09:00 - 11:00 AM]", "duration_hours": 2, "topics": [f"Candidate keys and Functional closures matching {scope}", "Normalization rules"]},
+            {"day": "Wednesday [04:00 - 06:00 PM]", "duration_hours": 2, "topics": ["SQL Joins and subquery syntax", "Aggregate grouping constraints"]},
+            {"day": "Friday [10:00 - 12:00 AM]", "duration_hours": 2, "topics": ["Conflict serializability graphs", "2PL concurrency locks"]},
+            {"day": "Saturday [02:00 - 04:00 PM]", "duration_hours": 2, "topics": ["B+ Tree index node splitting", "Hashing file structures"]}
+        ]
+        chart_metrics = {
+            "topic_frequency": {"Normalization": 5, "SQL Joins": 4, "Serializability": 4, "2PL Concurrency": 3, "B+ Tree Indexes": 3},
+            "unit_importance": {"Unit 1 (Schema Normalization)": 30, "Unit 2 (SQL Queries)": 25, "Unit 3 (Transactions)": 25, "Unit 4 (Storage Indexing)": 20},
+            "study_time_distribution": {"Normalization Closures": 10, "SQL Coding Practice": 12, "Precedence Graph Tracing": 8}
+        }
+        fallback_data = {
+            'success': True,
+            'summary': f"Synthesized high-grade AI academic blueprint for the subject **{subject}** tailored to **{scope}** standards. This plan prioritizes relational normalization schemas, SQL outer join operators, transaction precedence graphs, and indexing splits. Allocate recommended time slots to master relational algebra logic.",
+            'key_concepts': [
+                "Functional dependencies (FD) & attribute closures",
+                "Lossless joins and dependency preservation closures",
+                "Precedence graphs for conflict serializability checks",
+                "Growing vs shrinking transaction phases in 2PL",
+                "Dense vs Sparse indexing in B+ tree architectures"
+            ],
+            'formulas': [
+                "Attribute Closure: X+ calculation sets",
+                "Precedence Graph Edge criteria: Tj reads/writes X after Ti writes/reads X",
+                "B+ Tree Leaf Node Order constraints: ceil(n/2) keys",
+                "Transaction Rollback probability equations"
+            ],
+            'exam_tips': [
+                "Check for schema decomposition lossless joins before evaluating dependency preservation.",
+                "Ensure SQL keywords SELECT, FROM, JOIN are written in consistent uppercase.",
+                "Identify transactional conflict edges sequentially: W-R, R-W, W-W."
+            ],
+            'difficulty_analysis': "Functional closures, Normal Form decomposition checks, and Transaction conflict loops require absolute precision. SQL commands are practical.",
+            'prep_time_hours': 30,
+            'repeated_topics': repeated_topics,
+            'important_questions': important_questions,
+            'weekly_plan': weekly_plan,
+            'chart_metrics': chart_metrics,
+            'model': 'local-fallback',
+            'timestamp': json.dumps({'generated': False})
+        }
+
+    # 4. General/DSA fallback using keywords from text
+    else:
+        # Dynamic keywords helper
+        import re
+        ignored = {'syllabus', 'structure', 'question', 'questions', 'subject', 'university', 'exam', 'exams', 'course', 'topic', 'topics', 'unit', 'units', 'chapter', 'chapters', 'marks', 'weightage'}
+        text_words = re.findall(r'\b[a-zA-Z]{5,}\b', text_combined)
+        keywords = []
+        for w in text_words:
+            w_cap = w.capitalize()
+            if w.lower() not in ignored and len(w) > 4 and w_cap not in keywords:
+                keywords.append(w_cap)
+        keywords = keywords[:12]
+        
+        # If still empty, supply default technical placeholders
+        while len(keywords) < 5:
+            keywords.append("Core Concept")
+            
+        k1, k2, k3, k4, k5 = keywords[0], keywords[1], keywords[2], keywords[3], keywords[min(4, len(keywords)-1)]
+        
+        repeated_topics = [
+            {"topic": f"{k1} Principles & System Architectures", "frequency": 5},
+            {"topic": f"{k2} Design & Optimization Patterns", "frequency": 4},
+            {"topic": f"{k3} Implementation & Execution Constraints", "frequency": 3},
+            {"topic": f"{k4} Standard Analysis & Best Practices", "frequency": 3},
+            {"topic": f"{k5} Validation & Practical Integration Case Studies", "frequency": 2}
+        ]
+        important_questions = [
+            f"Unit 1: Synthesize and explain the theoretical foundations and design constraints of {k1} matching the {scope} learning guidelines.",
+            f"Unit 2: Discuss how {k2} parameters can be dynamically optimized and trace state transitions step-by-step.",
+            f"Unit 3: Formulate an implementation strategy for {k3} resolving auxiliary memory constraints.",
+            f"Unit 4: Discuss and compare {k4} vs {k5} implementations, highlighting their tradeoffs."
+        ]
+        weekly_plan = [
+            {"day": "Monday [09:00 - 11:00 AM]", "duration_hours": 2, "topics": [f"Study the core principles of {k1} matching {scope}", "Identify architectural constraints"]},
+            {"day": "Wednesday [04:00 - 06:00 PM]", "duration_hours": 2, "topics": [f"Practice optimization equations for {k2}", "Draw design flow diagrams"]},
+            {"day": "Friday [10:00 - 12:00 AM]", "duration_hours": 2, "topics": [f"Master bottom-up algorithms for {k3}", "Formulate state variables"]},
+            {"day": "Saturday [02:00 - 04:00 PM]", "duration_hours": 2, "topics": [f"Resolve validation parameters for {k4}", f"Trace {k5} integration cases"]}
+        ]
+        chart_metrics = {
+            "topic_frequency": {f"{k1} Theory": 5, f"{k2} Design": 4, f"{k3} Algorithms": 3, f"{k4} Practices": 3, f"{k5} Case Studies": 2},
+            "unit_importance": {f"Unit 1 ({k1})": 25, f"Unit 2 ({k2})": 25, f"Unit 3 ({k3})": 30, f"Unit 4 ({k4})": 20},
+            "study_time_distribution": {"Theoretical Study": 10, "Analytical Calculations": 12, "Case Work & Review": 8}
+        }
+        
+        fallback_data = {
+            'success': True,
+            'summary': f"Synthesized high-grade AI academic blueprint for the subject **{subject}** tailored to **{scope}** standards. This plan prioritizes {k1} core principles, {k2} optimizations, and {k3} algorithms. Allocate recommended time slots to solidify logical execution schemas.",
+            'key_concepts': [
+                f"Core foundations of {k1} systems",
+                f"Dynamic optimization boundaries in {k2}",
+                f"Algorithmic formulation equations in {k3}",
+                f"Execution and trace structures in {k4}",
+                f"Integration constraints and case guidelines of {k5}"
+            ],
+            'formulas': [
+                f"{k1} Performance Metric: P = Work / Time",
+                f"{k2} Optimal Allocation Efficiency: E = Output / Capacity",
+                f"{k3} Iterative Scaling Factor: S = Complexity * N"
+            ],
+            'exam_tips': [
+                f"Always state base assumptions clearly before initiating {k1} system drawings.",
+                f"Verify remaining boundary constraints before running {k2} safety steps.",
+                f"Write step-by-step state transition equations for all {k3} problems."
+            ],
+            'difficulty_analysis': f"System optimizations for {k2} and algorithm traces for {k3} contain high-weightage sections but hold a steep learning curve.",
+            'prep_time_hours': 30,
+            'repeated_topics': repeated_topics,
+            'important_questions': important_questions,
+            'weekly_plan': weekly_plan,
+            'chart_metrics': chart_metrics,
+            'model': 'local-fallback',
+            'timestamp': json.dumps({'generated': False})
+        }
 
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     

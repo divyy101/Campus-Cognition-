@@ -181,7 +181,15 @@ def study():
             try:
                 with open(filepath, 'rb') as f:
                     reader = PyPDF2.PdfReader(f)
-                    syllabus_text = '\n'.join([page.extract_text() for page in reader.pages])
+                    pages_text = []
+                    char_count = 0
+                    for page in reader.pages:
+                        text = page.extract_text() or ''
+                        pages_text.append(text)
+                        char_count += len(text)
+                        if char_count >= 5000:
+                            break
+                    syllabus_text = '\n'.join(pages_text)
             except Exception as e:
                 print(f"Error reading syllabus PDF: {e}")
         
@@ -194,7 +202,15 @@ def study():
             try:
                 with open(filepath, 'rb') as f:
                     reader = PyPDF2.PdfReader(f)
-                    pqp_text = '\n'.join([page.extract_text() for page in reader.pages])
+                    pages_text = []
+                    char_count = 0
+                    for page in reader.pages:
+                        text = page.extract_text() or ''
+                        pages_text.append(text)
+                        char_count += len(text)
+                        if char_count >= 5000:
+                            break
+                    pqp_text = '\n'.join(pages_text)
             except Exception as e:
                 print(f"Error reading PYQ PDF: {e}")
         
@@ -258,7 +274,15 @@ def analyze_study_material():
         try:
             with open(filepath, 'rb') as f:
                 reader = PyPDF2.PdfReader(f)
-                syllabus_text = '\n'.join([page.extract_text() for page in reader.pages])
+                pages_text = []
+                char_count = 0
+                for page in reader.pages:
+                    text = page.extract_text() or ''
+                    pages_text.append(text)
+                    char_count += len(text)
+                    if char_count >= 5000:
+                        break
+                syllabus_text = '\n'.join(pages_text)
         except Exception as e:
             print(f"Error reading syllabus PDF: {e}")
     
@@ -271,7 +295,15 @@ def analyze_study_material():
         try:
             with open(filepath, 'rb') as f:
                 reader = PyPDF2.PdfReader(f)
-                pqp_text = '\n'.join([page.extract_text() for page in reader.pages])
+                pages_text = []
+                char_count = 0
+                for page in reader.pages:
+                    text = page.extract_text() or ''
+                    pages_text.append(text)
+                    char_count += len(text)
+                    if char_count >= 5000:
+                        break
+                pqp_text = '\n'.join(pages_text)
         except Exception as e:
             print(f"Error reading PYQ PDF: {e}")
             

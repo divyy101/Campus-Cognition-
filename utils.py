@@ -21,9 +21,15 @@ def extract_text_from_pdf(file_path):
             pdf_reader = PdfReader(file)
             num_pages = len(pdf_reader.pages)
             
-            for page_num in range(num_pages):
-                page = pdf_reader.pages[page_num]
-                text += page.extract_text()
+            pages_text = []
+            char_count = 0
+            for page in pdf_reader.pages:
+                page_text = page.extract_text() or ''
+                pages_text.append(page_text)
+                char_count += len(page_text)
+                if char_count >= 5000:
+                    break
+            text = '\n'.join(pages_text)
         
         return text, num_pages
     except Exception as e:

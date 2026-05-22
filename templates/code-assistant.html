@@ -534,7 +534,24 @@
                 body: JSON.stringify(formData)
             });
 
-            const data = await response.json();
+            let data;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                let errMsg = "Server responded with an invalid format.";
+                if (response.status === 504 || text.includes("Gateway Timeout") || text.includes("Gateway Time-out")) {
+                    errMsg = "Gateway Timeout (504): The code analysis took longer than 10 seconds. Try a simpler or shorter code segment.";
+                } else if (response.status === 413 || text.includes("Payload Too Large") || text.includes("Request Entity Too Large")) {
+                    errMsg = "Request Entity Too Large (413): The payload is too large. Please use a code block under 4.5MB.";
+                } else if (response.status >= 500) {
+                    errMsg = `Server Error (${response.status}): The server encountered an issue processing the request.`;
+                } else {
+                    errMsg = `Error (${response.status}): ${text.substring(0, 100)}`;
+                }
+                throw new Error(errMsg);
+            }
 
             if (data.success) {
                 displayHudAnalysis(data.analysis, formData.code);
