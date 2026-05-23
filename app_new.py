@@ -369,6 +369,7 @@ def api_explore_scholarships():
     data = request.get_json() or {}
     branch = data.get('branch', '')
     cgpa_val = data.get('cgpa', '')
+    query = data.get('query', '')
     
     user_id = session['user_id']
     user = get_user_by_id(user_id)
@@ -380,10 +381,10 @@ def api_explore_scholarships():
     except (ValueError, TypeError):
         cgpa = 8.0
         
-    # Crawl the web via live AI proxy
-    scholarships_data = fetch_live_scholarships(branch, cgpa)
+    # Crawl the web via live AI proxy matching custom search criteria
+    scholarships_data = fetch_live_scholarships(branch, cgpa, query)
     
-    log_activity(user_id, 'SCHOLARSHIP_AI_EXPLORE', f'AI explored scholarships for branch={branch}, cgpa={cgpa}')
+    log_activity(user_id, 'SCHOLARSHIP_AI_EXPLORE', f'AI explored scholarships for branch={branch}, cgpa={cgpa}, query={query}')
     
     return jsonify({
         'success': True,
@@ -397,6 +398,7 @@ def api_explore_internships():
     data = request.get_json() or {}
     branch = data.get('branch', '')
     cgpa_val = data.get('cgpa', '')
+    query = data.get('query', '')
     
     user_id = session['user_id']
     user = get_user_by_id(user_id)
@@ -408,10 +410,10 @@ def api_explore_internships():
     except (ValueError, TypeError):
         cgpa = 8.0
         
-    # Crawl the web via live AI proxy
-    internships_data = fetch_live_internships(branch, cgpa)
+    # Crawl the web via live AI proxy matching custom search criteria
+    internships_data = fetch_live_internships(branch, cgpa, query)
     
-    log_activity(user_id, 'INTERNSHIP_AI_EXPLORE', f'AI explored internships for branch={branch}, cgpa={cgpa}')
+    log_activity(user_id, 'INTERNSHIP_AI_EXPLORE', f'AI explored internships for branch={branch}, cgpa={cgpa}, query={query}')
     
     return jsonify({
         'success': True,

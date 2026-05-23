@@ -1128,44 +1128,56 @@ def get_api_status() -> Dict:
 
 LIVE_SCHOLARSHIPS_PROMPT = """
 You are a real-time academic crawlers AI agent designed to search and retrieve active scholarships for university students.
-Generate a list of 6 highly realistic, current, and active scholarships matching this student profile:
+Generate a list of 6 highly realistic, current, and active scholarships matching this student profile and search keywords:
 - Branch: {branch}
 - CGPA: {cgpa}
+- Search Keywords / Specific Focus: {query}
+
+**CRITICAL GUIDELINES**:
+1. Strongly prioritize official government scholarship schemes (e.g., National Scholarship Portal (NSP) India, INSPIRE Scholarship, Prime Minister's Scholarship Scheme (PMSS), AICTE Pragati/Saksham schemes, or other state and central government educational boards).
+2. For government scholarships, provide official government portal links (e.g. domains ending in '.gov.in' or '.edu.in', like 'https://scholarships.gov.in/').
+3. Dynamically adjust suggestions and matching scores strictly based on the provided Search Keywords / Specific Focus.
 
 For each scholarship, provide:
 1. "id": A unique integer ID (1 to 6)
-2. "title": Scholarship name (e.g. "Google Generation Scholarship", "Reliance Foundation Undergraduate Scholarship", "Adobe Women-in-Technology Scholarship")
-3. "organization": Organization name
-4. "award_amount": Financial award details (e.g. "INR 2,00,000" or "$10,000")
-5. "min_cgpa": Minimum CGPA required (float, e.g. 7.5)
+2. "title": Scholarship name (e.g. "Inspire Scholarship for Higher Education", "National Scholarship Portal Merit-cum-Means", "Prime Minister's Scholarship Scheme")
+3. "organization": Organization or Ministry name (e.g. "Ministry of Electronics & IT", "Department of Science & Technology")
+4. "award_amount": Financial award details (e.g. "INR 80,000/year" or "INR 2,00,000")
+5. "min_cgpa": Minimum CGPA required (float, e.g. 6.0)
 6. "deadline": Active future deadline (YYYY-MM-DD format in 2026, e.g. "2026-11-30")
 7. "category": merit, need, special, or research
-8. "description": A concise, useful summary of eligibility and benefits.
-9. "link": Real-world official application domain link (e.g. "https://buildyourfuture.withgoogle.com/")
-10. "match_percentage": A realistic match score (0-100) based on CGPA and Branch.
+8. "description": A concise, useful summary of eligibility, benefits, and how it correlates with the search query.
+9. "link": Official government or scheme application domain link (e.g. "https://scholarships.gov.in/")
+10. "match_percentage": A realistic match score (0-100) based on CGPA, Branch, and the Search Keywords.
 
 Return a valid JSON array ONLY. Do NOT wrap the JSON in ```json ``` code blocks.
 """
 
 LIVE_INTERNSHIPS_PROMPT = """
 You are a real-time career crawlers AI agent designed to search and retrieve active internships for university students.
-Generate a list of 6 highly realistic, current, and active internships matching this student profile:
+Generate a list of 6 highly realistic, current, and active internships matching this student profile and search keywords:
 - Branch: {branch}
 - CGPA: {cgpa}
+- Search Keywords / Specific Focus: {query}
+
+**CRITICAL GUIDELINES**:
+1. Strongly prioritize official government internship portals (e.g., AICTE Internship Portal, NITI Aayog Internship Scheme, Digital India Internship Scheme, DRDO/ISRO student research fellowships) and premier public/private organizations.
+2. Provide official application links (e.g. domains ending in '.gov.in' or official corporate careers pages like 'https://internship.aicte-india.org/').
+3. Dynamically adjust roles and matching scores strictly based on the provided Search Keywords / Specific Focus.
 
 For each internship, provide:
 1. "id": A unique integer ID (1 to 6)
-2. "title": Role title (e.g. "Software Engineering Intern", "Data Science & Analytics Intern", "Cloud Support Intern", "Frontend Dev Intern")
-3. "company": Company name (e.g. "Google", "Amazon", "Microsoft", "TCS", "Infosys")
+2. "title": Role title matching search keywords (e.g. "Government Cyber Security Intern", "AICTE Virtual Internship", "NITI Aayog Research Associate Intern")
+3. "company": Company or Ministry name (e.g. "NITI Aayog", "AICTE", "ISRO", "DRDO", "Google")
 4. "type": summer, winter, remote, or permanent
 5. "duration": e.g. "3 months" or "6 months"
-6. "location": e.g. "Bangalore, India", "Remote", or "Hyderabad, India"
-7. "stipend": e.g. "INR 50,000/month" or "INR 1,20,000/month"
+6. "location": e.g. "New Delhi, India", "Remote", or "Bangalore, India"
+7. "stipend": e.g. "INR 10,000/month", "INR 25,000/month", or "Unpaid (Certificate of Experience)"
 8. "deadline": Active future deadline (YYYY-MM-DD format in 2026, e.g. "2026-08-30")
 9. "required_skills": Comma-separated required skills
-10. "description": A concise, useful summary of the role and responsibilities.
-11. "link": Real-world official careers domain link (e.g. "https://careers.google.com")
-12. "match_percentage": A realistic match score (0-100) based on CGPA and Branch.
+10. "description": A concise, useful summary of the role, responsibilities, and how it relates to the search query.
+11. "link": Official portal or application domain link (e.g. "https://internship.aicte-india.org/")
+12. "match_percentage": A realistic match score (0-100) based on CGPA, Branch, and the Search Keywords.
 
 Return a valid JSON array ONLY. Do NOT wrap the JSON in ```json ``` code blocks.
 """
@@ -1226,10 +1238,10 @@ def get_default_internships() -> List[Dict]:
     """Get static default internships."""
     return DEFAULT_INTERNSHIPS
 
-def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict]:
-    """Fetch live scholarships matching user branch and CGPA using AI agents."""
+def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0, query: str = '') -> List[Dict]:
+    """Fetch live scholarships matching user branch, CGPA, and search query using AI agents."""
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
-    prompt = LIVE_SCHOLARSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0)
+    prompt = LIVE_SCHOLARSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0, query=query or 'General / Latest official government scholarships')
     fallback_data = DEFAULT_SCHOLARSHIPS
     
     # Try Gemini
@@ -1256,10 +1268,10 @@ def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict
         
     return fallback_data
 
-def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict]:
-    """Fetch live internships matching user branch and CGPA using AI agents."""
+def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0, query: str = '') -> List[Dict]:
+    """Fetch live internships matching user branch, CGPA, and search query using AI agents."""
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
-    prompt = LIVE_INTERNSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0)
+    prompt = LIVE_INTERNSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0, query=query or 'General / Latest official government internship programs')
     fallback_data = DEFAULT_INTERNSHIPS
     
     # Try Gemini

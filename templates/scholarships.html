@@ -188,6 +188,7 @@
         
         const branch = branchInput.value.trim();
         const cgpa = cgpaInput.value.trim();
+        const query = searchInput.value.trim();
         
         // 1. Disable controls
         btn.disabled = true;
@@ -236,7 +237,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ branch: branch, cgpa: cgpa })
+            body: JSON.stringify({ branch: branch, cgpa: cgpa, query: query })
         })
         .then(response => response.json())
         .then(data => {
