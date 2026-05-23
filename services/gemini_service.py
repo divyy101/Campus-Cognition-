@@ -842,7 +842,7 @@ def analyze_code(code: str, language: str, ai_engine: str = 'gemini') -> Dict:
 def recommend_opportunities(branch: str, cgpa: float, skills: str, 
                            interests: str, opportunities_list: str) -> Dict:
     """
-    Recommend scholarships and internships based on student profile using Gemini AI.
+    Recommend scholarships and internships based on student profile using Gemini or OpenAI AI.
     
     Args:
         branch (str): Academic branch
@@ -854,35 +854,44 @@ def recommend_opportunities(branch: str, cgpa: float, skills: str,
     Returns:
         Dict: Contains recommendations with match scores and strategies
     """
-    if not GEMINI_API_KEY:
-        return {
-            'success': False,
-            'recommendations': 'Gemini API key not configured'
-        }
+    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
+    prompt = OPPORTUNITY_MATCHING_PROMPT.format(
+        branch=branch,
+        cgpa=cgpa,
+        skills=skills,
+        interests=interests,
+        opportunities_list=opportunities_list[:2000]
+    )
     
+    # Try Gemini
+    if use_gemini:
+        try:
+            model = genai.GenerativeModel(GEMINI_MODEL)
+            response = model.generate_content(prompt)
+            return {
+                'success': True,
+                'recommendations': response.text,
+                'model': GEMINI_MODEL
+            }
+        except Exception as e:
+            print(f"Gemini Opportunity matching error: {e}")
+            
+    # Try OpenAI
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL)
-        prompt = OPPORTUNITY_MATCHING_PROMPT.format(
-            branch=branch,
-            cgpa=cgpa,
-            skills=skills,
-            interests=interests,
-            opportunities_list=opportunities_list[:2000]
-        )
-        
-        response = model.generate_content(prompt)
-        
-        return {
-            'success': True,
-            'recommendations': response.text,
-            'model': GEMINI_MODEL
-        }
-    
+        openai_text = call_openai_chat(prompt, json_mode=False)
+        if openai_text:
+            return {
+                'success': True,
+                'recommendations': openai_text,
+                'model': 'openai-gpt-4o-mini'
+            }
     except Exception as e:
-        return {
-            'success': False,
-            'recommendations': f'Error generating recommendations: {str(e)}'
-        }
+        print(f"OpenAI Opportunity matching error: {e}")
+        
+    return {
+        'success': False,
+        'recommendations': 'API keys rate-limited or not configured.'
+    }
 
 # ==========================================
 # SCHOLARSHIP ANALYSIS FUNCTION
@@ -902,38 +911,49 @@ def analyze_scholarship(scholarship_info: str, branch: str, cgpa: float,
     Returns:
         Dict: Contains eligibility, match score, and application tips
     """
-    if not GEMINI_API_KEY:
-        return {
-            'success': False,
-            'analysis': 'Gemini API key not configured',
-            'match_score': 0
-        }
+    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
+    prompt = SCHOLARSHIP_ANALYSIS_PROMPT.format(
+        scholarship_info=scholarship_info,
+        branch=branch,
+        cgpa=cgpa,
+        achievements=achievements
+    )
     
+    # Try Gemini
+    if use_gemini:
+        try:
+            model = genai.GenerativeModel(GEMINI_MODEL)
+            response = model.generate_content(prompt)
+            match_score = extract_match_score(response.text)
+            
+            return {
+                'success': True,
+                'analysis': response.text,
+                'match_score': match_score,
+                'model': GEMINI_MODEL
+            }
+        except Exception as e:
+            print(f"Gemini Scholarship analysis error: {e}")
+            
+    # Try OpenAI
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL)
-        prompt = SCHOLARSHIP_ANALYSIS_PROMPT.format(
-            scholarship_info=scholarship_info,
-            branch=branch,
-            cgpa=cgpa,
-            achievements=achievements
-        )
-        
-        response = model.generate_content(prompt)
-        match_score = extract_match_score(response.text)
-        
-        return {
-            'success': True,
-            'analysis': response.text,
-            'match_score': match_score,
-            'model': GEMINI_MODEL
-        }
-    
+        openai_text = call_openai_chat(prompt, json_mode=False)
+        if openai_text:
+            match_score = extract_match_score(openai_text)
+            return {
+                'success': True,
+                'analysis': openai_text,
+                'match_score': match_score,
+                'model': 'openai-gpt-4o-mini'
+            }
     except Exception as e:
-        return {
-            'success': False,
-            'analysis': f'Error analyzing scholarship: {str(e)}',
-            'match_score': 0
-        }
+        print(f"OpenAI Scholarship analysis error: {e}")
+        
+    return {
+        'success': False,
+        'analysis': 'API keys rate-limited or not configured.',
+        'match_score': 0
+    }
 
 # ==========================================
 # INTERNSHIP ANALYSIS FUNCTION
@@ -954,39 +974,50 @@ def analyze_internship(internship_info: str, branch: str, skills: str,
     Returns:
         Dict: Contains fit analysis, skill gaps, and preparation plan
     """
-    if not GEMINI_API_KEY:
-        return {
-            'success': False,
-            'analysis': 'Gemini API key not configured',
-            'fit_score': 0
-        }
+    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
+    prompt = INTERNSHIP_ANALYSIS_PROMPT.format(
+        internship_info=internship_info,
+        branch=branch,
+        skills=skills,
+        experience=experience,
+        cgpa=cgpa
+    )
     
+    # Try Gemini
+    if use_gemini:
+        try:
+            model = genai.GenerativeModel(GEMINI_MODEL)
+            response = model.generate_content(prompt)
+            fit_score = extract_match_score(response.text)
+            
+            return {
+                'success': True,
+                'analysis': response.text,
+                'fit_score': fit_score,
+                'model': GEMINI_MODEL
+            }
+        except Exception as e:
+            print(f"Gemini Internship analysis error: {e}")
+            
+    # Try OpenAI
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL)
-        prompt = INTERNSHIP_ANALYSIS_PROMPT.format(
-            internship_info=internship_info,
-            branch=branch,
-            skills=skills,
-            experience=experience,
-            cgpa=cgpa
-        )
-        
-        response = model.generate_content(prompt)
-        fit_score = extract_match_score(response.text)
-        
-        return {
-            'success': True,
-            'analysis': response.text,
-            'fit_score': fit_score,
-            'model': GEMINI_MODEL
-        }
-    
+        openai_text = call_openai_chat(prompt, json_mode=False)
+        if openai_text:
+            fit_score = extract_match_score(openai_text)
+            return {
+                'success': True,
+                'analysis': openai_text,
+                'fit_score': fit_score,
+                'model': 'openai-gpt-4o-mini'
+            }
     except Exception as e:
-        return {
-            'success': False,
-            'analysis': f'Error analyzing internship: {str(e)}',
-            'fit_score': 0
-        }
+        print(f"OpenAI Internship analysis error: {e}")
+        
+    return {
+        'success': False,
+        'analysis': 'API keys rate-limited or not configured.',
+        'fit_score': 0
+    }
 
 # ==========================================
 # HELPER FUNCTIONS
