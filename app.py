@@ -404,9 +404,9 @@ def api_explore_scholarships():
     user = get_user_by_id(user_id)
     
     # Use default user values if not customized
-    branch = branch or user.get('branch') or 'CSE'
+    branch = branch or user['branch'] or 'CSE'
     try:
-        cgpa = float(cgpa_val) if cgpa_val else float(user.get('cgpa') or 8.0)
+        cgpa = float(cgpa_val) if cgpa_val else float(user['cgpa'] or 8.0)
     except (ValueError, TypeError):
         cgpa = 8.0
         
@@ -432,9 +432,9 @@ def api_explore_internships():
     user = get_user_by_id(user_id)
     
     # Use default user values if not customized
-    branch = branch or user.get('branch') or 'CSE'
+    branch = branch or user['branch'] or 'CSE'
     try:
-        cgpa = float(cgpa_val) if cgpa_val else float(user.get('cgpa') or 8.0)
+        cgpa = float(cgpa_val) if cgpa_val else float(user['cgpa'] or 8.0)
     except (ValueError, TypeError):
         cgpa = 8.0
         
