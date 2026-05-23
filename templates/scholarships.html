@@ -45,11 +45,11 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label">Target Major / Branch</label>
-                <input type="text" class="form-control" id="aiBranchInput" value="{{ user.get('branch', 'CSE') }}" placeholder="e.g., Computer Science, Biotech">
+                <input type="text" class="form-control" id="aiBranchInput" value="{{ user['branch'] or 'CSE' }}" placeholder="e.g., Computer Science, Biotech">
             </div>
             <div class="col-md-4">
                 <label class="form-label">Target CGPA</label>
-                <input type="number" step="0.1" min="0" max="10" class="form-control" id="aiCgpaInput" value="{{ user.get('cgpa', 8.0) }}" placeholder="e.g., 8.5">
+                <input type="number" step="0.1" min="0" max="10" class="form-control" id="aiCgpaInput" value="{{ user['cgpa'] or 8.0 }}" placeholder="e.g., 8.5">
             </div>
             <div class="col-md-4">
                 <button class="btn btn-primary w-100" id="aiExploreBtn" onclick="exploreLiveScholarships()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border: none; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); height: 42px;">
