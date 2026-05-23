@@ -188,6 +188,15 @@ def get_user_by_username(username):
     conn.close()
     return user
 
+def get_user_by_email(email):
+    """Get user by email (case-insensitive)"""
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM users WHERE email = ? COLLATE NOCASE', (email,))
+    user = c.fetchone()
+    conn.close()
+    return user
+
 def get_user_by_id(user_id):
     """Get user by ID"""
     conn = get_db_connection()
