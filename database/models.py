@@ -217,6 +217,23 @@ def update_user_profile(user_id, branch, cgpa):
     conn.commit()
     conn.close()
 
+def delete_user_and_records(user_id):
+    """Delete a user and all their associated database records completely"""
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('DELETE FROM study_sessions WHERE user_id = ?', (user_id,))
+        c.execute('DELETE FROM user_opportunities WHERE user_id = ?', (user_id,))
+        c.execute('DELETE FROM code_analysis WHERE user_id = ?', (user_id,))
+        c.execute('DELETE FROM activity_log WHERE user_id = ?', (user_id,))
+        c.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error deleting user records: {e}")
+        return False
+
 # Study Session functions
 def create_study_session(user_id, title, syllabus_path=None, pqp_path=None):
     """Create a new study session"""

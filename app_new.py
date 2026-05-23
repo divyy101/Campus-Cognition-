@@ -17,7 +17,7 @@ from database.models import (
     create_opportunity, match_opportunities, save_user_opportunity, get_user_opportunities,
     save_code_analysis, get_code_analysis_history, log_activity, get_user_activity,
     update_user_profile, get_all_opportunities, insert_sample_opportunities, get_db_connection,
-    hash_password, get_user_by_email
+    hash_password, get_user_by_email, delete_user_and_records
 )
 
 # Initialize Flask app
@@ -92,26 +92,24 @@ def signup():
         password = request.form.get('password')
         first_name = request.form.get('first_name', '')
 
-        existing_user_by_username = get_user_by_username(username) if username else None
+        # Check if email is already used to register and wipe previous data to allow fresh replacement
         existing_user_by_email = get_user_by_email(email) if email else None
-        existing_user = existing_user_by_username or existing_user_by_email
+        if existing_user_by_email:
+            delete_user_and_records(existing_user_by_email['id'])
+            
+        # Check if username is already used and wipe to avoid conflict
+        existing_user_by_username = get_user_by_username(username) if username else None
+        if existing_user_by_username:
+            delete_user_and_records(existing_user_by_username['id'])
         
-        if existing_user:
-            # Check if correct password is provided to reuse account with previous data
-            if verify_password(password, existing_user['password'], user_id=existing_user['id']):
-                session['user_id'] = existing_user['id']
-                log_activity(existing_user['id'], 'SIGNUP_REUSE', 'User logged in by reusing existing account')
-                return jsonify({'success': True, 'message': 'Account verified and reused! Redirecting...', 'redirect': url_for('dashboard')})
-            else:
-                return jsonify({'success': False, 'message': 'Username or email already exists. Enter the correct password to reuse it.'})
-        
+        # Create fresh user account
         user_id = create_user(username, email, password, first_name)
         if user_id:
             session['user_id'] = user_id
-            log_activity(user_id, 'SIGNUP', 'New user registered')
+            log_activity(user_id, 'SIGNUP', 'New user registered (replaced legacy records)')
             return jsonify({'success': True, 'message': 'Account created successfully!', 'redirect': url_for('dashboard')})
         else:
-            return jsonify({'success': False, 'message': 'Username or email already exists'})
+            return jsonify({'success': False, 'message': 'Registration error occurred'})
 
     return render_template('signup.html')
 
