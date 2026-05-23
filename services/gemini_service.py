@@ -200,9 +200,17 @@ def clean_json_response(text: str) -> str:
         if text.endswith("```"):
             text = text[:-3].strip()
             
-    # 2. Extract content starting from first '{' and ending at last '}'
-    start_idx = text.find('{')
-    end_idx = text.rfind('}')
+    # 2. Extract content starting from first '{' or '[' and ending at last '}' or ']'
+    start_bracket = text.find('[')
+    start_brace = text.find('{')
+    
+    if start_bracket != -1 and (start_brace == -1 or start_bracket < start_brace):
+        start_idx = start_bracket
+        end_idx = text.rfind(']')
+    else:
+        start_idx = start_brace
+        end_idx = text.rfind('}')
+        
     if start_idx != -1 and end_idx != -1:
         text = text[start_idx:end_idx + 1]
         
