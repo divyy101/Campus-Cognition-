@@ -137,7 +137,7 @@ def verify_password(password, hashed, user_id=None):
         return False
         
     # Check if this is a secure Werkzeug hash
-    if hashed.startswith(('pbkdf2:sha256:', 'scrypt:', 'bcrypt:', 'pbkdf2:')):
+    if ':' in hashed:
         try:
             return check_password_hash(hashed, password)
         except Exception:
@@ -180,10 +180,10 @@ def create_user(username, email, password, first_name='', last_name=''):
         return None
 
 def get_user_by_username(username):
-    """Get user by username"""
+    """Get user by username (case-insensitive)"""
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute('SELECT * FROM users WHERE username = ?', (username,))
+    c.execute('SELECT * FROM users WHERE username = ? COLLATE NOCASE', (username,))
     user = c.fetchone()
     conn.close()
     return user
