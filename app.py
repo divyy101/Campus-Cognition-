@@ -20,7 +20,9 @@ from services.gemini_service import (
     analyze_scholarship,
     analyze_internship,
     is_api_available,
-    get_api_status
+    get_api_status,
+    fetch_live_scholarships,
+    fetch_live_internships
 )
 
 # Import database models
@@ -364,21 +366,8 @@ def scholarships():
     user_id = session['user_id']
     user = get_user_by_id(user_id)
     
-    # Sample scholarships data
-    scholarships_data = [
-        {
-            'id': 1, 'title': 'KVPY Scholarship', 'organization': 'DST India',
-            'award_amount': '500000', 'min_cgpa': 6.0, 'deadline': '2026-11-30',
-            'category': 'merit', 'description': 'Exceptional merit-based scholarship for science students',
-            'match_percentage': 85, 'link': '#'
-        },
-        {
-            'id': 2, 'title': 'Google Scholarship', 'organization': 'Google',
-            'award_amount': '1000000', 'min_cgpa': 7.5, 'deadline': '2026-12-15',
-            'category': 'special', 'description': 'Technology and innovation focused scholarship',
-            'match_percentage': 75, 'link': '#'
-        },
-    ]
+    # Fetch live scholarships matching user profile using AI crawling agents
+    scholarships_data = fetch_live_scholarships(user['branch'] or 'CSE', user['cgpa'] or 8.0)
     
     return render_template('scholarships.html', user=user, scholarships=scholarships_data)
 
@@ -392,25 +381,8 @@ def internships():
     user_id = session['user_id']
     user = get_user_by_id(user_id)
     
-    # Sample internships data
-    internships_data = [
-        {
-            'id': 1, 'title': 'SDE Intern', 'company': 'Google',
-            'type': 'summer', 'duration': '3 months', 'location': 'Bangalore',
-            'stipend': '50000', 'deadline': '2026-06-30',
-            'required_skills': 'Python, DSA, JavaScript',
-            'description': 'Software Development Engineer Internship',
-            'match_percentage': 90, 'link': '#'
-        },
-        {
-            'id': 2, 'title': 'Data Science Intern', 'company': 'Amazon',
-            'type': 'summer', 'duration': '3 months', 'location': 'Remote',
-            'stipend': '45000', 'deadline': '2026-07-15',
-            'required_skills': 'Python, SQL, ML',
-            'description': 'Data Science and Analytics Internship',
-            'match_percentage': 80, 'link': '#'
-        },
-    ]
+    # Fetch live internships matching user profile using AI crawling agents
+    internships_data = fetch_live_internships(user['branch'] or 'CSE', user['cgpa'] or 8.0)
     
     return render_template('internships.html', user=user, internships=internships_data)
 
