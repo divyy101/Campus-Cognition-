@@ -2,6 +2,7 @@ import sqlite3
 import os
 from datetime import datetime
 import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Database file path
 ORIGINAL_DB_PATH = os.path.join(os.path.dirname(__file__), 'campus_cognition.db')
@@ -127,12 +128,38 @@ def init_db():
     conn.close()
 
 def hash_password(password):
-    """Hash password using SHA-256"""
-    return hashlib.sha256(password.encode()).hexdigest()
+    """Hash password securely using Werkzeug's generate_password_hash"""
+    return generate_password_hash(password)
 
-def verify_password(password, hashed):
-    """Verify password against hash"""
-    return hash_password(password) == hashed
+def verify_password(password, hashed, user_id=None):
+    """Verify password against hash. Supports salted PBKDF2/scrypt and old SHA-256 with auto-migration."""
+    if not hashed:
+        return False
+        
+    # Check if this is a secure Werkzeug hash
+    if hashed.startswith(('pbkdf2:sha256:', 'scrypt:', 'bcrypt:', 'pbkdf2:')):
+        try:
+            return check_password_hash(hashed, password)
+        except Exception:
+            pass
+
+    # Fallback/migration for legacy SHA-256 unsalted hash
+    legacy_hash = hashlib.sha256(password.encode()).hexdigest()
+    if legacy_hash == hashed:
+        # If user_id is provided, automatically upgrade legacy hash to secure hash
+        if user_id:
+            try:
+                conn = get_db_connection()
+                c = conn.cursor()
+                secure_hash = hash_password(password)
+                c.execute('UPDATE users SET password = ? WHERE id = ?', (secure_hash, user_id))
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                print(f"Error upgrading legacy password hash: {e}")
+        return True
+        
+    return False
 
 # User functions
 def create_user(username, email, password, first_name='', last_name=''):

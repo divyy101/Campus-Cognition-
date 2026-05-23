@@ -67,3 +67,6 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+# Local Scratch Workspace
+scratch/

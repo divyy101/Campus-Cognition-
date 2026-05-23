@@ -31,7 +31,8 @@ from models import (
     create_study_session, save_study_analysis, get_user_study_sessions,
     create_opportunity, match_opportunities, save_user_opportunity, get_user_opportunities,
     save_code_analysis, get_code_analysis_history, log_activity, get_user_activity,
-    update_user_profile, get_all_opportunities, insert_sample_opportunities, get_db_connection
+    update_user_profile, get_all_opportunities, insert_sample_opportunities, get_db_connection,
+    hash_password
 )
 
 # Initialize Flask app
@@ -90,7 +91,7 @@ def login():
             
         user = get_user_by_username(username)
         
-        if user and verify_password(password, user['password']):
+        if user and verify_password(password, user['password'], user_id=user['id']):
             session['user_id'] = user['id']
             log_activity(user['id'], 'LOGIN', f'User logged in at {datetime.now()}')
             return jsonify({'success': True, 'message': 'Login successful!', 'redirect': url_for('dashboard')})
@@ -661,6 +662,49 @@ def profile():
         return jsonify({'success': True, 'message': 'Profile updated!'})
     
     return render_template('profile.html', user=user)
+
+@app.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    user_id = session['user_id']
+    
+    if request.is_json:
+        data = request.get_json() or {}
+        current_password = data.get('current_password')
+        new_password = data.get('new_password')
+    else:
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        
+    if not current_password or not new_password:
+        return jsonify({'success': False, 'message': 'All fields are required'})
+        
+    user = get_user_by_id(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'})
+        
+    # Verify current password and upgrade legacy hash if needed
+    if not verify_password(current_password, user['password'], user_id=user_id):
+        return jsonify({'success': False, 'message': 'Incorrect current password'})
+        
+    if len(new_password) < 6:
+        return jsonify({'success': False, 'message': 'New password must be at least 6 characters long'})
+        
+    # Hash and update password
+    hashed_password = hash_password(new_password)
+    
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', (hashed_password, user_id))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Database error: {str(e)}'})
+        
+    log_activity(user_id, 'PASSWORD_CHANGE', 'User changed their password')
+    
+    return jsonify({'success': True, 'message': 'Password updated successfully!'})
 
 # ==========================================
 # ACTIVITY LOG ROUTE

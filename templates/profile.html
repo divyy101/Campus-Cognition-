@@ -94,6 +94,38 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Security & Password Card -->
+            <div class="glass-card p-4 mt-4">
+                <h5 class="mb-3"><i class="bi bi-shield-lock"></i> Change Password</h5>
+                
+                <form id="changePasswordForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control glass-input" id="current_password" name="current_password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control glass-input" id="new_password" name="new_password" placeholder="Minimum 6 characters" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_new_password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control glass-input" id="confirm_new_password" name="confirm_new_password" placeholder="Re-enter new password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-secondary w-100 gradient-btn">
+                        <i class="bi bi-key"></i> Update Password
+                    </button>
+                </form>
+
+                <div id="passwordStatus" style="display: none;" class="mt-3">
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i> Password updated successfully!
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -156,6 +188,54 @@ document.getElementById('professionalForm').addEventListener('submit', async (e)
             }, 3000);
         } else {
             showToast(data.message || 'Error updating profile', 'danger');
+        }
+    } catch (error) {
+        showToast('Error: ' + error.message, 'danger');
+    }
+});
+
+document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const current_password = document.getElementById('current_password').value;
+    const new_password = document.getElementById('new_password').value;
+    const confirm_new_password = document.getElementById('confirm_new_password').value;
+
+    if (new_password.length < 6) {
+        showToast('New password must be at least 6 characters long.', 'danger');
+        return;
+    }
+
+    if (new_password !== confirm_new_password) {
+        showToast('New passwords do not match.', 'danger');
+        return;
+    }
+
+    const formData = {
+        current_password: current_password,
+        new_password: new_password
+    };
+
+    try {
+        const response = await fetch('{{ url_for("change_password") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById('passwordStatus').style.display = 'block';
+            showToast('Password updated successfully!', 'success');
+            document.getElementById('changePasswordForm').reset();
+            setTimeout(() => {
+                document.getElementById('passwordStatus').style.display = 'none';
+            }, 3000);
+        } else {
+            showToast(data.message || 'Error updating password', 'danger');
         }
     } catch (error) {
         showToast('Error: ' + error.message, 'danger');
