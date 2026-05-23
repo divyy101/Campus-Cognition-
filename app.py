@@ -22,7 +22,9 @@ from services.gemini_service import (
     is_api_available,
     get_api_status,
     fetch_live_scholarships,
-    fetch_live_internships
+    fetch_live_internships,
+    get_default_scholarships,
+    get_default_internships
 )
 
 # Import database models
@@ -366,8 +368,8 @@ def scholarships():
     user_id = session['user_id']
     user = get_user_by_id(user_id)
     
-    # Fetch live scholarships matching user profile using AI crawling agents
-    scholarships_data = fetch_live_scholarships(user['branch'] or 'CSE', user['cgpa'] or 8.0)
+    # Serving default/fallback options initially for quick page response
+    scholarships_data = get_default_scholarships()
     
     return render_template('scholarships.html', user=user, scholarships=scholarships_data)
 
@@ -381,10 +383,70 @@ def internships():
     user_id = session['user_id']
     user = get_user_by_id(user_id)
     
-    # Fetch live internships matching user profile using AI crawling agents
-    internships_data = fetch_live_internships(user['branch'] or 'CSE', user['cgpa'] or 8.0)
+    # Serving default/fallback options initially for quick page response
+    internships_data = get_default_internships()
     
     return render_template('internships.html', user=user, internships=internships_data)
+
+# ==========================================
+# AI DYNAMIC SEARCH / EXPLORATION API ROUTES
+# ==========================================
+
+@app.route('/api/explore-scholarships', methods=['POST'])
+@login_required
+def api_explore_scholarships():
+    """API endpoint to dynamically crawl scholarships using AI proxy."""
+    data = request.get_json() or {}
+    branch = data.get('branch', '')
+    cgpa_val = data.get('cgpa', '')
+    
+    user_id = session['user_id']
+    user = get_user_by_id(user_id)
+    
+    # Use default user values if not customized
+    branch = branch or user.get('branch') or 'CSE'
+    try:
+        cgpa = float(cgpa_val) if cgpa_val else float(user.get('cgpa') or 8.0)
+    except (ValueError, TypeError):
+        cgpa = 8.0
+        
+    # Crawl the web via live AI proxy
+    scholarships_data = fetch_live_scholarships(branch, cgpa)
+    
+    log_activity(user_id, 'SCHOLARSHIP_AI_EXPLORE', f'AI explored scholarships for branch={branch}, cgpa={cgpa}')
+    
+    return jsonify({
+        'success': True,
+        'scholarships': scholarships_data
+    })
+
+@app.route('/api/explore-internships', methods=['POST'])
+@login_required
+def api_explore_internships():
+    """API endpoint to dynamically crawl internships using AI proxy."""
+    data = request.get_json() or {}
+    branch = data.get('branch', '')
+    cgpa_val = data.get('cgpa', '')
+    
+    user_id = session['user_id']
+    user = get_user_by_id(user_id)
+    
+    # Use default user values if not customized
+    branch = branch or user.get('branch') or 'CSE'
+    try:
+        cgpa = float(cgpa_val) if cgpa_val else float(user.get('cgpa') or 8.0)
+    except (ValueError, TypeError):
+        cgpa = 8.0
+        
+    # Crawl the web via live AI proxy
+    internships_data = fetch_live_internships(branch, cgpa)
+    
+    log_activity(user_id, 'INTERNSHIP_AI_EXPLORE', f'AI explored internships for branch={branch}, cgpa={cgpa}')
+    
+    return jsonify({
+        'success': True,
+        'internships': internships_data
+    })
 
 # ==========================================
 # OPPORTUNITIES ROUTE

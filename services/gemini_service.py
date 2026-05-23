@@ -1131,34 +1131,69 @@ For each internship, provide:
 Return a valid JSON array ONLY. Do NOT wrap the JSON in ```json ``` code blocks.
 """
 
+DEFAULT_SCHOLARSHIPS = [
+    {
+        'id': 1, 'title': 'Google Generation Scholarship', 'organization': 'Google',
+        'award_amount': '2,00,000', 'min_cgpa': 7.5, 'deadline': '2026-11-30',
+        'category': 'merit', 'description': 'Exceptional merit-based scholarship for technology students.',
+        'link': 'https://buildyourfuture.withgoogle.com/', 'match_percentage': 85
+    },
+    {
+        'id': 2, 'title': 'Reliance Foundation Scholarship', 'organization': 'Reliance Foundation',
+        'award_amount': '2,00,000', 'min_cgpa': 6.5, 'deadline': '2026-10-15',
+        'category': 'need', 'description': 'Need-cum-merit scholarship for undergraduate students.',
+        'link': 'https://www.reliancefoundation.org/', 'match_percentage': 90
+    },
+    {
+        'id': 3, 'title': 'Adobe Women-in-Technology Scholarship', 'organization': 'Adobe',
+        'award_amount': '3,50,000', 'min_cgpa': 8.0, 'deadline': '2026-09-30',
+        'category': 'special', 'description': 'Supporting outstanding female computer science minds globally.',
+        'link': 'https://www.adobe.com/careers', 'match_percentage': 75
+    }
+]
+
+DEFAULT_INTERNSHIPS = [
+    {
+        'id': 1, 'title': 'Software Engineering Intern', 'company': 'Google',
+        'type': 'summer', 'duration': '3 months', 'location': 'Bangalore, India',
+        'stipend': '1,15,000', 'deadline': '2026-08-30',
+        'required_skills': 'Python, Java, DSA, Web Dev',
+        'description': 'Work alongside engineers to scale production backend architectures.',
+        'link': 'https://careers.google.com', 'match_percentage': 92
+    },
+    {
+        'id': 2, 'title': 'Data Science & ML Intern', 'company': 'Amazon',
+        'type': 'summer', 'duration': '3 months', 'location': 'Hyderabad, India',
+        'stipend': '80,000', 'deadline': '2026-07-15',
+        'required_skills': 'Python, SQL, Machine Learning, Tableau',
+        'description': 'Develop automated recommendation pipeline algorithms for prime services.',
+        'link': 'https://amazon.jobs', 'match_percentage': 88
+    },
+    {
+        'id': 3, 'title': 'Cloud Support Associate Intern', 'company': 'Microsoft',
+        'type': 'remote', 'duration': '6 months', 'location': 'Remote',
+        'stipend': '60,000', 'deadline': '2026-10-31',
+        'required_skills': 'AWS/Azure, Linux Shell, Python, Networking',
+        'description': 'Assist enterprise clients in migrating workloads safely to Azure Cloud.',
+        'link': 'https://careers.microsoft.com', 'match_percentage': 80
+    }
+]
+
+def get_default_scholarships() -> List[Dict]:
+    """Get static default scholarships."""
+    return DEFAULT_SCHOLARSHIPS
+
+def get_default_internships() -> List[Dict]:
+    """Get static default internships."""
+    return DEFAULT_INTERNSHIPS
+
 def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict]:
     """Fetch live scholarships matching user branch and CGPA using AI agents."""
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     prompt = LIVE_SCHOLARSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0)
+    fallback_data = DEFAULT_SCHOLARSHIPS
     
-    # 1. Fallback Static Data in case of API failure
-    fallback_data = [
-        {
-            'id': 1, 'title': 'Google Generation Scholarship', 'organization': 'Google',
-            'award_amount': 'INR 2,00,000', 'min_cgpa': 7.5, 'deadline': '2026-11-30',
-            'category': 'merit', 'description': 'Exceptional merit-based scholarship for technology students.',
-            'link': 'https://buildyourfuture.withgoogle.com/', 'match_percentage': 85
-        },
-        {
-            'id': 2, 'title': 'Reliance Foundation Scholarship', 'organization': 'Reliance Foundation',
-            'award_amount': 'INR 2,00,000', 'min_cgpa': 6.5, 'deadline': '2026-10-15',
-            'category': 'need', 'description': 'Need-cum-merit scholarship for undergraduate students.',
-            'link': 'https://www.reliancefoundation.org/', 'match_percentage': 90
-        },
-        {
-            'id': 3, 'title': 'Adobe Women-in-Technology Scholarship', 'organization': 'Adobe',
-            'award_amount': 'INR 3,50,000', 'min_cgpa': 8.0, 'deadline': '2026-09-30',
-            'category': 'special', 'description': 'Supporting outstanding female computer science minds globally.',
-            'link': 'https://www.adobe.com/careers', 'match_percentage': 75
-        }
-    ]
-    
-    # 2. Try Gemini
+    # Try Gemini
     if use_gemini:
         try:
             model = genai.GenerativeModel(GEMINI_MODEL)
@@ -1171,7 +1206,7 @@ def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict
         except Exception as e:
             print(f"Gemini Live Scholarships error: {e}")
             
-    # 3. Try OpenAI
+    # Try OpenAI
     try:
         openai_text = call_openai_chat(prompt, json_mode=True)
         if openai_text:
@@ -1186,36 +1221,9 @@ def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict]
     """Fetch live internships matching user branch and CGPA using AI agents."""
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     prompt = LIVE_INTERNSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0)
+    fallback_data = DEFAULT_INTERNSHIPS
     
-    # 1. Fallback Static Data in case of API failure
-    fallback_data = [
-        {
-            'id': 1, 'title': 'Software Engineering Intern', 'company': 'Google',
-            'type': 'summer', 'duration': '3 months', 'location': 'Bangalore, India',
-            'stipend': 'INR 1,15,000/month', 'deadline': '2026-08-30',
-            'required_skills': 'Python, Java, DSA, Web Dev',
-            'description': 'Work alongside engineers to scale production backend architectures.',
-            'link': 'https://careers.google.com', 'match_percentage': 92
-        },
-        {
-            'id': 2, 'title': 'Data Science & ML Intern', 'company': 'Amazon',
-            'type': 'summer', 'duration': '3 months', 'location': 'Hyderabad, India',
-            'stipend': 'INR 80,000/month', 'deadline': '2026-07-15',
-            'required_skills': 'Python, SQL, Machine Learning, Tableau',
-            'description': 'Develop automated recommendation pipeline algorithms for prime services.',
-            'link': 'https://amazon.jobs', 'match_percentage': 88
-        },
-        {
-            'id': 3, 'title': 'Cloud Support Associate Intern', 'company': 'Microsoft',
-            'type': 'remote', 'duration': '6 months', 'location': 'Remote',
-            'stipend': 'INR 60,000/month', 'deadline': '2026-10-31',
-            'required_skills': 'AWS/Azure, Linux Shell, Python, Networking',
-            'description': 'Assist enterprise clients in migrating workloads safely to Azure Cloud.',
-            'link': 'https://careers.microsoft.com', 'match_percentage': 80
-        }
-    ]
-    
-    # 2. Try Gemini
+    # Try Gemini
     if use_gemini:
         try:
             model = genai.GenerativeModel(GEMINI_MODEL)
@@ -1228,7 +1236,7 @@ def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict]
         except Exception as e:
             print(f"Gemini Live Internships error: {e}")
             
-    # 3. Try OpenAI
+    # Try OpenAI
     try:
         openai_text = call_openai_chat(prompt, json_mode=True)
         if openai_text:
@@ -1238,3 +1246,4 @@ def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0) -> List[Dict]
         print(f"OpenAI Live Internships error: {e}")
         
     return fallback_data
+
