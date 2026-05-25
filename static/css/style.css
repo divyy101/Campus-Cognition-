@@ -547,7 +547,6 @@ a:hover {
     border-radius: 20px;
     padding: 0.5rem 1rem;
     font-weight: 600;
-    backdrop-filter: var(--blur);
     border: 2px solid var(--accent-blue);
     background: linear-gradient(135deg, rgba(79, 156, 249, 0.15), rgba(6, 182, 212, 0.1));
     color: var(--accent-blue);
@@ -1187,5 +1186,61 @@ body.light-mode .glass-input option {
     background-color: #ffffff !important;
     color: #121a2b !important;
 }
+
+/* ==========================================
+   HIGH-CONTRAST CARD READABILITY REFINEMENTS
+   ========================================== */
+
+/* Elevate default variables to higher brightness for maximum legibility */
+:root {
+    --text-primary: #FFFFFF !important;
+    --text-secondary: #F1F5F9 !important; /* Extremely high contrast near-white */
+    --text-tertiary: #CBD5E1 !important;  /* High contrast light silver */
+}
+
+/* Explicitly target and override Bootstrap text-muted and secondary styles in cards */
+.text-muted {
+    color: #CBD5E1 !important;
+}
+
+.text-secondary {
+    color: #F1F5F9 !important;
+}
+
+.text-tertiary {
+    color: #CBD5E1 !important;
+}
+
+/* Specific card adjustments to ensure internship and opportunities text does not blend */
+.internship-card, .opportunity-card, .glass-card, .opportunity-item {
+    color: #FFFFFF !important;
+}
+
+.internship-card p, .opportunity-card p, .glass-card p, .opportunity-item p {
+    color: #F1F5F9 !important; /* Ensure descriptions are highly readable */
+}
+
+.internship-card span, .opportunity-card span, .glass-card span, .opportunity-item span {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); /* Subtle text shadow to pop details */
+}
+
+/* Ensure detail labels (e.g. Duration, Location, Stipend labels) are crisp */
+.internship-card span[style*="var(--text-tertiary)"],
+.opportunity-card span[style*="var(--text-tertiary)"],
+.glass-card span[style*="var(--text-tertiary)"],
+.opportunity-item span[style*="var(--text-tertiary)"] {
+    color: #E2E8F0 !important;
+    font-weight: 600 !important;
+}
+
+/* Adjust general secondary values for tags and headers */
+.glass-card strong, .opportunity-item strong {
+    color: #FFFFFF !important;
+}
+
+.glass-card label, .opportunity-item label {
+    color: #FFFFFF !important;
+}
+
 
 

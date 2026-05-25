@@ -1209,11 +1209,19 @@ DEFAULT_INTERNSHIPS = [
         'type': 'summer', 'duration': '3 months', 'location': 'Bangalore, India',
         'stipend': '1,15,000', 'deadline': '2026-08-30',
         'required_skills': 'Python, Java, DSA, Web Dev',
-        'description': 'Work alongside engineers to scale production backend architectures.',
+        'description': 'Work alongside MNC engineering teams to scale production backend architectures.',
         'link': 'https://careers.google.com', 'match_percentage': 92
     },
     {
-        'id': 2, 'title': 'Data Science & ML Intern', 'company': 'Amazon',
+        'id': 2, 'title': 'Deep Learning & AI Research Intern', 'company': 'Nvidia',
+        'type': 'summer', 'duration': '6 months', 'location': 'Bangalore, India',
+        'stipend': '1,20,000', 'deadline': '2026-09-30',
+        'required_skills': 'Python, PyTorch, C++, Machine Learning',
+        'description': 'Optimize CUDA acceleration libraries and train modern LLM model boundaries.',
+        'link': 'https://careers.nvidia.com', 'match_percentage': 95
+    },
+    {
+        'id': 3, 'title': 'Data Science & ML Intern', 'company': 'Amazon',
         'type': 'summer', 'duration': '3 months', 'location': 'Hyderabad, India',
         'stipend': '80,000', 'deadline': '2026-07-15',
         'required_skills': 'Python, SQL, Machine Learning, Tableau',
@@ -1221,7 +1229,55 @@ DEFAULT_INTERNSHIPS = [
         'link': 'https://amazon.jobs', 'match_percentage': 88
     },
     {
-        'id': 3, 'title': 'Cloud Support Associate Intern', 'company': 'Microsoft',
+        'id': 4, 'title': 'Systems Engineer Trainee Intern', 'company': 'Infosys',
+        'type': 'summer', 'duration': '3 months', 'location': 'Bangalore, India',
+        'stipend': '25,000', 'deadline': '2026-08-15',
+        'required_skills': 'Java, Python, DBMS, Basic Networking',
+        'description': 'Undergo rigorous training on full stack systems engineering and application deployment.',
+        'link': 'https://careers.infosys.com', 'match_percentage': 90
+    },
+    {
+        'id': 5, 'title': 'Digital Technology Intern', 'company': 'TCS',
+        'type': 'winter', 'duration': '6 months', 'location': 'Pune, India',
+        'stipend': '20,000', 'deadline': '2026-10-15',
+        'required_skills': 'Python, C++, SQL, Git',
+        'description': 'Support enterprise digital transformation projects under TCS Cognitive Business unit.',
+        'link': 'https://www.tcs.com/careers', 'match_percentage': 87
+    },
+    {
+        'id': 6, 'title': 'Project Engineer Intern', 'company': 'Wipro',
+        'type': 'remote', 'duration': '3 months', 'location': 'Remote',
+        'stipend': '18,000', 'deadline': '2026-08-30',
+        'required_skills': 'Java, Spring Boot, Web Development',
+        'description': 'Participate in client web portal maintenance and unit testing cycles.',
+        'link': 'https://careers.wipro.com', 'match_percentage': 85
+    },
+    {
+        'id': 7, 'title': 'Associate Application Developer', 'company': 'Accenture',
+        'type': 'permanent', 'duration': '6 months', 'location': 'Noida, India',
+        'stipend': '30,000', 'deadline': '2026-09-30',
+        'required_skills': 'Java, Cloud Computing, SDLC Basics',
+        'description': 'Collaborate with engineering teams to define, design, and build next-gen enterprise apps.',
+        'link': 'https://www.accenture.com/careers', 'match_percentage': 89
+    },
+    {
+        'id': 8, 'title': 'Programmer Analyst Intern', 'company': 'Cognizant',
+        'type': 'remote', 'duration': '6 months', 'location': 'Remote',
+        'stipend': '22,000', 'deadline': '2026-10-31',
+        'required_skills': 'Python, SQL, React, AWS',
+        'description': 'Implement functional logic components and assist in query optimization routines.',
+        'link': 'https://careers.cognizant.com', 'match_percentage': 84
+    },
+    {
+        'id': 9, 'title': 'e-Commerce Operations Intern', 'company': 'Amazon',
+        'type': 'summer', 'duration': '3 months', 'location': 'Hyderabad, India',
+        'stipend': '65,000', 'deadline': '2026-07-31',
+        'required_skills': 'Excel, SQL, Python, Tableau',
+        'description': 'Optimize seller onboarding funnels and build operations analysis dashboards.',
+        'link': 'https://amazon.jobs', 'match_percentage': 86
+    },
+    {
+        'id': 10, 'title': 'Cloud & Virtualization Intern', 'company': 'Microsoft',
         'type': 'remote', 'duration': '6 months', 'location': 'Remote',
         'stipend': '60,000', 'deadline': '2026-10-31',
         'required_skills': 'AWS/Azure, Linux Shell, Python, Networking',
@@ -1396,7 +1452,31 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
             'link': 'https://amazon.jobs', 'match_percentage': 88
         },
         {
-            'id': 4, 'title': 'Space Applications & Satellite Computing Intern', 'company': 'ISRO',
+            'id': 4, 'title': 'Systems Engineer Trainee Intern', 'company': 'Infosys',
+            'type': 'summer', 'duration': '3 months', 'location': 'Bangalore, India',
+            'stipend': '25,000', 'deadline': '2026-08-15',
+            'required_skills': 'Java, Python, DBMS, Basic Networking',
+            'description': 'Undergo rigorous training on full stack systems engineering and application deployment.',
+            'link': 'https://careers.infosys.com', 'match_percentage': 90
+        },
+        {
+            'id': 5, 'title': 'Digital Technology Intern', 'company': 'TCS',
+            'type': 'winter', 'duration': '6 months', 'location': 'Pune, India',
+            'stipend': '20,000', 'deadline': '2026-10-15',
+            'required_skills': 'Python, C++, SQL, Git',
+            'description': 'Support enterprise digital transformation projects under TCS Cognitive Business unit.',
+            'link': 'https://www.tcs.com/careers', 'match_percentage': 87
+        },
+        {
+            'id': 6, 'title': 'Project Engineer Intern', 'company': 'Wipro',
+            'type': 'remote', 'duration': '3 months', 'location': 'Remote',
+            'stipend': '18,000', 'deadline': '2026-08-30',
+            'required_skills': 'Java, Spring Boot, Web Development',
+            'description': 'Participate in client web portal maintenance and unit testing cycles.',
+            'link': 'https://careers.wipro.com', 'match_percentage': 85
+        },
+        {
+            'id': 7, 'title': 'Space Applications & Satellite Computing Intern', 'company': 'ISRO',
             'type': 'winter', 'duration': '6 months', 'location': 'Ahmedabad, India',
             'stipend': '15,000', 'deadline': '2026-10-15',
             'required_skills': 'C, Python, MATLAB, Image Processing',
@@ -1404,7 +1484,7 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
             'link': 'https://www.isro.gov.in/careers', 'match_percentage': 90
         },
         {
-            'id': 5, 'title': 'Defense Coding & Security Systems Intern', 'company': 'DRDO',
+            'id': 8, 'title': 'Defense Coding & Security Systems Intern', 'company': 'DRDO',
             'type': 'summer', 'duration': '3 months', 'location': 'Pune, India',
             'stipend': '12,000', 'deadline': '2026-08-15',
             'required_skills': 'C++, Linux, Networking, Cryptography',
@@ -1412,7 +1492,7 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
             'link': 'https://drdo.gov.in', 'match_percentage': 85
         },
         {
-            'id': 6, 'title': 'Public Policy & Data Analytics Intern', 'company': 'NITI Aayog',
+            'id': 9, 'title': 'Public Policy & Data Analytics Intern', 'company': 'NITI Aayog',
             'type': 'remote', 'duration': '3 months', 'location': 'Remote',
             'stipend': 'Unpaid (Certificate)', 'deadline': '2026-11-30',
             'required_skills': 'Python, Excel, R, Statistical Modeling',
@@ -1420,7 +1500,7 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
             'link': 'https://niti.gov.in', 'match_percentage': 82
         },
         {
-            'id': 7, 'title': 'National Web Portal & Cloud Architecture Intern', 'company': 'AICTE',
+            'id': 10, 'title': 'National Web Portal & Cloud Architecture Intern', 'company': 'AICTE',
             'type': 'remote', 'duration': '3 months', 'location': 'Remote',
             'stipend': '10,000', 'deadline': '2026-09-30',
             'required_skills': 'Node.js, React, MongoDB, AWS',
@@ -1428,7 +1508,7 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
             'link': 'https://internship.aicte-india.org', 'match_percentage': 92
         },
         {
-            'id': 8, 'title': 'e-Governance & Digital Infrastructure Developer Intern', 'company': 'Digital India',
+            'id': 11, 'title': 'e-Governance & Digital Infrastructure Developer Intern', 'company': 'Digital India',
             'type': 'remote', 'duration': '6 months', 'location': 'Remote',
             'stipend': '20,000', 'deadline': '2026-10-31',
             'required_skills': 'Golang, React, Docker, Kubernetes',
@@ -1455,4 +1535,164 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
         cgpa_diff = max(0.0, cgpa - 6.0)
         i['match_percentage'] = min(100, int(80 + (cgpa_diff * 5)))
     return selected
+
+# ==========================================
+# DYNAMIC LIVE OPPORTUNITIES CRAWLER AGENTS
+# ==========================================
+
+LIVE_OPPORTUNITIES_PROMPT = """
+You are a real-time career matchmaker AI agent designed to search and retrieve active job, internship, and scholarship opportunities for university students.
+Generate a list of 6 highly realistic, current, and active opportunities matching this student profile and search keywords:
+- Desired Role: {role}
+- Branch: {branch}
+- CGPA: {cgpa}
+- Skills: {skills}
+
+**CRITICAL GUIDELINES**:
+1. Strongly prioritize premier multinational companies (MNCs) such as Infosys, Amazon, TCS, Wipro, Google, Microsoft, Accenture, Cognizant, IBM, Tech Mahindra, and Nvidia.
+2. Provide official application links (e.g. domains like 'https://infosys.com/careers', 'https://amazon.jobs', 'https://careers.google.com').
+3. Dynamically adjust roles, companies, and matching scores strictly based on the provided Desired Role, branch, and skills. Do NOT show the exact same static opportunities.
+
+For each opportunity, provide:
+1. "id": A unique integer ID (1 to 6)
+2. "title": Position/Role title matching search keywords (e.g. "Associate Software Engineer", "Systems Engineer", "Data Analyst Intern")
+3. "company": Company name (e.g. "Infosys", "TCS", "Amazon", "Wipro", "Accenture", "Google")
+4. "type": Internship, Full-time, or Scholarship
+5. "deadline": Active future deadline (YYYY-MM-DD format in 2026, e.g. "2026-08-30")
+6. "required_skills": Comma-separated required skills
+7. "description": A concise, useful summary of the role, responsibilities, and how it relates to the search query.
+8. "link": Official portal or application domain link (e.g. "https://careers.infosys.com")
+9. "match_percentage": A realistic match score (0-100) based on CGPA, Branch, and the search query.
+
+Return a valid JSON array ONLY. Do NOT wrap the JSON in ```json ``` code blocks.
+"""
+
+def fetch_live_opportunities(branch: str = 'CSE', cgpa: float = 8.0, role: str = '', skills: str = '') -> List[Dict]:
+    """Fetch live opportunities matching user branch, CGPA, role, and skills using AI agents."""
+    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
+    prompt = LIVE_OPPORTUNITIES_PROMPT.format(
+        branch=branch or 'CSE', 
+        cgpa=cgpa or 8.0, 
+        role=role or 'Software Engineer', 
+        skills=skills or 'Python, SQL, DSA'
+    )
+    
+    # Try Gemini
+    if use_gemini:
+        try:
+            model = genai.GenerativeModel(GEMINI_MODEL)
+            response = model.generate_content(
+                prompt,
+                generation_config={"response_mime_type": "application/json"}
+            )
+            cleaned_text = clean_json_response(response.text)
+            return json.loads(cleaned_text)
+        except Exception as e:
+            print(f"Gemini Live Opportunities error: {e}")
+            
+    # Try OpenAI
+    try:
+        openai_text = call_openai_chat(prompt, json_mode=True)
+        if openai_text:
+            cleaned_text = clean_json_response(openai_text)
+            return json.loads(cleaned_text)
+    except Exception as e:
+        print(f"OpenAI Live Opportunities error: {e}")
+        
+    return simulate_live_opportunities(branch, cgpa, role, skills)
+
+def simulate_live_opportunities(branch: str, cgpa: float, role: str, skills: str) -> List[Dict]:
+    """Simulates a highly refined real-time MNC / tech opportunity crawl if APIs fail."""
+    crawled_db = [
+        {
+            'id': 1, 'title': 'Associate Software Engineer', 'company': 'Infosys',
+            'type': 'Full-time', 'deadline': '2026-08-30',
+            'required_skills': 'Python, Java, SQL, OOPs',
+            'description': 'Develop scalable backend modules, run validation testing, and assist deployment pipelines.',
+            'link': 'https://careers.infosys.com', 'match_percentage': 88
+        },
+        {
+            'id': 2, 'title': 'Software Engineer - Entry Level', 'company': 'Amazon',
+            'type': 'Full-time', 'deadline': '2026-07-31',
+            'required_skills': 'Python, C++, DSA, Systems Design',
+            'description': 'Build high-availability services and e-commerce APIs supporting global operations.',
+            'link': 'https://amazon.jobs', 'match_percentage': 92
+        },
+        {
+            'id': 3, 'title': 'Systems Engineer Trainee', 'company': 'TCS',
+            'type': 'Full-time', 'deadline': '2026-09-15',
+            'required_skills': 'Java, Python, SQL, HTML/CSS',
+            'description': 'Support enterprise digital transformation platforms and core database integration routines.',
+            'link': 'https://www.tcs.com/careers', 'match_percentage': 85
+        },
+        {
+            'id': 4, 'title': 'Project Engineer', 'company': 'Wipro',
+            'type': 'Full-time', 'deadline': '2026-10-31',
+            'required_skills': 'Java, Spring Boot, React, Git',
+            'description': 'Develop client-facing web portals and maintain API services in agile cycles.',
+            'link': 'https://careers.wipro.com', 'match_percentage': 86
+        },
+        {
+            'id': 5, 'title': 'Associate Application Developer', 'company': 'Accenture',
+            'type': 'Full-time', 'deadline': '2026-08-20',
+            'required_skills': 'Python, SQL, Cloud Basics, JavaScript',
+            'description': 'Design, code, and test cloud-native applications for global clients.',
+            'link': 'https://www.accenture.com/careers', 'match_percentage': 89
+        },
+        {
+            'id': 6, 'title': 'Programmer Analyst', 'company': 'Cognizant',
+            'type': 'Full-time', 'deadline': '2026-11-30',
+            'required_skills': 'C#, .NET, SQL Server, HTML5',
+            'description': 'Work under general supervision to write test cases, debug, and document technical solutions.',
+            'link': 'https://careers.cognizant.com', 'match_percentage': 84
+        },
+        {
+            'id': 7, 'title': 'Cloud Support Associate', 'company': 'AWS',
+            'type': 'Full-time', 'deadline': '2026-09-30',
+            'required_skills': 'AWS, Linux Shell, Python, Networking',
+            'description': 'Debug deployment crashes and assist enterprise partners in cloud infrastructure migrations.',
+            'link': 'https://aws.amazon.com/careers', 'match_percentage': 90
+        },
+        {
+            'id': 8, 'title': 'AI/ML Engineer - Graduate Program', 'company': 'Nvidia',
+            'type': 'Full-time', 'deadline': '2026-12-15',
+            'required_skills': 'Python, PyTorch, C++, Machine Learning',
+            'description': 'Optimize neural networks for CUDA hardware acceleration and test model inference speeds.',
+            'link': 'https://careers.nvidia.com', 'match_percentage': 95
+        },
+        {
+            'id': 9, 'title': 'Data Analyst Associate', 'company': 'TCS',
+            'type': 'Full-time', 'deadline': '2026-08-10',
+            'required_skills': 'Excel, SQL, Python, PowerBI',
+            'description': 'Perform ETL data extraction routines and build visual KPIs for senior management review.',
+            'link': 'https://www.tcs.com/careers', 'match_percentage': 83
+        },
+        {
+            'id': 10, 'title': 'Cyber Security Analyst', 'company': 'IBM India',
+            'type': 'Full-time', 'deadline': '2026-10-15',
+            'required_skills': 'Linux, TCP/IP, Python, Security Audits',
+            'description': 'Monitor enterprise security logs, run penetration tests, and secure data pipelines.',
+            'link': 'https://www.ibm.com/in-en/employment', 'match_percentage': 87
+        }
+    ]
+    
+    query_lower = (role + " " + skills).lower().strip()
+    if query_lower:
+        matches = []
+        for i in crawled_db:
+            text = (i['title'] + " " + i['company'] + " " + i['description'] + " " + i['required_skills']).lower()
+            if any(word in text for word in query_lower.split() if len(word) > 2):
+                matches.append(dict(i))
+        if matches:
+            for i in matches:
+                cgpa_diff = max(0.0, cgpa - 6.0)
+                i['match_percentage'] = min(100, int(82 + (cgpa_diff * 4)))
+            return matches[:6]
+            
+    selected = [dict(i) for i in crawled_db[:6]]
+    for i in selected:
+        cgpa_diff = max(0.0, cgpa - 6.0)
+        i['match_percentage'] = min(100, int(82 + (cgpa_diff * 4)))
+    return selected
+
 

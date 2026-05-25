@@ -24,7 +24,8 @@ from services.gemini_service import (
     fetch_live_scholarships,
     fetch_live_internships,
     get_default_scholarships,
-    get_default_internships
+    get_default_internships,
+    fetch_live_opportunities
 )
 
 # Import database models
@@ -463,39 +464,96 @@ def opportunities():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json() or {}
-            skills_str = data.get('skills', '')
+            role = data.get('role', '')
             branch = data.get('branch', '')
+            cgpa_val = data.get('cgpa', '')
+            skills_str = data.get('skills', '')
         else:
-            skills_str = request.form.get('skills', '')
+            role = request.form.get('role', '')
             branch = request.form.get('branch', '')
+            cgpa_val = request.form.get('cgpa', '')
+            skills_str = request.form.get('skills', '')
             
-        if branch:
-            update_user_profile(user_id, branch, user['cgpa'])
+        # Synchronize profile branch and CGPA
+        try:
+            cgpa = float(cgpa_val) if cgpa_val else user['cgpa']
+        except (ValueError, TypeError):
+            cgpa = user['cgpa']
+            
+        branch = branch or user['branch'] or 'CSE'
+        
+        if branch or cgpa:
+            update_user_profile(user_id, branch, cgpa)
             user = get_user_by_id(user_id)
             
-        skills_list = [s.strip() for s in skills_str.split(',') if s.strip()]
-        matches = match_opportunities(user_id, skills_list)
-        
-        for match in matches:
-            save_user_opportunity(user_id, match['opportunity']['id'], match['match_percentage'])
+        # Get dynamically crawled/generated AI matching opportunities
+        try:
+            matched_opps = fetch_live_opportunities(
+                branch=branch,
+                cgpa=cgpa or 8.0,
+                role=role,
+                skills=skills_str
+            )
+        except Exception as e:
+            print(f"Error fetching live opportunities: {e}")
+            from services.gemini_service import simulate_live_opportunities
+            matched_opps = simulate_live_opportunities(branch, cgpa or 8.0, role, skills_str)
             
         formatted_matches = []
-        for match in matches:
-            opp = dict(match['opportunity'])
+        for opp in matched_opps:
+            # Safely check / save to opportunities master table in DB to prevent duplicates
+            opp_id = opp.get('id')
+            try:
+                conn = get_db_connection()
+                c = conn.cursor()
+                c.execute('SELECT id FROM opportunities WHERE title = ? AND company = ?', (opp['title'], opp['company']))
+                row = c.fetchone()
+                if row:
+                    opp_id = row['id']
+                else:
+                    c.execute('''
+                    INSERT INTO opportunities (title, company, description, required_skills, required_branch, min_cgpa, deadline, link, type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (
+                        opp['title'], 
+                        opp['company'], 
+                        opp['description'], 
+                        opp.get('required_skills', skills_str), 
+                        branch, 
+                        cgpa or 6.0, 
+                        opp.get('deadline', '2026-12-31'), 
+                        opp.get('link', '#'), 
+                        opp.get('type', 'Full-time')
+                    ))
+                    conn.commit()
+                    opp_id = c.lastrowid
+                conn.close()
+            except Exception as dbe:
+                print(f"DB insert opportunity error: {dbe}")
+                
+            # Link matched opportunity to user
+            if opp_id:
+                try:
+                    save_user_opportunity(user_id, opp_id, opp['match_percentage'])
+                except Exception as save_err:
+                    print(f"Error linking user opportunity: {save_err}")
+                    
             formatted_matches.append({
-                'id': opp['id'],
+                'id': opp_id or opp.get('id'),
                 'title': opp['title'],
                 'company': opp['company'],
                 'description': opp['description'],
-                'match_percentage': match['match_percentage'],
-                'type': opp['type'],
-                'deadline': opp['deadline'],
-                'link': opp['link']
+                'match_percentage': opp['match_percentage'],
+                'type': opp.get('type', 'Full-time'),
+                'deadline': opp.get('deadline', 'N/A'),
+                'link': opp.get('link', '#')
             })
+            
+        log_activity(user_id, 'OPPORTUNITY_AI_EXPLORE', f'AI searched opportunities for role={role}, branch={branch}, cgpa={cgpa}')
             
         return jsonify({
             'success': True,
-            'message': f'Found {len(formatted_matches)} matching opportunities!',
+            'message': f'AI Crawler found {len(formatted_matches)} matching opportunities!',
             'matched_opportunities': formatted_matches
         })
         

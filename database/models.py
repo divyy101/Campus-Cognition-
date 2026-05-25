@@ -307,22 +307,32 @@ def match_opportunities(user_id, skills_list):
         match_percentage = 0
         
         # Check CGPA match
-        if user['cgpa'] and opp['min_cgpa']:
-            if user['cgpa'] >= opp['min_cgpa']:
-                match_percentage += 30
+        if user.get('cgpa') is not None and opp.get('min_cgpa') is not None:
+            try:
+                if float(user['cgpa']) >= float(opp['min_cgpa']):
+                    match_percentage += 30
+            except (ValueError, TypeError):
+                pass
         
         # Check branch match
-        if user['branch'] and opp['required_branch']:
-            if user['branch'].lower() in opp['required_branch'].lower():
-                match_percentage += 30
+        if user.get('branch') and opp.get('required_branch'):
+            try:
+                if str(user['branch']).lower() in str(opp['required_branch']).lower():
+                    match_percentage += 30
+            except Exception:
+                pass
         
         # Check skills match
-        if opp['required_skills']:
-            opp_skills = [s.strip().lower() for s in opp['required_skills'].split(',')]
-            user_skills = [s.strip().lower() for s in skills_list]
-            matched_skills = len(set(opp_skills) & set(user_skills))
-            if matched_skills > 0:
-                match_percentage += min(40, (matched_skills / len(opp_skills)) * 40)
+        if opp.get('required_skills'):
+            try:
+                opp_skills = [s.strip().lower() for s in str(opp['required_skills']).split(',') if s.strip()]
+                user_skills = [s.strip().lower() for s in skills_list if s.strip()]
+                if opp_skills and user_skills:
+                    matched_skills = len(set(opp_skills) & set(user_skills))
+                    if matched_skills > 0:
+                        match_percentage += min(40, (matched_skills / len(opp_skills)) * 40)
+            except Exception:
+                pass
         
         if match_percentage > 0:
             matched.append({
