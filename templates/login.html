@@ -355,7 +355,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             showToast('Login successful! Redirecting...', 'success');
             setTimeout(() => {
                 window.location.href = '{{ url_for("dashboard") }}';
-            }, 1000);
+            }, 100);
         } else {
             showToast(data.message, 'danger');
         }

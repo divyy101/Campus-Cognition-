@@ -21,7 +21,8 @@ def send_email(recipient, subject, body):
     username = os.getenv('SMTP_USERNAME', '').strip()
     password = os.getenv('SMTP_PASSWORD', '')
     try:
-        with smtplib.SMTP(host, port, timeout=15) as server:
+        # A mail provider outage must not leave the auth pages loading indefinitely.
+        with smtplib.SMTP(host, port, timeout=8) as server:
             if os.getenv('SMTP_USE_TLS', 'true').lower() == 'true':
                 server.starttls()
             if username:

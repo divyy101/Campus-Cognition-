@@ -256,7 +256,8 @@ def call_openai_chat(prompt: str, json_mode: bool = True) -> Optional[str]:
     req = urllib.request.Request(url, data=req_body, headers=headers, method="POST")
     
     try:
-        with urllib.request.urlopen(req, timeout=45) as response:
+        # Keep each provider attempt short enough for the UI to return within a minute.
+        with urllib.request.urlopen(req, timeout=22) as response:
             res_body = response.read().decode('utf-8')
             res_json = json.loads(res_body)
             return res_json['choices'][0]['message']['content']
@@ -659,8 +660,8 @@ def analyze_study_materials(syllabus_text: str, pyq_text: str, subject_name: str
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     
     prompt = STUDY_ANALYSIS_PROMPT.format(
-        syllabus_text=syllabus_text[:12000],  # Cover substantially more of the uploaded syllabus
-        pyq_text=pyq_text[:12000],
+        syllabus_text=syllabus_text[:8000],  # Detailed enough for coverage while keeping the response fast
+        pyq_text=pyq_text[:8000],
         subject_name=subject,
         scope=scope
     )
@@ -680,7 +681,8 @@ def analyze_study_materials(syllabus_text: str, pyq_text: str, subject_name: str
                 model = genai.GenerativeModel(GEMINI_MODEL)
                 response = model.generate_content(
                     prompt,
-                    generation_config={"response_mime_type": "application/json"}
+                    generation_config={"response_mime_type": "application/json"},
+                    request_options={"timeout": 25}
                 )
                 cleaned_text = clean_json_response(response.text)
                 analysis = json.loads(cleaned_text)
@@ -1316,8 +1318,55 @@ def _valid_discovery_results(results, kind: str) -> List[Dict]:
         unique.append(item)
     return unique[:12]
 
+def fetch_verified_web_results(kind: str, query: str, branch: str = '') -> List[Dict]:
+    """Use Google Programmable Search when configured to return current, clickable listings.
+
+    Unlike an LLM-generated listing, every returned URL and description comes from a live
+    search result. The service remains optional so the app still works without a search key.
+    """
+    import urllib.parse
+    import urllib.request
+    api_key = os.getenv('GOOGLE_CSE_API_KEY', '').strip()
+    search_engine_id = os.getenv('GOOGLE_CSE_ID', '').strip()
+    if not api_key or not search_engine_id:
+        return []
+    if kind == 'scholarships':
+        search_terms = f"{query or branch or 'engineering'} scholarship application India official"
+    elif kind == 'internships':
+        search_terms = f"{query or branch or 'software'} internship apply India official careers"
+    else:
+        search_terms = f"{query or branch or 'student'} internship scholarship official application"
+    params = urllib.parse.urlencode({'key': api_key, 'cx': search_engine_id, 'q': search_terms, 'num': 10})
+    try:
+        with urllib.request.urlopen(f'https://www.googleapis.com/customsearch/v1?{params}', timeout=8) as response:
+            payload = json.loads(response.read().decode('utf-8'))
+    except Exception as error:
+        print(f'Live web search unavailable: {error}')
+        return []
+    listings = []
+    for index, item in enumerate(payload.get('items', []), start=1):
+        title = item.get('title', '').strip()
+        link = item.get('link', '').strip()
+        if not title or not link.startswith(('https://', 'http://')):
+            continue
+        display = item.get('displayLink', '').strip() or 'Verified web result'
+        description = item.get('snippet', '').strip() or 'Open the official listing for eligibility and application details.'
+        if kind == 'scholarships':
+            listings.append({'id': index, 'title': title, 'organization': display, 'award_amount': 'See listing',
+                             'min_cgpa': 'See listing', 'deadline': 'See listing', 'category': 'current listing',
+                             'description': description, 'link': link, 'match_percentage': 80, 'source': 'live-web'})
+        else:
+            listings.append({'id': index, 'title': title, 'company': display, 'type': 'current listing',
+                             'duration': 'See listing', 'location': 'See listing', 'stipend': 'See listing',
+                             'deadline': 'See listing', 'required_skills': branch or 'See listing',
+                             'description': description, 'link': link, 'match_percentage': 80, 'source': 'live-web'})
+    return _valid_discovery_results(listings, kind if kind != 'opportunities' else 'internships')
+
 def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0, query: str = '') -> List[Dict]:
     """Fetch live scholarships matching user branch, CGPA, and search query using AI agents."""
+    verified = fetch_verified_web_results('scholarships', query, branch)
+    if verified:
+        return verified
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     prompt = LIVE_SCHOLARSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0, query=query or 'General / Latest official government scholarships')
     
@@ -1352,6 +1401,9 @@ def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0, query: str =
 
 def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0, query: str = '') -> List[Dict]:
     """Fetch live internships matching user branch, CGPA, and search query using AI agents."""
+    verified = fetch_verified_web_results('internships', query, branch)
+    if verified:
+        return verified
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     prompt = LIVE_INTERNSHIPS_PROMPT.format(branch=branch or 'CSE', cgpa=cgpa or 8.0, query=query or 'General / Latest official government internship programs')
     
@@ -1600,6 +1652,9 @@ Return a valid JSON array ONLY. Do NOT wrap the JSON in ```json ``` code blocks.
 
 def fetch_live_opportunities(branch: str = 'CSE', cgpa: float = 8.0, role: str = '', skills: str = '') -> List[Dict]:
     """Fetch live opportunities matching user branch, CGPA, role, and skills using AI agents."""
+    verified = fetch_verified_web_results('opportunities', role or skills, branch)
+    if verified:
+        return verified
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     prompt = LIVE_OPPORTUNITIES_PROMPT.format(
         branch=branch or 'CSE', 
