@@ -32,9 +32,10 @@ You are a highly advanced cognitive educational AI agent. Your task is to analyz
 {pyq_text}
 
 Return a valid JSON object ONLY. Do NOT wrap the JSON in ```json ``` markdown code blocks. The JSON must exactly match this schema:
+Important: build coverage from the complete supplied syllabus. Do not provide shallow one-line labels. For each identifiable unit, chapter, and subtopic, include a useful 2–3 sentence explanation in `key_concepts`, including definitions, relationships, and the expected exam treatment. Keep the wording concrete and subject-specific.
 {{
   "summary": "A detailed high-level summary of the subject and preparation strategy matching the scope",
-  "key_concepts": ["concept 1", "concept 2", "concept 3", "concept 4", "concept 5"],
+  "key_concepts": ["Topic name — a 2–3 sentence explanation of the idea, what must be understood, and how it is examined", "...include EVERY identifiable syllabus topic or subtopic; do not limit this list to five items"],
   "formulas": ["formula 1 or core theorem 1", "formula 2 or core theorem 2", "formula 3 or core theorem 3"],
   "exam_tips": ["critical exam tip 1", "critical exam tip 2", "critical exam tip 3"],
   "difficulty_analysis": "An evaluation of the difficulty levels of different units (e.g. recursion is hard, graphs are high-weightage)",
@@ -658,8 +659,8 @@ def analyze_study_materials(syllabus_text: str, pyq_text: str, subject_name: str
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     
     prompt = STUDY_ANALYSIS_PROMPT.format(
-        syllabus_text=syllabus_text[:3000],  # Limit text size
-        pyq_text=pyq_text[:3000],
+        syllabus_text=syllabus_text[:12000],  # Cover substantially more of the uploaded syllabus
+        pyq_text=pyq_text[:12000],
         subject_name=subject,
         scope=scope
     )
@@ -1294,6 +1295,27 @@ def get_default_internships() -> List[Dict]:
     """Get static default internships."""
     return DEFAULT_INTERNSHIPS
 
+def _valid_discovery_results(results, kind: str) -> List[Dict]:
+    """Validate AI output and remove duplicate listings before it reaches the UI."""
+    if isinstance(results, dict):
+        results = results.get(kind, results.get('results', []))
+    if not isinstance(results, list):
+        return []
+    required = ('title', 'organization') if kind == 'scholarships' else ('title', 'company')
+    unique, seen = [], set()
+    for item in results:
+        if not isinstance(item, dict) or not all(str(item.get(key, '')).strip() for key in required):
+            continue
+        identity = f"{item.get('title', '')}|{item.get(required[1], '')}".casefold().strip()
+        if identity in seen:
+            continue
+        seen.add(identity)
+        item = dict(item)
+        item['id'] = item.get('id') or len(unique) + 1
+        item['match_percentage'] = max(0, min(100, int(float(item.get('match_percentage', 0) or 0))))
+        unique.append(item)
+    return unique[:12]
+
 def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0, query: str = '') -> List[Dict]:
     """Fetch live scholarships matching user branch, CGPA, and search query using AI agents."""
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
@@ -1308,7 +1330,9 @@ def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0, query: str =
                 generation_config={"response_mime_type": "application/json"}
             )
             cleaned_text = clean_json_response(response.text)
-            return json.loads(cleaned_text)
+            results = _valid_discovery_results(json.loads(cleaned_text), 'scholarships')
+            if results:
+                return results
         except Exception as e:
             print(f"Gemini Live Scholarships error: {e}")
             
@@ -1317,11 +1341,14 @@ def fetch_live_scholarships(branch: str = 'CSE', cgpa: float = 8.0, query: str =
         openai_text = call_openai_chat(prompt, json_mode=True)
         if openai_text:
             cleaned_text = clean_json_response(openai_text)
-            return json.loads(cleaned_text)
+            results = _valid_discovery_results(json.loads(cleaned_text), 'scholarships')
+            if results:
+                return results
     except Exception as e:
         print(f"OpenAI Live Scholarships error: {e}")
         
-    return simulate_live_scholarships(branch, cgpa, query)
+    # Official portals remain usable even when an AI provider is unavailable.
+    return _valid_discovery_results(simulate_live_scholarships(branch, cgpa, query), 'scholarships')
 
 def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0, query: str = '') -> List[Dict]:
     """Fetch live internships matching user branch, CGPA, and search query using AI agents."""
@@ -1337,7 +1364,9 @@ def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0, query: str = 
                 generation_config={"response_mime_type": "application/json"}
             )
             cleaned_text = clean_json_response(response.text)
-            return json.loads(cleaned_text)
+            results = _valid_discovery_results(json.loads(cleaned_text), 'internships')
+            if results:
+                return results
         except Exception as e:
             print(f"Gemini Live Internships error: {e}")
             
@@ -1346,11 +1375,13 @@ def fetch_live_internships(branch: str = 'CSE', cgpa: float = 8.0, query: str = 
         openai_text = call_openai_chat(prompt, json_mode=True)
         if openai_text:
             cleaned_text = clean_json_response(openai_text)
-            return json.loads(cleaned_text)
+            results = _valid_discovery_results(json.loads(cleaned_text), 'internships')
+            if results:
+                return results
     except Exception as e:
         print(f"OpenAI Live Internships error: {e}")
         
-    return simulate_live_internships(branch, cgpa, query)
+    return _valid_discovery_results(simulate_live_internships(branch, cgpa, query), 'internships')
 
 def simulate_live_scholarships(branch: str, cgpa: float, query: str) -> List[Dict]:
     """Simulates a highly refined real-time government scholarship crawl if APIs fail."""
@@ -1416,9 +1447,9 @@ def simulate_live_scholarships(branch: str, cgpa: float, query: str) -> List[Dic
             for s in matches:
                 cgpa_diff = max(0.0, cgpa - s['min_cgpa'])
                 s['match_percentage'] = min(100, int(80 + (cgpa_diff * 5)))
-            return matches[:6]
+            return matches[:10]
             
-    selected = [dict(s) for s in crawled_db[:6]]
+    selected = [dict(s) for s in crawled_db]
     for s in selected:
         cgpa_diff = max(0.0, cgpa - s['min_cgpa'])
         s['match_percentage'] = min(100, int(80 + (cgpa_diff * 5)))
@@ -1528,9 +1559,9 @@ def simulate_live_internships(branch: str, cgpa: float, query: str) -> List[Dict
             for i in matches:
                 cgpa_diff = max(0.0, cgpa - 6.0)
                 i['match_percentage'] = min(100, int(80 + (cgpa_diff * 5)))
-            return matches[:6]
+            return matches[:10]
             
-    selected = [dict(i) for i in crawled_db[:6]]
+    selected = [dict(i) for i in crawled_db]
     for i in selected:
         cgpa_diff = max(0.0, cgpa - 6.0)
         i['match_percentage'] = min(100, int(80 + (cgpa_diff * 5)))

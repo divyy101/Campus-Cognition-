@@ -123,6 +123,20 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users(id)
     )
     ''')
+
+    # Password-reset tokens are stored hashed so a database leak cannot be used
+    # to reset an account. Expired and used tokens are never accepted.
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        token_hash TEXT NOT NULL UNIQUE,
+        expires_at TIMESTAMP NOT NULL,
+        used_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+    ''')
     
     conn.commit()
     conn.close()
@@ -205,6 +219,36 @@ def get_user_by_id(user_id):
     user = c.fetchone()
     conn.close()
     return user
+
+def create_password_reset_token(user_id, token_hash, expires_at):
+    """Invalidate old tokens and persist one new, hashed reset token."""
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('DELETE FROM password_reset_tokens WHERE user_id = ? OR expires_at < CURRENT_TIMESTAMP', (user_id,))
+    c.execute('INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
+              (user_id, token_hash, expires_at))
+    conn.commit()
+    conn.close()
+
+def consume_password_reset_token(token_hash):
+    """Return the owner of a valid one-time token and mark it used atomically."""
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''SELECT user_id FROM password_reset_tokens
+                 WHERE token_hash = ? AND used_at IS NULL AND expires_at > CURRENT_TIMESTAMP''', (token_hash,))
+    row = c.fetchone()
+    if row:
+        c.execute('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE token_hash = ?', (token_hash,))
+        conn.commit()
+    conn.close()
+    return row['user_id'] if row else None
+
+def update_password(user_id, password_hash):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', (password_hash, user_id))
+    conn.commit()
+    conn.close()
 
 def update_user_profile(user_id, branch, cgpa):
     """Update user profile"""

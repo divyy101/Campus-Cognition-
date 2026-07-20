@@ -1,5 +1,8 @@
 import os
 import json
+import hashlib
+import secrets
+import re
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_session import Session
 from werkzeug.utils import secure_filename
@@ -37,8 +40,10 @@ from models import (
     create_opportunity, match_opportunities, save_user_opportunity, get_user_opportunities,
     save_code_analysis, get_code_analysis_history, log_activity, get_user_activity,
     update_user_profile, get_all_opportunities, insert_sample_opportunities, get_db_connection,
-    hash_password, get_user_by_email, delete_user_and_records
+    hash_password, get_user_by_email, create_password_reset_token,
+    consume_password_reset_token, update_password
 )
+from services.email_service import send_registration_email, send_password_reset_email
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -122,27 +127,64 @@ def signup():
             first_name = request.form.get('first_name', '')
             last_name = request.form.get('last_name', '')
         
-        # Check if email is already used to register and wipe previous data to allow fresh replacement
-        existing_user_by_email = get_user_by_email(email) if email else None
-        if existing_user_by_email:
-            delete_user_and_records(existing_user_by_email['id'])
-            
-        # Check if username is already used and wipe to avoid conflict
-        existing_user_by_username = get_user_by_username(username) if username else None
-        if existing_user_by_username:
-            delete_user_and_records(existing_user_by_username['id'])
+        username = (username or '').strip()
+        email = (email or '').strip().lower()
+        if len(username) < 3 or not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', email):
+            return jsonify({'success': False, 'message': 'Enter a valid username and email address.'}), 400
+        if not password or len(password) < 6:
+            return jsonify({'success': False, 'message': 'Password must be at least 6 characters long.'}), 400
+        if get_user_by_email(email):
+            return jsonify({'success': False, 'message': 'An account already exists for this email. Please log in or reset your password.'}), 409
+        if get_user_by_username(username):
+            return jsonify({'success': False, 'message': 'That username is already in use. Please choose another.'}), 409
         
         # Create fresh user account
         if create_user(username, email, password, first_name, last_name):
             new_user = get_user_by_username(username)
             if new_user:
                 session['user_id'] = new_user['id']
-                log_activity(new_user['id'], 'SIGNUP', 'New user registered (replaced legacy records)')
-            return jsonify({'success': True, 'message': 'Account created successfully!', 'redirect': url_for('dashboard')})
+                log_activity(new_user['id'], 'SIGNUP', 'New user registered')
+                email_sent = send_registration_email(new_user)
+            return jsonify({'success': True, 'message': 'Account created successfully!' + (' A welcome email was sent.' if email_sent else ''), 'redirect': url_for('dashboard')})
         
         return jsonify({'success': False, 'message': 'Registration error occurred'})
     
     return render_template('signup.html')
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or request.form
+        email = (data.get('email') or '').strip().lower()
+        user = get_user_by_email(email) if email else None
+        # Keep this response identical whether or not the address is registered.
+        message = 'If an account exists for that email, a password-reset link has been sent.'
+        if user:
+            raw_token = secrets.token_urlsafe(32)
+            create_password_reset_token(user['id'], hashlib.sha256(raw_token.encode()).hexdigest(),
+                                        (datetime.utcnow() + timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M:%S'))
+            reset_url = url_for('reset_password', token=raw_token, _external=True)
+            send_password_reset_email(user, reset_url)
+            log_activity(user['id'], 'PASSWORD_RESET_REQUEST', 'Password reset link requested')
+        return jsonify({'success': True, 'message': message})
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or request.form
+        password = data.get('password') or ''
+        confirm_password = data.get('confirm_password') or ''
+        if len(password) < 6 or password != confirm_password:
+            return jsonify({'success': False, 'message': 'Passwords must match and contain at least 6 characters.'}), 400
+        user_id = consume_password_reset_token(token_hash)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'This reset link is invalid or has expired.'}), 400
+        update_password(user_id, hash_password(password))
+        log_activity(user_id, 'PASSWORD_RESET', 'Password reset using email link')
+        return jsonify({'success': True, 'message': 'Password reset successfully. You can now log in.', 'redirect': url_for('login')})
+    return render_template('reset_password.html', token=token)
 
 @app.route('/logout')
 def logout():
@@ -413,7 +455,11 @@ def api_explore_scholarships():
         cgpa = 8.0
         
     # Crawl the web via live AI proxy matching custom search criteria
-    scholarships_data = fetch_live_scholarships(branch, cgpa, query)
+    try:
+        scholarships_data = fetch_live_scholarships(branch, cgpa, query)
+    except Exception as error:
+        app.logger.exception('Scholarship discovery failed')
+        return jsonify({'success': False, 'message': 'Scholarship search is temporarily unavailable. Please try again.'}), 503
     
     log_activity(user_id, 'SCHOLARSHIP_AI_EXPLORE', f'AI explored scholarships for branch={branch}, cgpa={cgpa}, query={query}')
     
@@ -442,7 +488,11 @@ def api_explore_internships():
         cgpa = 8.0
         
     # Crawl the web via live AI proxy matching custom search criteria
-    internships_data = fetch_live_internships(branch, cgpa, query)
+    try:
+        internships_data = fetch_live_internships(branch, cgpa, query)
+    except Exception as error:
+        app.logger.exception('Internship discovery failed')
+        return jsonify({'success': False, 'message': 'Internship search is temporarily unavailable. Please try again.'}), 503
     
     log_activity(user_id, 'INTERNSHIP_AI_EXPLORE', f'AI explored internships for branch={branch}, cgpa={cgpa}, query={query}')
     
