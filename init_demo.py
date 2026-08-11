@@ -1,19 +1,24 @@
 """
-Campus Cognition - Demo Data Initialization Script
-Creates sample users and opportunities for testing
+Campus Cognition V2 - Demo Data Initialization Script (MongoDB Atlas version)
+Creates sample users and opportunities for testing in MongoDB.
 """
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'database'))
+from dotenv import load_dotenv
 
-from models import (
-    init_db, create_user, insert_sample_opportunities,
-    get_all_opportunities
-)
+# Load environment variables
+load_dotenv()
+
+# Add project root to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from database.mongodb import init_indexes
+from database.repositories.user_repository import create_user, get_user_by_username
+from database.repositories.opportunity_repository import insert_sample_opportunities, get_all_opportunities
 
 def create_demo_users():
-    """Create demo users for testing"""
+    """Create demo users for testing in MongoDB"""
     demo_users = [
         {
             'username': 'student1',
@@ -39,6 +44,12 @@ def create_demo_users():
     ]
     
     for user in demo_users:
+        # Check if already exists
+        existing = get_user_by_username(user['username'])
+        if existing:
+            print(f"[INFO] User already exists: {user['username']}")
+            continue
+            
         user_id = create_user(
             user['username'],
             user['email'],
@@ -49,18 +60,18 @@ def create_demo_users():
         if user_id:
             print(f"[OK] Created user: {user['username']}")
         else:
-            print(f"[INFO] User already exists: {user['username']}")
+            print(f"[ERROR] Failed to create user: {user['username']}")
  
 def main():
     print("=" * 50)
-    print("Campus Cognition - Demo Data Initialization")
+    print("Campus Cognition V2 - Demo Data Initialization")
     print("=" * 50)
     print()
     
-    # Initialize database
-    print("[DB] Initializing database...")
-    init_db()
-    print("[DB] Database initialized")
+    # Initialize MongoDB collections and indexes
+    print("[DB] Initializing MongoDB indexes...")
+    init_indexes()
+    print("[DB] MongoDB indexes initialized")
     print()
     
     # Create demo users
@@ -72,7 +83,7 @@ def main():
     print("[OPPS] Inserting sample opportunities...")
     insert_sample_opportunities()
     opportunities = get_all_opportunities()
-    print(f"[OPPS] {len(opportunities)} opportunities added")
+    print(f"[OPPS] {len(opportunities)} opportunities in database")
     print()
     
     print("=" * 50)

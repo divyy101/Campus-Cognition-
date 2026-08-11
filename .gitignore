@@ -6,6 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 develop-eggs/
@@ -36,10 +37,11 @@ flask_session/
 *~
 .DS_Store
 
-# Environment
+# Environment — NEVER commit real credentials
 .env
 .env.local
-.env.*.local
+.env.*
+!.env.example
 
 # Database
 *.db
@@ -70,3 +72,6 @@ build/
 
 # Local Scratch Workspace
 scratch/
+
+# Agents
+.agents/

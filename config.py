@@ -1,6 +1,6 @@
 """
-Campus Cognition - Configuration Module
-Centralized configuration management
+Campus Cognition V2 - Configuration Module
+Centralized configuration management for Flask and MongoDB.
 """
 
 import os
@@ -23,13 +23,22 @@ class Config:
     # Upload
     UPLOAD_FOLDER = '/tmp' if os.environ.get('VERCEL') else 'static/uploads'
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB
-    ALLOWED_EXTENSIONS = {'pdf'}
+    ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt', 'md', 'pptx'}
     
-    # Database
-    DATABASE_PATH = '/tmp/campus_cognition.db' if os.environ.get('VERCEL') else 'database/campus_cognition.db'
+    # MongoDB Configuration
+    MONGODB_URI = os.getenv('MONGODB_URI', '')
+    MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'campus_cognition')
     
-    # Gemini API
+    # Gemini & OpenAI API Configuration
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+    GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+    
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+    OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+    
+    # AI Providers Fallback Engine selection
+    AI_PRIMARY_PROVIDER = os.getenv('AI_PRIMARY_PROVIDER', 'gemini')
+    AI_FALLBACK_PROVIDER = os.getenv('AI_FALLBACK_PROVIDER', 'openai')
     
     # Server
     HOST = '0.0.0.0'

@@ -126,10 +126,113 @@ Please provide:
 3. **Application Strategy**: How to position yourself
 4. **Preparation Tips**: What to prepare for each
 5. **Timeline**: When to apply
+  "formulas": ["formula 1 or core theorem 1", "formula 2 or core theorem 2", "formula 3 or core theorem 3"],
+  "exam_tips": ["critical exam tip 1", "critical exam tip 2", "critical exam tip 3"],
+  "difficulty_analysis": "An evaluation of the difficulty levels of different units (e.g. recursion is hard, graphs are high-weightage)",
+  "prep_time_hours": 30,
+  "repeated_topics": [
+    {{"topic": "Recursion & Backtracking", "frequency": 5}},
+    {{"topic": "Dynamic Programming", "frequency": 4}},
+    {{"topic": "Graph Algorithms", "frequency": 3}},
+    {{"topic": "Tree Traversals", "frequency": 2}},
+    {{"topic": "Asymptotic Analysis", "frequency": 2}}
+  ],
+  "important_questions": [
+    "Unit 1: detailed high-weightage exam question or proof strategy",
+    "Unit 2: detailed high-weightage exam question or proof strategy",
+    "Unit 3: detailed high-weightage exam question or proof strategy",
+    "Unit 4: detailed high-weightage exam question or proof strategy"
+  ],
+  "weekly_plan": [
+    {{"day": "Monday [09:00 - 11:00 AM]", "duration_hours": 2, "topics": ["Recursion theory", "Practice tree traversals"]}},
+    {{"day": "Wednesday [04:00 - 06:00 PM]", "duration_hours": 2, "topics": ["Graph BFS & DFS tracing", "Adjacency matrix proofs"]}},
+    {{"day": "Friday [10:00 - 12:00 AM]", "duration_hours": 2, "topics": ["Dijkstra algorithm dry-runs", "Relaxation proofs"]}},
+    {{"day": "Saturday [02:00 - 04:00 PM]", "duration_hours": 2, "topics": ["Dynamic programming knapsack", "State formulation equations"]}}
+  ],
+  "chart_metrics": {{
+    "topic_frequency": {{
+      "Recursion": 5,
+      "DP": 4,
+      "Graphs": 3,
+      "Trees": 2,
+      "Complexity": 2
+    }},
+    "unit_importance": {{
+      "Unit 1 (Basics)": 15,
+      "Unit 2 (Trees)": 25,
+      "Unit 3 (Graphs)": 35,
+      "Unit 4 (DP)": 25
+    }},
+    "study_time_distribution": {{
+      "Theoretical Study": 10,
+      "Practical Coding": 12,
+      "Mock PYQ Solving": 8
+    }}
+  }}
+}}
+"""
+
+CODE_ANALYSIS_PROMPT = """
+You are a code review expert. Analyze the following {language} code and provide detailed feedback in a strict JSON format.
+
+**Code:**
+```{language}
+{code}
+```
+
+Return a valid JSON object ONLY. Do NOT wrap the JSON in ```json ``` markdown code blocks. The JSON must exactly match this schema:
+{{
+  "summary": "A detailed explanation of what the code does, its functionality, and architectural patterns.",
+  "errors": ["detailed bug description 1", "detailed bug description 2"],
+  "time_complexity": "O(...) for worst/average case",
+  "space_complexity": "O(...) auxiliary space",
+  "optimized_code": "Full drop-in replacement optimized code with syntax cleanups and best practices applied",
+  "readability_score": 85,
+  "performance_gain": "25% execution speed improvement or O(N^2) to O(N log N) optimization",
+  "why_better": "Detailed technical comparison explaining why the optimized version is faster/safer/more memory-efficient",
+  "suggestions": [
+    "best practice suggestion 1",
+    "best practice suggestion 2",
+    "best practice suggestion 3"
+  ]
+}}
+"""
+
+OPPORTUNITY_MATCHING_PROMPT = """
+You are an opportunity recommendation expert. Given a student's profile, recommend scholarships and internships.
+
+**Student Profile:**
+- Branch: {branch}
+- CGPA: {cgpa}
+- Skills: {skills}
+- Interests: {interests}
+
+**Available Opportunities:**
+{opportunities_list}
+
+Please provide:
+1. **Top 5 Matches**: Why each is a good fit
+2. **Match Score**: Percentage match for each (0-100)
+3. **Application Strategy**: How to position yourself
+4. **Preparation Tips**: What to prepare for each
+5. **Timeline**: When to apply
 6. **Competitive Analysis**: How to stand out
 7. **Backup Options**: Plan B opportunities
 
 Be specific and actionable in your recommendations.
+"""
+
+RAG_PROMPT = """
+You are the Campus Cognition Study Assistant. Your task is to answer the student's question based strictly on the provided document excerpts.
+If the provided context does not contain the answer, you must state that clearly and optionally supplement with general knowledge, but you MUST distinguish between what is in the text and what is general knowledge.
+Always cite the source document section/topic where possible.
+
+**Question:** {question}
+
+**Relevant Document Context:**
+{context}
+
+Format your response in Markdown. Do not return JSON.
 """
 
 SCHOLARSHIP_ANALYSIS_PROMPT = """
@@ -264,6 +367,24 @@ def call_openai_chat(prompt: str, json_mode: bool = True) -> Optional[str]:
     except Exception as e:
         print(f"OpenAI API call failed: {e}")
         return None
+
+def answer_rag_question(question: str, context: str, ai_engine: str = 'gemini') -> str:
+    """
+    Answer a student's question based on provided RAG context.
+    """
+    prompt = RAG_PROMPT.format(question=question, context=context)
+    
+    if ai_engine == 'gemini' and is_api_available():
+        try:
+            model = genai.GenerativeModel(GEMINI_MODEL)
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            print(f"RAG Gemini error: {e}")
+            
+    # Fallback to OpenAI
+    openai_response = call_openai_chat(prompt, json_mode=False)
+    return openai_response if openai_response else "I'm sorry, I'm unable to process your question at the moment."
 
 def validate_and_fill_study_data(data: Dict, subject: str, scope: str) -> Dict:
     """
@@ -674,7 +795,6 @@ def analyze_study_materials(syllabus_text: str, pyq_text: str, subject_name: str
         engines_to_try = ['gemini', 'openai']
         
     analysis = None
-    
     for eng in engines_to_try:
         if eng == 'gemini' and use_gemini:
             try:
@@ -684,298 +804,39 @@ def analyze_study_materials(syllabus_text: str, pyq_text: str, subject_name: str
                     generation_config={"response_mime_type": "application/json"},
                     request_options={"timeout": 25}
                 )
-                cleaned_text = clean_json_response(response.text)
-                analysis = json.loads(cleaned_text)
-                analysis['model'] = GEMINI_MODEL
-                analysis['success'] = True
-                break
+                if response and response.text:
+                    analysis_text = clean_json_response(response.text)
+                    try:
+                        analysis = json.loads(analysis_text)
+                        analysis['model'] = GEMINI_MODEL
+                        analysis['timestamp'] = json.dumps({'generated': True})
+                        break
+                    except Exception as e:
+                        print(f"Gemini Study JSON Parsing failed: {e}")
             except Exception as e:
-                print(f"Gemini API Study Analysis error: {e}. Trying fallback.")
+                print(f"Gemini Study execution failed: {e}")
+                
         elif eng == 'openai':
             try:
-                openai_text = call_openai_chat(prompt, json_mode=True)
-                if openai_text:
-                    cleaned_text = clean_json_response(openai_text)
-                    analysis = json.loads(cleaned_text)
-                    analysis['model'] = 'openai-gpt-4o-mini'
-                    analysis['success'] = True
+                response_text = call_openai_chat(prompt, json_mode=True)
+                if response_text:
+                    analysis_text = clean_json_response(response_text)
+                    analysis = json.loads(analysis_text)
+                    analysis['model'] = 'gpt-4o-mini'
+                    analysis['timestamp'] = json.dumps({'generated': True})
                     break
             except Exception as e:
-                print(f"OpenAI API Study Analysis error: {e}. Trying fallback.")
-            
-    # Validate and fill keys if any AI succeeded
-    if analysis:
-        try:
-            analysis = validate_and_fill_study_data(analysis, subject, scope)
-            analysis['timestamp'] = json.dumps({'generated': True})
-            return analysis
-        except Exception as e:
-            print(f"Study validation error: {e}. Utilizing absolute fallback.")
-            
-    # Absolute Fallback
-    return fallback_data
+                print(f"OpenAI Study execution failed: {e}")
+                
+    if not analysis:
+        print("Both AI providers failed. Using static fallback.")
+        return fallback_data
+        
+    return validate_and_fill_study_data(analysis, subject, scope)
 
-def analyze_code(code: str, language: str, ai_engine: str = 'gemini') -> Dict:
+def analyze_internship(internship_info: str, branch: str, skills: str, experience: str, cgpa: float, ai_engine: str = 'gemini') -> Dict:
     """
-    Analyze code and provide feedback using Gemini or OpenAI AI.
-    
-    Args:
-        code (str): Code to analyze
-        language (str): Programming language (python, javascript, java, etc)
-        ai_engine (str): AI engine to prioritize ('gemini' or 'openai')
-    
-    Returns:
-        Dict: Contains code analysis, errors, suggestions, and optimized code
-    """
-    summary = f"Comprehensive review of the submitted {language.capitalize()} script. The code implements logical sequences but exhibits minor inefficiencies in data access patterns and safety borders."
-    errors = []
-    suggestions = []
-    
-    if "print" in code and language == "python" and not code.strip().startswith("def"):
-        suggestions.append("Encapsulate code within main() or functional scopes to prevent global variable namespace pollution.")
-        
-    if "var " in code and language == "javascript":
-        suggestions.append("Use block-scoped variables 'let' or 'const' rather than 'var' to avoid variable hoisting side-effects.")
-        
-    if "catch" not in code and ("try" in code or "fetch" in code or "open(" in code or "xhr" in code):
-        errors.append("Potential unhandled exception: Code performs dynamic input/output operations but lacks try/except or try/catch blocks.")
-        suggestions.append("Wrap file handling, memory buffers, or remote fetch operations inside comprehensive error boundary containers.")
-        
-    if len(code.split('\n')) > 30:
-        suggestions.append("Break down lengthy code loops or deep nested conditional blocks into granular modular helper methods.")
-        
-    if not errors:
-        errors.append("No compilation-breaking syntax errors found during static lexer check.")
-    if not suggestions:
-        suggestions.append("Add clear docstrings and comments detailing parameter types and structural boundaries.")
-        suggestions.append("Check edge bounds (e.g., null parameters, empty lists, division-by-zero checks).")
-        
-    time_comp = "O(N)"
-    space_comp = "O(1)"
-    if "for " in code and "for " in code.replace("for ", "", 1): # Nested loops
-        time_comp = "O(N^2)"
-        suggestions.append("Double loop pattern found. Consider using HashMaps or sliding window mechanisms to reduce complexity to O(N).")
-        
-    # Generate optimized version
-    optimized_code = code
-    if language == "python":
-        optimized_code = f"# Optimized {language.capitalize()} Implementation\n# Optimized for performance, readability, and exception safety\n\n"
-        if not code.strip().startswith("def"):
-            optimized_code += "def main():\n    try:\n        " + code.replace("\n", "\n        ") + "\n    except Exception as e:\n        print(f'Runtime Error: {e}')\n\nif __name__ == '__main__':\n    main()"
-        else:
-            optimized_code += code
-    elif language in ["javascript", "js"]:
-        optimized_code = f"// Optimized {language.capitalize()} Implementation\n// Enhanced scoping, data maps, and security check validations\n\n" + code.replace("var ", "let ")
-    else:
-        optimized_code = f"// Optimized {language.capitalize()} Code Version\n// Implemented architectural refinements and strict type declarations\n\n" + code
-
-    why_better = "1. Replaced global scopes with encapsulated functional modules.\n2. Wrapped critical functions inside try/except error boundaries to catch unexpected memory crashes.\n3. Optimized variable lookup speeds by scoping loop constraints correctly."
-
-    fallback_data = {
-        'success': True,
-        'summary': summary,
-        'errors': errors,
-        'time_complexity': time_comp,
-        'space_complexity': space_comp,
-        'optimized_code': optimized_code,
-        'readability_score': 88,
-        'performance_gain': "30% faster execution speed & bounds validation",
-        'why_better': why_better,
-        'suggestions': suggestions
-    }
-
-    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
-    
-    prompt = CODE_ANALYSIS_PROMPT.format(
-        language=language,
-        code=code[:2000]  # Limit code size
-    )
-    
-    # Try the user's preferred engine first, fall back to the second one
-    engines_to_try = []
-    if ai_engine == 'openai':
-        engines_to_try = ['openai', 'gemini']
-    else:
-        engines_to_try = ['gemini', 'openai']
-        
-    analysis = None
-    
-    for eng in engines_to_try:
-        if eng == 'gemini' and use_gemini:
-            try:
-                model = genai.GenerativeModel(GEMINI_MODEL)
-                response = model.generate_content(
-                    prompt,
-                    generation_config={"response_mime_type": "application/json"}
-                )
-                cleaned_text = clean_json_response(response.text)
-                analysis = json.loads(cleaned_text)
-                analysis['model'] = GEMINI_MODEL
-                analysis['success'] = True
-                break
-            except Exception as e:
-                print(f"Gemini API Code Analysis error: {e}. Trying fallback.")
-        elif eng == 'openai':
-            try:
-                openai_text = call_openai_chat(prompt, json_mode=True)
-                if openai_text:
-                    cleaned_text = clean_json_response(openai_text)
-                    analysis = json.loads(cleaned_text)
-                    analysis['model'] = 'openai-gpt-4o-mini'
-                    analysis['success'] = True
-                    break
-            except Exception as e:
-                print(f"OpenAI API Code Analysis error: {e}. Trying fallback.")
-            
-    # Validate and fill keys if any AI succeeded
-    if analysis:
-        try:
-            analysis = validate_and_fill_code_data(analysis, code, language)
-            return analysis
-        except Exception as e:
-            print(f"Code validation error: {e}. Utilizing absolute fallback.")
-            
-    # Absolute Fallback
-    return fallback_data
-
-# ==========================================
-# OPPORTUNITY RECOMMENDATION FUNCTION
-# ==========================================
-
-def recommend_opportunities(branch: str, cgpa: float, skills: str, 
-                           interests: str, opportunities_list: str) -> Dict:
-    """
-    Recommend scholarships and internships based on student profile using Gemini or OpenAI AI.
-    
-    Args:
-        branch (str): Academic branch
-        cgpa (float): Cumulative GPA
-        skills (str): Comma-separated list of skills
-        interests (str): Career interests
-        opportunities_list (str): Available opportunities
-    
-    Returns:
-        Dict: Contains recommendations with match scores and strategies
-    """
-    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
-    prompt = OPPORTUNITY_MATCHING_PROMPT.format(
-        branch=branch,
-        cgpa=cgpa,
-        skills=skills,
-        interests=interests,
-        opportunities_list=opportunities_list[:2000]
-    )
-    
-    # Try Gemini
-    if use_gemini:
-        try:
-            model = genai.GenerativeModel(GEMINI_MODEL)
-            response = model.generate_content(prompt)
-            return {
-                'success': True,
-                'recommendations': response.text,
-                'model': GEMINI_MODEL
-            }
-        except Exception as e:
-            print(f"Gemini Opportunity matching error: {e}")
-            
-    # Try OpenAI
-    try:
-        openai_text = call_openai_chat(prompt, json_mode=False)
-        if openai_text:
-            return {
-                'success': True,
-                'recommendations': openai_text,
-                'model': 'openai-gpt-4o-mini'
-            }
-    except Exception as e:
-        print(f"OpenAI Opportunity matching error: {e}")
-        
-    return {
-        'success': False,
-        'recommendations': 'API keys rate-limited or not configured.'
-    }
-
-# ==========================================
-# SCHOLARSHIP ANALYSIS FUNCTION
-# ==========================================
-
-def analyze_scholarship(scholarship_info: str, branch: str, cgpa: float, 
-                       achievements: str) -> Dict:
-    """
-    Analyze a specific scholarship opportunity.
-    
-    Args:
-        scholarship_info (str): Details about the scholarship
-        branch (str): Student's academic branch
-        cgpa (float): Student's CGPA
-        achievements (str): Student's achievements
-    
-    Returns:
-        Dict: Contains eligibility, match score, and application tips
-    """
-    use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
-    prompt = SCHOLARSHIP_ANALYSIS_PROMPT.format(
-        scholarship_info=scholarship_info,
-        branch=branch,
-        cgpa=cgpa,
-        achievements=achievements
-    )
-    
-    # Try Gemini
-    if use_gemini:
-        try:
-            model = genai.GenerativeModel(GEMINI_MODEL)
-            response = model.generate_content(prompt)
-            match_score = extract_match_score(response.text)
-            
-            return {
-                'success': True,
-                'analysis': response.text,
-                'match_score': match_score,
-                'model': GEMINI_MODEL
-            }
-        except Exception as e:
-            print(f"Gemini Scholarship analysis error: {e}")
-            
-    # Try OpenAI
-    try:
-        openai_text = call_openai_chat(prompt, json_mode=False)
-        if openai_text:
-            match_score = extract_match_score(openai_text)
-            return {
-                'success': True,
-                'analysis': openai_text,
-                'match_score': match_score,
-                'model': 'openai-gpt-4o-mini'
-            }
-    except Exception as e:
-        print(f"OpenAI Scholarship analysis error: {e}")
-        
-    return {
-        'success': False,
-        'analysis': 'API keys rate-limited or not configured.',
-        'match_score': 0
-    }
-
-# ==========================================
-# INTERNSHIP ANALYSIS FUNCTION
-# ==========================================
-
-def analyze_internship(internship_info: str, branch: str, skills: str, 
-                      experience: str, cgpa: float) -> Dict:
-    """
-    Analyze a specific internship opportunity.
-    
-    Args:
-        internship_info (str): Details about the internship
-        branch (str): Student's academic branch
-        skills (str): Student's skills
-        experience (str): Student's experience
-        cgpa (float): Student's CGPA
-    
-    Returns:
-        Dict: Contains fit analysis, skill gaps, and preparation plan
+    Analyze an internship based on student profile and return an assessment in JSON format.
     """
     use_gemini = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
     prompt = INTERNSHIP_ANALYSIS_PROMPT.format(
@@ -1021,10 +882,6 @@ def analyze_internship(internship_info: str, branch: str, skills: str,
         'analysis': 'API keys rate-limited or not configured.',
         'fit_score': 0
     }
-
-# ==========================================
-# HELPER FUNCTIONS
-# ==========================================
 
 def extract_section(text: str, section_name: str) -> List[str]:
     """
