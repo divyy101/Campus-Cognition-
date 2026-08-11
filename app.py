@@ -167,7 +167,7 @@ def login():
         user = get_user_by_username(username)
 
         if user and verify_password(password, user['password'], user_id=user['id']):
-            session['user_id'] = user['id']
+            session['user_id'] = str(user['id'])
             log_activity(user['id'], 'LOGIN', f'User logged in at {datetime.now()}')
             return jsonify({'success': True, 'message': 'Login successful!', 'redirect': url_for('dashboard')})
 
@@ -205,9 +205,10 @@ def signup():
 
         user_id = create_user(username, email, password, first_name, last_name)
         if user_id:
+            email_sent = False
             new_user = get_user_by_id(user_id)
             if new_user:
-                session['user_id'] = new_user['id']
+                session['user_id'] = str(new_user['id']) if '_id' not in new_user else str(new_user['_id'])
                 log_activity(new_user['id'], 'SIGNUP', 'New user registered')
                 
                 # Send welcome email, fail gracefully
