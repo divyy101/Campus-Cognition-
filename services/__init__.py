@@ -2,9 +2,8 @@
 Services Module - AI and external service integrations
 """
 
-from .gemini_service import (
+from .ai_service import (
     analyze_study_materials,
-    analyze_code,
     recommend_opportunities,
     analyze_scholarship,
     analyze_internship,
@@ -14,7 +13,6 @@ from .gemini_service import (
 
 __all__ = [
     'analyze_study_materials',
-    'analyze_code',
     'recommend_opportunities',
     'analyze_scholarship',
     'analyze_internship',

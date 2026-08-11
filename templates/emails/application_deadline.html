@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 24px; font-weight: bold; color: #2563eb; text-decoration: none; }
+        .content { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; border-top: 4px solid #f59e0b; }
+        .footer { text-align: center; margin-top: 30px; font-size: 14px; color: #6b7280; }
+        .opportunity-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 15px; margin: 20px 0; }
+        .button { display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ url_for('index', _external=True) }}" class="logo">Campus Cognition</a>
+    </div>
+    <div class="content">
+        <h2>Application Deadline Reminder ⏰</h2>
+        <p>Hello {{ name }},</p>
+        <p>This is a reminder that the application deadline for a saved opportunity is approaching rapidly.</p>
+        
+        <div class="opportunity-box">
+            <h3 style="margin-top: 0; color: #111827;">{{ opportunity.get('title') }}</h3>
+            <p style="margin-bottom: 5px;"><strong>Company/Org:</strong> {{ opportunity.get('company', 'Organization') }}</p>
+            <p style="margin-bottom: 0; color: #dc2626;"><strong>Deadline:</strong> {{ opportunity.get('deadline') }}</p>
+        </div>
+
+        <center>
+            <a href="{{ url_for('dashboard', _external=True) }}" class="button">View Dashboard</a>
+        </center>
+    </div>
+    <div class="footer">
+        &copy; 2026 Campus Cognition. All rights reserved.
+    </div>
+</body>
+</html>

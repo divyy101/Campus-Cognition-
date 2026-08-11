@@ -34,7 +34,6 @@ logger = logging.getLogger('campus_cognition')
 # ---------------------------------------------------------------------------
 from services.ai_service import (
     analyze_study_materials,
-    analyze_code,
     recommend_opportunities,
     analyze_scholarship,
     analyze_internship,
@@ -73,7 +72,7 @@ from database.repositories.opportunity_repository import (
 from database.repositories.activity_repository import (
     log_activity, get_user_activity,
 )
-from services.email_service import send_registration_email, send_password_reset_email
+from services.email_service import send_welcome_email, send_password_reset_email
 from services.document_processor import process_document, generate_file_hash, validate_document_file
 from services.document_pipeline import trigger_document_pipeline
 from database.repositories.document_repository import get_document, semantic_search_chunks
@@ -210,7 +209,14 @@ def signup():
             if new_user:
                 session['user_id'] = new_user['id']
                 log_activity(new_user['id'], 'SIGNUP', 'New user registered')
-                email_sent = send_registration_email(new_user)
+                
+                # Send welcome email, fail gracefully
+                try:
+                    email_sent = send_welcome_email(new_user)
+                except Exception as e:
+                    logger.error(f"Failed to send welcome email: {e}")
+                    email_sent = False
+                    
             return jsonify({'success': True, 'message': 'Account created successfully!' + (' A welcome email was sent.' if email_sent else ''), 'redirect': url_for('dashboard')})
 
         return jsonify({'success': False, 'message': 'Registration error occurred'})
@@ -222,8 +228,22 @@ def forgot_password():
     if request.method == 'POST':
         data = request.get_json(silent=True) or request.form
         email = (data.get('email') or '').strip().lower()
+        
+        # Rate Limiting (Basic IP-based for forgot password)
+        # In a real enterprise app, we'd use Redis or Flask-Limiter here.
+        client_ip = request.remote_addr
+        rate_key = f'reset_limit_{client_ip}'
+        attempts = session.get(rate_key, 0)
+        
+        if attempts >= 3:
+            return jsonify({'success': False, 'message': 'Too many requests. Please try again later.'}), 429
+            
+        session[rate_key] = attempts + 1
+        session.modified = True
+        
         user = get_user_by_email(email) if email else None
-        message = 'If an account exists for that email, a password-reset link has been sent.'
+        message = 'If an account exists for this email, a password reset link has been sent.'
+        
         if user:
             raw_token = secrets.token_urlsafe(32)
             create_password_reset_token(
@@ -231,9 +251,23 @@ def forgot_password():
                 hashlib.sha256(raw_token.encode()).hexdigest(),
                 datetime.now(timezone.utc) + timedelta(minutes=30),
             )
-            reset_url = url_for('reset_password', token=raw_token, _external=True)
-            send_password_reset_email(user, reset_url)
+            
+            # Use configured frontend URL, or fallback to relative URL
+            frontend_url = os.getenv('FRONTEND_URL')
+            if frontend_url:
+                reset_url = f"{frontend_url.rstrip('/')}/reset-password/{raw_token}"
+            else:
+                reset_url = url_for('reset_password', token=raw_token, _external=True)
+                
+            # Execute asynchronously or synchronously depending on the environment
+            try:
+                from services.email_service import send_password_reset_email
+                send_password_reset_email(user, reset_url)
+            except Exception as e:
+                logger.error(f"Failed to send reset email: {e}")
+                
             log_activity(user['id'], 'PASSWORD_RESET_REQUEST', 'Password reset link requested')
+            
         return jsonify({'success': True, 'message': message})
     return render_template('forgot_password.html')
 
@@ -244,13 +278,26 @@ def reset_password(token):
         data = request.get_json(silent=True) or request.form
         password = data.get('password') or ''
         confirm_password = data.get('confirm_password') or ''
-        if len(password) < 6 or password != confirm_password:
-            return jsonify({'success': False, 'message': 'Passwords must match and contain at least 6 characters.'}), 400
+        
+        if len(password) < 8 or password != confirm_password:
+            return jsonify({'success': False, 'message': 'Passwords must match and contain at least 8 characters.'}), 400
+            
         user_id = consume_password_reset_token(token_hash)
         if not user_id:
             return jsonify({'success': False, 'message': 'This reset link is invalid or has expired.'}), 400
+            
         update_password(user_id, hash_password(password))
         log_activity(user_id, 'PASSWORD_RESET', 'Password reset using email link')
+        
+        # Send confirmation email
+        try:
+            user = get_user_by_id(user_id)
+            if user:
+                from services.email_service import send_password_changed_email
+                send_password_changed_email(user)
+        except Exception as e:
+            logger.error(f"Failed to send password changed email: {e}")
+            
         return jsonify({'success': True, 'message': 'Password reset successfully. You can now log in.', 'redirect': url_for('login')})
     return render_template('reset_password.html', token=token)
 
