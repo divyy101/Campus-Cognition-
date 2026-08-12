@@ -1,394 +1,125 @@
-{% extends "base_new.html" %}
-
-{% block title %}Internships - Campus Cognition{% endblock %}
+{% extends "base.html" %}
+{% block title %}Internships — Campus Cognition{% endblock %}
 
 {% block content %}
-<div class="fade-in">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1><i class="bi bi-briefcase-fill"></i> Internship Opportunities</h1>
-        <p>Launch your career with amazing internship programs from top companies</p>
-    </div>
-
-    <!-- Filters -->
-    <div class="glass-card mb-4">
-        <h4 class="mb-3">🔍 Filter Internships</h4>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Search Company/Role</label>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+<div class="page-container animate-fade-in" style="--page-accent: var(--intern-accent);">
+    <div class="page-header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="page-title" style="color:var(--intern-accent);">💼 Career Discovery</h1>
+                <p class="page-subtitle">Natural language search to find your perfect internship.</p>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Type</label>
-                <select class="form-select" id="typeFilter">
-                    <option value="">All Types</option>
-                    <option value="summer">Summer Internship</option>
-                    <option value="winter">Winter Internship</option>
-                    <option value="permanent">Permanent Role</option>
-                    <option value="remote">Remote</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Skill Required</label>
-                <input type="text" class="form-control" id="skillFilter" placeholder="e.g., Python, React">
-            </div>
-        </div>
-
-        <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 1.5rem 0;">
-        
-        <div class="row g-3 align-items-end">
-            <div class="col-12">
-                <h5 class="mb-1" style="color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="bi bi-robot"></i> AI Deep-Crawler Proxy
-                </h5>
-                <p class="text-muted mb-0" style="font-size: 0.85rem;">Crawl and search the web in real-time matching your custom details.</p>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Target Major / Branch</label>
-                <input type="text" class="form-control" id="aiBranchInput" value="{{ user['branch'] or 'CSE' }}" placeholder="e.g., Computer Science, Biotech">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Target CGPA</label>
-                <input type="number" step="0.1" min="0" max="10" class="form-control" id="aiCgpaInput" value="{{ user['cgpa'] or 8.0 }}" placeholder="e.g., 8.5">
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-primary w-100" id="aiExploreBtn" onclick="exploreLiveInternships()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border: none; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); height: 42px;">
-                    <i class="bi bi-globe"></i> Deep-Scan Live Internet
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Internships Grid -->
-    <div class="row" id="internshipsContainer">
-        {% if internships %}
-            {% for internship in internships %}
-            <div class="col-lg-6 col-xl-4 mb-4 internship-card" data-type="{{ internship.get('type', 'summer') }}">
-                <div class="glass-card h-100">
-                    <!-- Header with Company -->
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <h5 style="color: var(--accent-cyan); margin-bottom: 0.25rem;">{{ internship['title'] }}</h5>
-                            <p style="color: var(--accent-blue); font-weight: 700; font-size: 0.95rem;">{{ internship.get('company', 'Company') }}</p>
-                        </div>
-                        <i class="bi bi-heart" style="cursor: pointer; color: var(--text-tertiary); font-size: 1.5rem;"></i>
-                    </div>
-
-                    <!-- Quick Info -->
-                    <div class="mb-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
-                        <div>
-                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Duration</span>
-                            <span style="color: var(--accent-blue); font-weight: 700;">{{ internship.get('duration', '3 months') }}</span>
-                        </div>
-                        <div>
-                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Location</span>
-                            <span style="color: var(--accent-green); font-weight: 700;">{{ internship.get('location', 'Remote') }}</span>
-                        </div>
-                        <div>
-                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Stipend</span>
-                            <span style="color: var(--neon-pink); font-weight: 700;">₹{{ internship.get('stipend', '0') }}/month</span>
-                        </div>
-                        <div>
-                            <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Deadline</span>
-                            <span style="color: #FBBF24; font-weight: 700;">{{ internship.get('deadline', 'N/A') }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Skills Required -->
-                    <div class="mb-3">
-                        <span style="color: var(--text-tertiary); font-size: 0.85rem;">Required Skills</span>
-                        <div style="margin-top: 0.5rem;">
-                            {% for skill in internship.get('required_skills', '').split(',')[:3] %}
-                            <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border: 2px solid var(--accent-blue); color: var(--accent-blue); margin-right: 0.5rem; margin-bottom: 0.5rem;">
-                                {{ skill.strip() }}
-                            </span>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Match Score -->
-                    <div class="mb-3">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Your Match</span>
-                            <span class="badge badge-success">{{ internship.get('match_percentage', 0) }}%</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar" style="width: {{ internship.get('match_percentage', 0) }}%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                        {{ internship.get('description', 'Great opportunity to learn and grow')[:80] }}...
-                    </p>
-
-                    <!-- Actions -->
-                    <div class="d-grid gap-2">
-                        <a href="{{ internship.get('link', '#') }}" target="_blank" class="btn btn-primary">
-                            <i class="bi bi-send-fill"></i> Apply Now
-                        </a>
-                        <button class="btn btn-outline" onclick="toggleSave(this)">
-                            <i class="bi bi-heart"></i> Save
-                        </button>
-                    </div>
+            <div class="neural-engine">
+                <span class="neural-engine-label">Neural Engine</span>
+                <div class="neural-engine-options">
+                    <button class="neural-engine-option" data-engine="gemini">Gemini</button>
+                    <button class="neural-engine-option" data-engine="openai">OpenAI</button>
                 </div>
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="col-12">
-            <div class="glass-card text-center py-5">
-                <i class="bi bi-briefcase" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
-                <h4 style="color: var(--text-secondary);">No Internships Found</h4>
-                <p style="color: var(--text-tertiary);">Try adjusting your filters or check back later</p>
+        </div>
+    </div>
+
+    <!-- Search Hero -->
+    <div class="search-workspace mb-6">
+        <div class="search-label">Describe your ideal internship</div>
+        <form action="{{ url_for(request.endpoint) }}" method="GET">
+            <div class="search-input-wrapper">
+                <i data-lucide="search" style="width:20px;height:20px;color:var(--text-tertiary);"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="E.g., Find Java internships at Amazon for B.Tech students..." autocomplete="off" id="searchInput">
+                <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            </div>
+        </form>
+
+        <div class="search-filters">
+            <span class="filter-chip" onclick="applyQuickSearch('Remote Frontend developer roles')">Remote Frontend</span>
+            <span class="filter-chip" onclick="applyQuickSearch('Software engineer internships Google')">Google Internships</span>
+            <span class="filter-chip" onclick="applyQuickSearch('Data analyst intern remote')">Data Analyst</span>
+            <span class="filter-chip" onclick="applyQuickSearch('AI research intern machine learning')">AI / ML Research</span>
+        </div>
+    </div>
+
+    {% if query %}
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-md">Results for "{{ query }}"</h3>
+        <span class="text-xs text-muted">{{ items|length }} relevant matching opportunities</span>
+    </div>
+
+    <div class="grid grid-2">
+        {% for item in items %}
+        <div class="result-card animate-slide-up stagger-{{ loop.index }}">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="result-title">{{ item.title }}</h4>
+                {% if item.match_percentage %}
+                <div class="badge badge-primary">
+                    <i data-lucide="sparkles" style="width:12px;height:12px;margin-right:4px;"></i>
+                    {{ item.match_percentage }}% Match
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="result-company mb-3">🏢 {{ item.company }}</div>
+
+            <div class="result-meta mb-3">
+                {% if item.location %}<span class="meta-tag">📍 {{ item.location }}</span>{% endif %}
+                {% if item.type %}<span class="meta-tag">💼 {{ item.type }}</span>{% endif %}
+                {% if item.stipend %}<span class="meta-tag">💰 {{ item.stipend }}</span>{% endif %}
+                {% if item.duration %}<span class="meta-tag">⏳ {{ item.duration }}</span>{% endif %}
+            </div>
+
+            {% if item.description %}
+            <p class="text-sm text-secondary mb-4">{{ item.description }}</p>
+            {% endif %}
+
+            <div class="flex justify-between items-center mt-auto">
+                <div class="text-xs text-muted">
+                    Deadline: {{ item.deadline }}
+                </div>
+                <a href="{{ item.link or item.url or '#' }}" target="_blank" class="btn btn-secondary btn-sm">
+                    Apply Now
+                    <i data-lucide="external-link" style="width:12px;height:12px;margin-left:4px;"></i>
+                </a>
             </div>
         </div>
+        {% else %}
+        <div class="empty-state" style="grid-column: span 2;">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No direct matches found</div>
+            <div class="empty-text">Try adjusting your natural language query or removing specific filters.</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if total_pages and total_pages > 1 %}
+    <div class="flex justify-center gap-3 mt-6">
+        {% if page > 1 %}
+        <a href="{{ url_for(request.endpoint, q=query, page=page-1) }}" class="btn btn-secondary btn-sm">Previous</a>
+        {% endif %}
+        <span class="btn btn-ghost btn-sm disabled">{{ page }} of {{ total_pages }}</span>
+        {% if has_next %}
+        <a href="{{ url_for(request.endpoint, q=query, page=page+1) }}" class="btn btn-secondary btn-sm">Next</a>
         {% endif %}
     </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Default state: show default skeleton or placeholder -->
+    <div class="empty-state">
+        <div class="empty-icon">💡</div>
+        <div class="empty-title">Activate Intelligence Matching</div>
+        <div class="empty-text">Enter a natural language search query above to fetch active, verified internships.</div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    // Filter functionality
-    const searchInput = document.getElementById('searchInput');
-    const typeFilter = document.getElementById('typeFilter');
-    const skillFilter = document.getElementById('skillFilter');
-
-    function filterCards() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const type = typeFilter.value;
-        const skill = skillFilter.value.toLowerCase();
-        const cards = document.querySelectorAll('.internship-card');
-
-        cards.forEach(card => {
-            let visible = true;
-            const cardText = card.textContent.toLowerCase();
-            
-            if (type && card.getAttribute('data-type') !== type) {
-                visible = false;
-            }
-            
-            if (searchTerm && !cardText.includes(searchTerm)) {
-                visible = false;
-            }
-
-            if (skill && !cardText.includes(skill)) {
-                visible = false;
-            }
-
-            card.style.display = visible ? '' : 'none';
-        });
+function applyQuickSearch(text) {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = text;
+        input.closest('form').submit();
     }
-
-    searchInput.addEventListener('input', filterCards);
-    typeFilter.addEventListener('change', filterCards);
-    skillFilter.addEventListener('input', filterCards);
-
-    // Save functionality
-    function toggleSave(btn) {
-        const isSaved = btn.classList.contains('saved');
-        if (isSaved) {
-            btn.classList.remove('saved');
-            btn.innerHTML = '<i class="bi bi-heart"></i> Save';
-            showToast('Removed from saved', 'info');
-        } else {
-            btn.classList.add('saved');
-            btn.innerHTML = '<i class="bi bi-heart-fill" style="color: var(--neon-pink);"></i> Saved!';
-            showToast('Internship saved!', 'success');
-        }
-    }
-
-    // AI Proxy Crawling Exploration
-    function exploreLiveInternships() {
-        const btn = document.getElementById('aiExploreBtn');
-        const branchInput = document.getElementById('aiBranchInput');
-        const cgpaInput = document.getElementById('aiCgpaInput');
-        const container = document.getElementById('internshipsContainer');
-        
-        const branch = branchInput.value.trim();
-        const cgpa = cgpaInput.value.trim();
-        const query = searchInput.value.trim();
-        
-        // 1. Disable controls
-        btn.disabled = true;
-        branchInput.disabled = true;
-        cgpaInput.disabled = true;
-        
-        // 2. Render glassmorphic deep progress loader
-        container.innerHTML = `
-            <div class="col-12">
-                <div class="glass-card text-center py-5 position-relative overflow-hidden" style="border: 1px solid rgba(6, 182, 212, 0.3); box-shadow: 0 0 25px rgba(6, 182, 212, 0.1);">
-                    <div class="spinner-border mb-4" role="status" style="width: 3.5rem; height: 3.5rem; color: var(--accent-cyan);">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <h4 class="mb-3 animate-pulse" style="color: var(--accent-cyan); font-weight: 600;">🤖 Spawning Autonomous AI Crawling Proxies...</h4>
-                    <div class="progress mx-auto mb-4" style="width: 60%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="aiProgressBar" style="width: 15%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); transition: width 0.8s ease;"></div>
-                    </div>
-                    <p class="mb-0 text-muted" id="aiProgressText" style="font-size: 0.95rem;">Establishing secure proxy handshakes...</p>
-                </div>
-            </div>
-        `;
-        
-        const steps = [
-            { p: 30, t: "Initiating network requests through secure AI tunnels..." },
-            { p: 55, t: "Indexing internship portals and careers repositories..." },
-            { p: 75, t: "Correlating profile criteria with listing qualifications..." },
-            { p: 90, t: "Structuring listings and calculating matching percentages..." }
-        ];
-        
-        let currentStep = 0;
-        const progressInterval = setInterval(() => {
-            if (currentStep < steps.length) {
-                const bar = document.getElementById('aiProgressBar');
-                const text = document.getElementById('aiProgressText');
-                if (bar && text) {
-                    bar.style.width = steps[currentStep].p + "%";
-                    text.textContent = steps[currentStep].t;
-                }
-                currentStep++;
-            }
-        }, 2000);
-        
-        // 3. Make AJAX API call
-        fetch('/api/explore-internships', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ branch: branch, cgpa: cgpa, query: query })
-        })
-        .then(response => response.json())
-        .then(data => {
-            clearInterval(progressInterval);
-            btn.disabled = false;
-            branchInput.disabled = false;
-            cgpaInput.disabled = false;
-            
-            if (data.success && data.internships && data.internships.length > 0) {
-                let html = '';
-                data.internships.forEach(i => {
-                    const matchPercent = i.match_percentage || 0;
-                    const desc = (i.description || 'Great opportunity to learn and grow').substring(0, 80) + '...';
-                    
-                    let skillsHtml = '';
-                    if (i.required_skills) {
-                        i.required_skills.split(',').slice(0, 3).forEach(skill => {
-                            skillsHtml += `
-                            <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border: 2px solid var(--accent-blue); color: var(--accent-blue); margin-right: 0.5rem; margin-bottom: 0.5rem;">
-                                ${skill.trim()}
-                            </span>
-                            `;
-                        });
-                    }
-                    
-                    html += `
-                    <div class="col-lg-6 col-xl-4 mb-4 internship-card" data-type="${i.type || 'summer'}" style="opacity: 0;">
-                        <div class="glass-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h5 style="color: var(--accent-cyan); margin-bottom: 0.25rem;">${i.title}</h5>
-                                    <p style="color: var(--accent-blue); font-weight: 700; font-size: 0.95rem;">${i.company || 'Company'}</p>
-                                </div>
-                                <i class="bi bi-heart" style="cursor: pointer; color: var(--text-tertiary); font-size: 1.5rem;"></i>
-                            </div>
-
-                            <div class="mb-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
-                                <div>
-                                    <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Duration</span>
-                                    <span style="color: var(--accent-blue); font-weight: 700;">${i.duration || '3 months'}</span>
-                                </div>
-                                <div>
-                                    <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Location</span>
-                                    <span style="color: var(--accent-green); font-weight: 700;">${i.location || 'Remote'}</span>
-                                </div>
-                                <div>
-                                    <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Stipend</span>
-                                    <span style="color: var(--neon-pink); font-weight: 700;">₹${i.stipend || '0'}/month</span>
-                                </div>
-                                <div>
-                                    <span style="color: var(--text-tertiary); font-size: 0.8rem; display: block;">Deadline</span>
-                                    <span style="color: #FBBF24; font-weight: 700;">${i.deadline || 'N/A'}</span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <span style="color: var(--text-tertiary); font-size: 0.85rem;">Required Skills</span>
-                                <div style="margin-top: 0.5rem;">
-                                    ${skillsHtml}
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span style="color: var(--text-tertiary); font-size: 0.85rem;">Your Match</span>
-                                    <span class="badge badge-success">${matchPercent}%</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar" style="width: ${matchPercent}%"></div>
-                                </div>
-                            </div>
-
-                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                                ${desc}
-                            </p>
-
-                            <div class="d-grid gap-2">
-                                <a href="${i.link || '#'}" target="_blank" class="btn btn-primary">
-                                    <i class="bi bi-send-fill"></i> Apply Now
-                                </a>
-                                <button class="btn btn-outline" onclick="toggleSave(this)">
-                                    <i class="bi bi-heart"></i> Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-                });
-                container.innerHTML = html;
-                
-                // Animate dynamic cards
-                const newCards = container.querySelectorAll('.internship-card');
-                newCards.forEach((card, index) => {
-                    card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
-                });
-                showToast(`Crawl complete! Found ${data.internships.length} internships.`, 'success');
-            } else {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="glass-card text-center py-5">
-                            <i class="bi bi-briefcase" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
-                            <h4 style="color: var(--text-secondary);">No Internships Found</h4>
-                            <p style="color: var(--text-tertiary);">The AI crawler completed the search but found no matching internships. Try broader terms.</p>
-                        </div>
-                    </div>
-                `;
-                showToast('AI search complete, but no matching opportunities were found.', 'info');
-            }
-        })
-        .catch(err => {
-            clearInterval(progressInterval);
-            btn.disabled = false;
-            branchInput.disabled = false;
-            cgpaInput.disabled = false;
-            console.error(err);
-            showToast('Failed to contact crawling proxy. Please try again.', 'danger');
-            container.innerHTML = `
-                <div class="col-12">
-                    <div class="glass-card text-center py-5">
-                        <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--neon-pink); margin-bottom: 1rem; display: block;"></i>
-                        <h4 style="color: var(--text-secondary);">Crawling Failed</h4>
-                        <p style="color: var(--text-tertiary);">An error occurred connecting to the proxy servers. Please try again later.</p>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    // Animate initial cards on load
-    window.addEventListener('DOMContentLoaded', () => {
-        const initialCards = document.querySelectorAll('.internship-card');
-        initialCards.forEach((card, index) => {
-            card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
-        });
-    });
+}
 </script>
 {% endblock %}

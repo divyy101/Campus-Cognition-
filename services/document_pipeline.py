@@ -1,6 +1,8 @@
 """
 Campus Cognition V2 — Document Pipeline Service
-Handles asynchronous processing of uploaded documents.
+Handles processing of uploaded documents.
+On Vercel: processes synchronously (no background threads).
+Locally: uses ThreadPoolExecutor for async processing.
 """
 import os
 import threading
@@ -21,45 +23,49 @@ from database.repositories.study_repository import (
 
 logger = logging.getLogger(__name__)
 
-# In local development, we use ThreadPoolExecutor.
-# In production (Vercel), background threads are paused when the request ends.
-# Therefore, on Vercel, we must either process synchronously (if limits allow)
-# or offload to a serverless queue (like Upstash QStash, AWS SQS, or Vercel Cron).
-# For now, we will execute synchronously if running on Vercel, or asynchronously locally.
-executor = ThreadPoolExecutor(max_workers=4)
+# Only use thread pool locally — Vercel kills background threads after response
+executor = ThreadPoolExecutor(max_workers=2)
+
 
 def is_vercel() -> bool:
     """Check if running in Vercel serverless environment."""
     return os.environ.get('VERCEL') == '1'
 
+
 def _process_document_background(doc_id: str, filepath: str, title: str, scope: str, ai_engine: str):
-    """Background task to extract text, run AI analysis, and chunk/index."""
+    """Process a document: extract text, run AI analysis, chunk/index."""
     try:
         # 1. EXTRACTING
         update_document_status(doc_id, status='EXTRACTING')
         _, extracted_text = process_document(filepath)
-        
+
+        if not extracted_text or len(extracted_text.strip()) < 50:
+            update_document_status(doc_id, status='FAILED')
+            logger.error(f"Document {doc_id}: extracted text too short or empty.")
+            return
+
         # 2. ANALYZING
         update_document_status(doc_id, status='ANALYZING')
-        
-        # We simulate passing just this document as syllabus, with no PQPs for simplicity in the pipeline.
+
         result = analyze_study_materials(
-            syllabus_text=extracted_text,
-            pyq_text="",
+            syllabus_text=extracted_text[:30000],
+            notes_text="",
             subject_name=title,
             scope=scope,
             ai_engine=ai_engine
         )
-        
+
         if not result.get('success'):
-            raise Exception("AI analysis failed.")
-            
-        # Extract and save advanced insights (Phases 14, 15)
+            update_document_status(doc_id, status='FAILED')
+            logger.error(f"Document {doc_id}: AI analysis returned failure.")
+            return
+
+        # Save study session
         session_id = create_study_session(doc_id, title)
         important_topics = result.get('important_questions', [])
         study_priority = result.get('repeated_topics', [])
         weekly_plan = result.get('weekly_plan', [])
-        
+
         save_study_analysis(
             session_id,
             json.dumps(important_topics),
@@ -67,46 +73,58 @@ def _process_document_background(doc_id: str, filepath: str, title: str, scope: 
             json.dumps(weekly_plan),
             json.dumps(result)
         )
-        
-        save_topic_frequency(doc_id, session_id, study_priority)
-        save_study_roadmap(doc_id, session_id, weekly_plan)
-            
-        # 3. CHUNKING (Phase 8)
+
+        try:
+            save_topic_frequency(doc_id, session_id, study_priority)
+            save_study_roadmap(doc_id, session_id, weekly_plan)
+        except Exception as e:
+            logger.warning(f"Non-critical: failed to save topic/roadmap data: {e}")
+
+        # 3. CHUNKING
         update_document_status(doc_id, status='CHUNKING')
-        chunks = chunk_document(doc_id, extracted_text)
-        
-        # 4. INDEXING (Phase 9-10)
-        update_document_status(doc_id, status='INDEXING')
-        for chunk in chunks:
-            # Generate embedding for each chunk
-            embedding = generate_text_embedding(chunk['content'])
-            chunk['embedding'] = embedding
-            
-        # Save chunks to MongoDB
+        try:
+            chunks = chunk_document(doc_id, extracted_text)
+        except Exception as e:
+            logger.warning(f"Chunking failed (non-critical): {e}")
+            chunks = []
+
+        # 4. INDEXING (embeddings)
         if chunks:
-            save_chunks(doc_id, chunks)
-        
+            update_document_status(doc_id, status='INDEXING')
+            for chunk in chunks:
+                try:
+                    embedding = generate_text_embedding(chunk.get('content', ''))
+                    chunk['embedding'] = embedding
+                except Exception:
+                    chunk['embedding'] = []
+
+            try:
+                save_chunks(doc_id, chunks)
+            except Exception as e:
+                logger.warning(f"Chunk save failed (non-critical): {e}")
+
         # 5. COMPLETED
         update_document_status(doc_id, status='COMPLETED', analysis=json.dumps(result))
         logger.info(f"Document {doc_id} processed successfully.")
-        
+
     except Exception as e:
         logger.error(f"Failed to process document {doc_id}: {e}")
         update_document_status(doc_id, status='FAILED')
     finally:
-        # Cleanup temporary file if needed
         if os.path.exists(filepath):
             try:
                 os.remove(filepath)
             except Exception as e:
                 logger.warning(f"Could not remove temp file {filepath}: {e}")
 
-def trigger_document_pipeline(user_id: str, filepath: str, filename: str, file_type: str, file_size: int, doc_hash: str, title: str, scope: str, ai_engine: str) -> str:
+
+def trigger_document_pipeline(user_id: str, filepath: str, filename: str,
+                              file_type: str, file_size: int, doc_hash: str,
+                              title: str, scope: str, ai_engine: str) -> str:
     """
-    Validates cache. If not cached, stores metadata and queues background processing.
+    Validates cache. If not cached, stores metadata and queues processing.
     Returns the document ID.
     """
-    # Create or get existing document
     doc_id, is_cached = create_document(
         user_id=user_id,
         filename=filename,
@@ -115,23 +133,20 @@ def trigger_document_pipeline(user_id: str, filepath: str, filename: str, file_t
         document_hash=doc_hash,
         status='COMPLETED' if is_cached else 'UPLOADED'
     )
-    
+
     if is_cached:
-        logger.info(f"Document {doc_hash} already exists in cache (ID: {doc_id}). Skipping processing.")
-        # Cleanup uploaded file since we don't need it
+        logger.info(f"Document {doc_hash} cached (ID: {doc_id}). Skipping processing.")
         if os.path.exists(filepath):
             os.remove(filepath)
         return doc_id
-        
+
     if is_vercel():
-        # Execute synchronously on Vercel to guarantee completion before serverless function exits.
-        # Note: Large files may hit the 10-60s execution limit on Vercel Hobby/Pro.
-        # In a full enterprise setup, replace this with a queuing service like QStash.
-        logger.info("Vercel environment detected. Executing document pipeline synchronously.")
+        # Vercel: process synchronously within the request
+        logger.info("Vercel detected — processing document synchronously.")
         _process_document_background(doc_id, filepath, title, scope, ai_engine)
     else:
-        # Execute asynchronously in background thread for local/VPS deployment.
-        logger.info("Local environment detected. Queuing document pipeline asynchronously.")
+        # Local: process asynchronously
+        logger.info("Queuing document pipeline asynchronously.")
         executor.submit(_process_document_background, doc_id, filepath, title, scope, ai_engine)
-        
+
     return doc_id

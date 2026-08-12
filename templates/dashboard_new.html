@@ -1,182 +1,150 @@
-{% extends "base_new.html" %}
-
-{% block title %}Dashboard - Campus Cognition{% endblock %}
+{% extends "base.html" %}
+{% block title %}Dashboard — Campus Cognition{% endblock %}
 
 {% block content %}
-<div class="fade-in">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1><i class="bi bi-lightning-charge"></i> Welcome Back, {{ user['first_name'] or user['username'] }}!</h1>
-        <p>Let's accelerate your journey to success with AI-powered insights and opportunities</p>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="row mb-4">
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-label">📚 Study Sessions</div>
-                        <div class="stat-value" data-target="{{ recent_sessions|length }}">0</div>
-                    </div>
-                    <i class="bi bi-book-fill" style="font-size: 2rem; color: var(--accent-blue); opacity: 0.5;"></i>
-                </div>
+<div class="page-container animate-fade-in">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="page-title" style="color:var(--dashboard-accent);">
+                    Welcome back{% if user %}, {{ user.first_name or user.username }}{% endif %} 👋
+                </h1>
+                <p class="page-subtitle">Your AI-powered student intelligence hub</p>
             </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-label">💼 Opportunities</div>
-                        <div class="stat-value" data-target="{{ user_opportunities|length }}">0</div>
-                    </div>
-                    <i class="bi bi-briefcase-fill" style="font-size: 2rem; color: var(--accent-cyan); opacity: 0.5;"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-label">🎓 Scholarships</div>
-                        <div class="stat-value" data-target="0">0</div>
-                    </div>
-                    <i class="bi bi-mortarboard-fill" style="font-size: 2rem; color: var(--accent-green); opacity: 0.5;"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-label">💻 Code Analyses</div>
-                        <div class="stat-value" data-target="0">0</div>
-                    </div>
-                    <i class="bi bi-code-square" style="font-size: 2rem; color: var(--accent-purple); opacity: 0.5;"></i>
+            <div class="neural-engine">
+                <span class="neural-engine-label">Neural Engine</span>
+                <div class="neural-engine-options">
+                    <button class="neural-engine-option" data-engine="gemini">Gemini</button>
+                    <button class="neural-engine-option" data-engine="openai">OpenAI</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="row">
-        <!-- Recent Activities -->
-        <div class="col-lg-8 mb-4">
-            <div class="glass-card">
-                <h4 class="mb-3 text-gradient">📊 Recent Activities</h4>
-                <div>
-                    {% if recent_activities %}
-                        {% for activity in recent_activities[:5] %}
-                        <div class="list-item">
-                            <div>
-                                <div style="color: var(--accent-blue); font-weight: 700;">{{ activity['action'] }}</div>
-                                <div style="color: var(--text-tertiary); font-size: 0.85rem;">{{ activity['description'] }}</div>
-                            </div>
-                            <span class="badge badge-success">{{ activity['created_at'] }}</span>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                    <div style="text-align: center; color: var(--text-tertiary); padding: 2rem;">
-                        <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                        No activities yet
-                    </div>
-                    {% endif %}
-                </div>
+    <!-- Quick Stats -->
+    <div class="grid grid-4 mb-6">
+        <div class="stat-card animate-slide-up stagger-1">
+            <div class="stat-icon" style="background:var(--accent-primary-soft);color:var(--accent-primary);">
+                <i data-lucide="book-open" style="width:22px;height:22px;"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ recent_sessions|length if recent_sessions else 0 }}</div>
+                <div class="stat-label">Study Plans</div>
             </div>
         </div>
-
-        <!-- Quick Links -->
-        <div class="col-lg-4 mb-4">
-            <div class="glass-card">
-                <h4 class="mb-3 text-gradient">🚀 Quick Actions</h4>
-                <div class="d-grid gap-2">
-                    <a href="{{ url_for('study') }}" class="btn btn-primary">
-                        <i class="bi bi-upload"></i> Upload Study Material
-                    </a>
-                    <a href="{{ url_for('scholarships') }}" class="btn btn-secondary">
-                        <i class="bi bi-search"></i> Find Scholarships
-                    </a>
-                    <a href="{{ url_for('internships') }}" class="btn btn-secondary">
-                        <i class="bi bi-briefcase"></i> Find Internships
-                    </a>
-                    <a href="{{ url_for('code_assistant') }}" class="btn btn-success">
-                        <i class="bi bi-robot"></i> Analyze Code
-                    </a>
-                </div>
+        <div class="stat-card animate-slide-up stagger-2">
+            <div class="stat-icon" style="background:rgba(34,197,94,0.1);color:var(--accent-success);">
+                <i data-lucide="code-2" style="width:22px;height:22px;"></i>
+            </div>
+            <div>
+                <div class="stat-value">—</div>
+                <div class="stat-label">Code Reviews</div>
+            </div>
+        </div>
+        <div class="stat-card animate-slide-up stagger-3">
+            <div class="stat-icon" style="background:rgba(108,99,255,0.1);color:var(--intern-accent);">
+                <i data-lucide="briefcase" style="width:22px;height:22px;"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ user_opportunities|length if user_opportunities else 0 }}</div>
+                <div class="stat-label">Opportunities</div>
+            </div>
+        </div>
+        <div class="stat-card animate-slide-up stagger-4">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--accent-warning);">
+                <i data-lucide="activity" style="width:22px;height:22px;"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ recent_activities|length if recent_activities else 0 }}</div>
+                <div class="stat-label">Activities</div>
             </div>
         </div>
     </div>
 
-    <!-- Featured Opportunities -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="glass-card">
-                <h4 class="mb-3 text-gradient">⭐ Top Matched Opportunities</h4>
-                <div class="row">
-                    {% if user_opportunities %}
-                        {% for opp in user_opportunities[:3] %}
-                        <div class="col-md-4 mb-3">
-                            <div style="border-left: 4px solid var(--accent-blue); padding: 1.5rem; background: linear-gradient(135deg, rgba(79, 156, 249, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
-                                <h6 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">{{ opp['title'] }}</h6>
-                                <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-bottom: 1rem;">{{ opp['company'] }}</p>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar" style="width: {{ opp['match_percentage'] }}%"></div>
-                                </div>
-                                <p style="font-size: 0.8rem; color: var(--accent-green);">Match: {{ opp['match_percentage'] }}%</p>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
+    <!-- Main Grid -->
+    <div class="grid grid-2 mb-6">
+        <!-- Recent Study Sessions -->
+        <div class="card animate-slide-up stagger-2">
+            <div class="card-header">
+                <h3 class="card-title">📚 Study Momentum</h3>
+                <a href="/study" class="btn btn-sm btn-ghost">View All</a>
+            </div>
+            {% if recent_sessions %}
+                {% for s in recent_sessions[:4] %}
+                <div class="flex items-center justify-between" style="padding:var(--space-3) 0;border-bottom:1px solid var(--border-light);">
+                    <div>
+                        <div class="font-medium text-sm">{{ s.title or 'Study Session' }}</div>
+                        <div class="text-xs text-muted">{{ s.created_at.strftime('%b %d, %Y') if s.created_at else '' }}</div>
+                    </div>
+                    <span class="badge badge-success">Completed</span>
                 </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📖</div>
+                    <div class="empty-title">No study plans yet</div>
+                    <div class="empty-text">Upload your syllabus to generate an AI-powered study roadmap</div>
+                    <a href="/study" class="btn btn-primary btn-sm mt-4">Start Studying</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card animate-slide-up stagger-3">
+            <div class="card-header">
+                <h3 class="card-title">⚡ Quick Actions</h3>
+            </div>
+            <div class="flex flex-col gap-3">
+                <a href="/study" class="result-card" style="display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);">
+                    <div class="stat-icon" style="background:rgba(107,143,113,0.1);color:var(--study-accent);width:40px;height:40px;">
+                        <i data-lucide="upload" style="width:18px;height:18px;"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm">Upload Syllabus</div>
+                        <div class="text-xs text-muted">Generate an AI study plan</div>
+                    </div>
+                </a>
+                <a href="/code-assistant" class="result-card" style="display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);">
+                    <div class="stat-icon" style="background:rgba(34,197,94,0.1);color:var(--code-accent);width:40px;height:40px;">
+                        <i data-lucide="scan-line" style="width:18px;height:18px;"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm">Analyze Code</div>
+                        <div class="text-xs text-muted">Bug detection & optimization</div>
+                    </div>
+                </a>
+                <a href="/internships" class="result-card" style="display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);">
+                    <div class="stat-icon" style="background:rgba(108,99,255,0.1);color:var(--intern-accent);width:40px;height:40px;">
+                        <i data-lucide="search" style="width:18px;height:18px;"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm">Find Internships</div>
+                        <div class="text-xs text-muted">AI-powered career discovery</div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Profile Completion -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="glass-card">
-                <h4 class="mb-3 text-gradient">📝 Profile Status</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p>Branch: <span class="badge badge-success" style="margin-left: 0.5rem;">{{ user['branch'] or 'Not Set' }}</span></p>
-                        <p>CGPA: <span class="badge badge-warning" style="margin-left: 0.5rem;">{{ user['cgpa'] or 'Not Set' }}</span></p>
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <a href="{{ url_for('profile') }}" class="btn btn-outline">
-                            <i class="bi bi-pencil"></i> Complete Profile
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <!-- Recent Activity -->
+    <div class="card animate-slide-up stagger-4">
+        <div class="card-header">
+            <h3 class="card-title">🕐 Recent Activity</h3>
+            <a href="/activity" class="btn btn-sm btn-ghost">Full Log</a>
         </div>
+        {% if recent_activities %}
+        <div class="timeline">
+            {% for act in recent_activities[:5] %}
+            <div class="timeline-item">
+                <div class="timeline-time">{{ act.created_at.strftime('%b %d, %I:%M %p') if act.created_at else '' }}</div>
+                <div class="timeline-content">{{ act.action_type or '' }}: {{ act.details or '' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-muted text-center" style="padding:var(--space-6);">Your activity log will appear here as you use the platform.</p>
+        {% endif %}
     </div>
 </div>
-
-<script>
-    // Animate counters
-    const counterElements = document.querySelectorAll('[data-target]');
-    counterElements.forEach(el => {
-        const target = parseInt(el.getAttribute('data-target'));
-        const increment = target / 30;
-        let current = 0;
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                el.textContent = target;
-                clearInterval(timer);
-            } else {
-                el.textContent = Math.floor(current);
-            }
-        }, 30);
-    });
-
-    // Fade in animation
-    window.addEventListener('load', () => {
-        document.querySelector('.fade-in').classList.add('fade-in');
-    });
-</script>
 {% endblock %}

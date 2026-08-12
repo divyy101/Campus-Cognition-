@@ -1,708 +1,213 @@
-{% extends "base_new.html" %}
-
-{% block theme_class %}code{% endblock %}
-
-{% block title %}Coding Terminal HUD - Campus Cognition{% endblock %}
+{% extends "base.html" %}
+{% block title %}Code Lab — Campus Cognition{% endblock %}
 
 {% block content %}
-<!-- Hacker Cyberpunk Styles & Overlays -->
-<style>
-    /* Scope styling to theme-code to keep it highly modular */
-    body.theme-code {
-        background-color: #050508 !important;
-        font-family: 'Fira Code', 'Courier New', Courier, monospace !important;
-        color: #00ff66 !important;
-        background-image: linear-gradient(rgba(0, 255, 102, 0.03) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(0, 255, 102, 0.03) 1px, transparent 1px);
-        background-size: 20px 20px;
-        position: relative;
-        overflow-x: hidden;
-    }
-
-    /* Cyber scanlines overlay */
-    body.theme-code::before {
-        content: " ";
-        display: block;
-        position: fixed;
-        top: 0; left: 0; bottom: 0; right: 0;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        z-index: 9999;
-        background-size: 100% 4px, 6px 100%;
-        pointer-events: none;
-        opacity: 0.4;
-    }
-
-    .terminal-card {
-        background: rgba(10, 10, 15, 0.85) !important;
-        border: 1px solid #00ff66 !important;
-        border-radius: 6px !important;
-        box-shadow: 0 0 15px rgba(0, 255, 102, 0.2) !important;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .terminal-card::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: #00ff66;
-        box-shadow: 0 0 10px #00ff66;
-        animation: scanline-animate 6s linear infinite;
-    }
-
-    @keyframes scanline-animate {
-        0% { top: 0%; }
-        50% { top: 100%; }
-        100% { top: 0%; }
-    }
-
-    .terminal-header {
-        background: rgba(0, 255, 102, 0.1) !important;
-        border-bottom: 1px solid #00ff66 !important;
-        padding: 10px 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .terminal-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 5px;
-    }
-
-    .dot-red { background-color: #ff5f56; }
-    .dot-yellow { background-color: #ffbd2e; }
-    .dot-green { background-color: #27c93f; }
-
-    .terminal-title {
-        color: #00ff66;
-        font-weight: bold;
-        font-size: 0.85rem;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-    }
-
-    .neon-glow-text {
-        text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
-    }
-
-    .neon-btn {
-        background: transparent !important;
-        border: 1px solid #00ff66 !important;
-        color: #00ff66 !important;
-        transition: all 0.3s ease !important;
-        font-weight: bold;
-        letter-spacing: 1px;
-    }
-
-    .neon-btn:hover {
-        background: #00ff66 !important;
-        color: #00 !important;
-        box-shadow: 0 0 15px #00ff66 !important;
-    }
-
-    .code-editor-area {
-        background: #050508 !important;
-        color: #00ff66 !important;
-        border: 1px solid rgba(0, 255, 102, 0.3) !important;
-        font-family: 'Fira Code', monospace !important;
-        resize: vertical;
-    }
-
-    .code-editor-area:focus {
-        border-color: #00ff66 !important;
-        box-shadow: 0 0 10px rgba(0, 255, 102, 0.4) !important;
-    }
-
-    /* Diagnostics Screen styling */
-    .diagnostics-log {
-        background: #020204;
-        color: #00ff66;
-        padding: 15px;
-        border-radius: 4px;
-        height: 120px;
-        overflow-y: auto;
-        font-size: 0.8rem;
-        border: 1px dashed rgba(0, 255, 102, 0.4);
-    }
-
-    /* Dynamic complexity gauges */
-    .complexity-dial {
-        border: 2px dashed rgba(0, 255, 102, 0.3);
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        background: rgba(0, 0, 0, 0.4);
-        transition: all 0.3s ease;
-    }
-
-    .complexity-dial:hover {
-        border-color: #00ff66;
-        box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-    }
-
-    .complexity-value {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #ffffff;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-
-    /* Comparison terminal diff views */
-    .diff-title {
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 4px 10px;
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-        border: 1px solid rgba(0, 255, 102, 0.3);
-        border-bottom: none;
-        display: inline-block;
-    }
-
-    .diff-pre {
-        background: #020203 !important;
-        border: 1px solid rgba(0, 255, 102, 0.3) !important;
-        border-radius: 0 4px 4px 4px !important;
-        max-height: 400px;
-        overflow: auto;
-        padding: 15px;
-    }
-
-    .diff-pre code {
-        font-family: 'Fira Code', 'Courier New', monospace !important;
-        font-size: 0.85rem !important;
-        text-shadow: none !important;
-    }
-
-    #originalCodeVal {
-        color: #e2e8f0 !important; /* Premium high contrast silver-white */
-    }
-
-    #optimizedCodeVal {
-        color: #39ff14 !important; /* Glowing brilliant neon green */
-        text-shadow: 0 0 8px rgba(57, 255, 20, 0.45) !important;
-    }
-
-    /* Toggles for explanations */
-    .hud-toggle-btn {
-        background: rgba(0, 255, 102, 0.05) !important;
-        border: 1px solid rgba(0, 255, 102, 0.3) !important;
-        color: #00ff66 !important;
-        text-align: left;
-        padding: 12px 20px;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-    .hud-toggle-btn:hover {
-        background: rgba(0, 255, 102, 0.1) !important;
-        border-color: #00ff66 !important;
-    }
-
-    .hud-collapse-body {
-        border: 1px solid rgba(0, 255, 102, 0.3);
-        border-top: none;
-        padding: 20px;
-        background: rgba(5, 5, 8, 0.9);
-        border-bottom-left-radius: 6px;
-        border-bottom-right-radius: 6px;
-    }
-
-    .glow-badge {
-        background: rgba(0, 255, 102, 0.15) !important;
-        color: #00ff66 !important;
-        border: 1px solid #00ff66 !important;
-        box-shadow: 0 0 5px rgba(0, 255, 102, 0.3);
-    }
-</style>
-
-<div class="container-fluid py-4">
-    <!-- Cyber HUD Banner -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="terminal-card">
-                <div class="terminal-header">
-                    <div>
-                        <span class="terminal-dot dot-red"></span>
-                        <span class="terminal-dot dot-yellow"></span>
-                        <span class="terminal-dot dot-green"></span>
-                    </div>
-                    <div class="terminal-title">CC-AI // CORE_CODING_TERMINAL_v2.0</div>
-                    <div>
-                        <span class="badge glow-badge"><i class="bi bi-cpu"></i> SYSTEMS: ONLINE</span>
-                    </div>
-                </div>
-                <div class="p-4 d-md-flex align-items-center justify-content-between">
-                    <div>
-                        <h1 class="h2 mb-1 text-white neon-glow-text"><i class="bi bi-terminal-fill text-success"></i> CODING NEURAL HUBS</h1>
-                        <p class="text-muted mb-0 small">Decentralized AI parser. Submit syntax trees to isolate bugs, optimize memory boundaries, and restructure workflows.</p>
-                    </div>
-                    <div class="mt-3 mt-md-0 text-md-end text-success">
-                        <small class="d-block"><i class="bi bi-broadcast"></i> NEURAL CORE: SECURE</small>
-                        <small class="d-block"><i class="bi bi-hdd-network"></i> DATASET FLAVOR: HYPER-STABLE</small>
-                    </div>
+<div class="page-container animate-fade-in">
+    <div class="page-header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="page-title" style="color:var(--code-accent);">⟨/⟩ Code Lab</h1>
+                <p class="page-subtitle">AI-powered bug detection, complexity analysis, and optimization</p>
+            </div>
+            <div class="neural-engine">
+                <span class="neural-engine-label">Neural Engine</span>
+                <div class="neural-engine-options">
+                    <button class="neural-engine-option" data-engine="gemini">Gemini</button>
+                    <button class="neural-engine-option" data-engine="openai">OpenAI</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- main interface -->
-    <div class="row">
-        <!-- paste editor terminal -->
-        <div class="col-lg-6 mb-4">
-            <div class="terminal-card">
-                <div class="terminal-header">
-                    <div class="terminal-title"><i class="bi bi-pencil-square"></i> INPUT_BUFFER // PASTE CODE</div>
-                    <span class="text-success small">LN:1 COL:1</span>
+    <div class="grid grid-2 gap-5">
+        <!-- Code Editor Panel -->
+        <div>
+            <div class="code-editor-wrapper animate-slide-up stagger-1">
+                <div class="code-editor-header">
+                    <div class="code-editor-dots">
+                        <span class="code-editor-dot red"></span>
+                        <span class="code-editor-dot yellow"></span>
+                        <span class="code-editor-dot green"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select id="langSelect" class="form-select" style="width:auto;padding:4px 28px 4px 10px;font-size:var(--fs-xs);background:var(--code-surface);color:#e6edf3;border-color:#30363d;">
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="sql">SQL</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="p-4">
-                    <form id="codeHudForm">
-                        <div class="mb-3">
-                            <label for="hudLanguage" class="form-label text-white-50 small font-monospace">1. SELECT_ENVIRONMENT_COMPILER</label>
-                            <select class="form-select code-editor-area" id="hudLanguage" required>
-                                <option value="python">Python 3.10 (Standard)</option>
-                                <option value="javascript">JavaScript (ECMAScript 2022)</option>
-                                <option value="java">Java SE 17 (LTS)</option>
-                                <option value="c">C Compiler (GCC v11)</option>
-                                <option value="cpp">C++ Compiler (Clang v14)</option>
-                            </select>
-                        </div>
+                <textarea id="codeInput" class="code-textarea" placeholder="# Paste your code here...
+# The AI will analyze it for bugs, complexity, and optimization opportunities.
 
-                        <div class="mb-3">
-                            <label for="hudEngine" class="form-label text-white-50 small font-monospace">1.5 CHOOSE_NEURAL_COGNITION_CORE</label>
-                            <select class="form-select code-editor-area" id="hudEngine" required>
-                                <option value="gemini">Google Gemini AI Core (Primary)</option>
-                                <option value="openai">OpenAI GPT-4o Core (Active Direct)</option>
-                            </select>
-                        </div>
+def example():
+    pass" spellcheck="false"></textarea>
+            </div>
 
-                        <div class="mb-4">
-                            <label for="hudCode" class="form-label text-white-50 small font-monospace">2. INPUT_RAW_SOURCE_SEGMENTS</label>
-                            <textarea class="form-control code-editor-area" id="hudCode" rows="16" placeholder="/* Paste code blocks here for AI compilation check... */" required></textarea>
-                        </div>
+            <button id="analyzeBtn" class="btn btn-lg w-full mt-4" style="background:var(--code-accent);color:#0d1117;font-weight:var(--fw-semibold);" onclick="analyzeCode()">
+                <i data-lucide="scan-line" style="width:18px;height:18px;"></i>
+                Analyze Code
+            </button>
 
-                        <button type="submit" class="btn neon-btn w-100 py-3">
-                            <i class="bi bi-cpu-fill"></i> EXECUTE NEURAL SYNTAX DECRYPTION
-                        </button>
-                    </form>
-                </div>
+            <div class="powered-by mt-2 justify-center" style="display:flex;">
+                <span>Powered by</span>
+                <span class="engine-badge">Gemini</span>
             </div>
         </div>
 
-        <!-- AI insights console -->
-        <div class="col-lg-6 mb-4">
-            <div class="terminal-card h-100 d-flex flex-column">
-                <div class="terminal-header">
-                    <div class="terminal-title"><i class="bi bi-cpu"></i> DIAGNOSTIC HUD // INSIGHTS ENGINE</div>
-                    <span class="badge glow-badge bg-dark" id="systemProgressStatus">IDLE</span>
-                </div>
-                <div class="p-4 flex-grow-1 d-flex flex-column">
-                    <!-- Progress / Diagnostic Logging Screen -->
-                    <div id="diagnosticsLogWrapper" class="mb-4" style="display:none;">
-                        <label class="text-white-50 small font-monospace mb-2 d-block"><i class="bi bi-activity text-danger"></i> COMPILATION LOGS</label>
-                        <div class="diagnostics-log font-monospace" id="diagnosticsLog">
-                            <!-- filled by script -->
-                        </div>
-                    </div>
-
-                    <!-- results output hub -->
-                    <div id="hudResultHub" class="flex-grow-1" style="display:none;">
-                        <!-- complexity cards -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-6">
-                                <div class="complexity-dial">
-                                    <small class="text-muted d-block font-monospace">TIME_COMPLEXITY</small>
-                                    <div class="complexity-value text-success mt-1" id="timeComplexityVal">O(1)</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="complexity-dial">
-                                    <small class="text-muted d-block font-monospace">SPACE_COMPLEXITY</small>
-                                    <div class="complexity-value text-info mt-1" id="spaceComplexityVal">O(1)</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- scores card -->
-                        <div class="glass-card p-3 mb-4 border-success" style="background: rgba(0, 255, 102, 0.03);">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="small font-monospace text-white-50"><i class="bi bi-speedometer2"></i> DECRYPTION SCORE</span>
-                                <span class="badge glow-badge" id="perfGainVal">+0% Gain</span>
-                            </div>
-                            <div class="progress mb-2 bg-dark" style="height: 8px; border: 1px solid rgba(0,255,102,0.3);">
-                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="readabilityBar" role="progressbar" style="width: 0%"></div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small font-monospace text-muted">Readability Metrics</span>
-                                <span class="small font-monospace text-white" id="readabilityVal">0%</span>
-                            </div>
-                        </div>
-
-                        <!-- collapse containers for modular reports -->
-                        <div class="d-flex flex-column gap-2">
-                            <!-- summary -->
-                            <div>
-                                <button class="btn w-100 hud-toggle-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hudSummaryCollapse" aria-expanded="false">
-                                    <i class="bi bi-chat-left-dots text-success"></i> 1. SUMMARY // COGNITIVE EXPL PLAN
-                                </button>
-                                <div class="collapse" id="hudSummaryCollapse">
-                                    <div class="hud-collapse-body small text-white-50 font-monospace" id="hudSummaryContent">
-                                        <!-- filled -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- errors -->
-                            <div>
-                                <button class="btn w-100 hud-toggle-btn collapsed text-danger" type="button" data-bs-toggle="collapse" data-bs-target="#hudErrorsCollapse" aria-expanded="false">
-                                    <i class="bi bi-exclamation-octagon-fill text-danger"></i> 2. CRITICAL BUGS // BOUND CHECK
-                                </button>
-                                <div class="collapse" id="hudErrorsCollapse">
-                                    <div class="hud-collapse-body font-monospace" id="hudErrorsContent">
-                                        <!-- filled -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- recommendations -->
-                            <div>
-                                <button class="btn w-100 hud-toggle-btn collapsed text-warning" type="button" data-bs-toggle="collapse" data-bs-target="#hudSuggestionsCollapse" aria-expanded="false">
-                                    <i class="bi bi-lightbulb-fill text-warning"></i> 3. SYNTAX REFACTORING SUGGESTIONS
-                                </button>
-                                <div class="collapse" id="hudSuggestionsCollapse">
-                                    <div class="hud-collapse-body font-monospace" id="hudSuggestionsContent">
-                                        <!-- filled -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- refactored comparison toggle -->
-                            <div>
-                                <button class="btn w-100 hud-toggle-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hudComparisonCollapse" aria-expanded="false">
-                                    <i class="bi bi-file-earmark-diff-fill text-info"></i> 4. CODE COMPARATIVE VIEW
-                                </button>
-                                <div class="collapse" id="hudComparisonCollapse">
-                                    <div class="hud-collapse-body p-2 font-monospace">
-                                        <div class="mb-3">
-                                            <div class="diff-title text-success">OPTIMIZATION LOGS // REFACTOR MATRIX</div>
-                                            <div class="p-3 glass-card bg-dark text-white-50 small mb-3 border-info" id="whyBetterContent">
-                                                <!-- filled -->
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="diff-title text-danger">ORIGINAL_SOURCE</div>
-                                                <pre class="diff-pre"><code class="text-white-50" id="originalCodeVal" style="white-space: pre-wrap;"></code></pre>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-0" style="max-width: 100%;">
-                                                    <div class="diff-title text-success" style="margin-bottom: 0;">AI_OPTIMIZED_SOURCE</div>
-                                                    <button class="btn btn-sm btn-outline-success font-monospace" onclick="copyOptimizedCode()" style="font-size: 0.65rem; padding: 2px 8px; border-color: rgba(0, 255, 102, 0.4); color: #39ff14; background: rgba(0, 255, 102, 0.05); border-radius: 4px; box-shadow: 0 0 5px rgba(0, 255, 102, 0.1); margin-bottom: 0;">
-                                                        <i class="bi bi-clipboard me-1"></i>COPY CODE
-                                                    </button>
-                                                </div>
-                                                <pre class="diff-pre" style="margin-top: 0;"><code class="text-success" id="optimizedCodeVal" style="white-space: pre-wrap;"></code></pre>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Idle Screen Placeholder -->
-                    <div id="hudIdlePlaceholder" class="text-center py-5 my-auto text-success-50 font-monospace">
-                        <i class="bi bi-terminal-dash neon-glow-text" style="font-size: 3rem;"></i>
-                        <p class="mt-3 text-muted">Awaiting code block decryption sequence...</p>
-                        <small class="text-white-25">Select language and enter code to execute the AI core.</small>
-                    </div>
+        <!-- Analysis Results Panel -->
+        <div id="analysisPanel">
+            <div class="card animate-slide-up stagger-2" style="background:var(--code-bg);border-color:#30363d;color:#e6edf3;min-height:400px;" id="analysisContent">
+                <div class="empty-state" style="color:#8b949e;">
+                    <div class="empty-icon">🔬</div>
+                    <div class="empty-title" style="color:#c9d1d9;">Paste code & hit Analyze</div>
+                    <div class="empty-text">The AI will detect bugs, measure complexity, and suggest optimizations.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- History Panel -->
+    <!-- History -->
     {% if history %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="terminal-card">
-                <div class="terminal-header">
-                    <div class="terminal-title"><i class="bi bi-clock-history"></i> DECRYPTION LOGS HISTORY</div>
-                    <span class="badge bg-secondary font-monospace">{{ history|length }} LOGS STORED</span>
-                </div>
-                <div class="p-4">
-                    <div class="table-responsive">
-                        <table class="table table-dark table-hover border-success align-middle font-monospace mb-0 text-success small">
-                            <thead>
-                                <tr>
-                                    <th>TIMESTAMP</th>
-                                    <th>ENVIRONMENT</th>
-                                    <th>CODE SNAPSHOT</th>
-                                    <th class="text-end">ACTION</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in history %}
-                                <tr>
-                                    <td>{{ item['created_at'] }}</td>
-                                    <td><span class="badge glow-badge">{{ item['language']|upper }}</span></td>
-                                    <td class="text-muted">{{ item['code'][:60] }}{% if item['code']|length > 60 %}...{% endif %}</td>
-                                    <td class="text-end">
-                                        <button type="button" class="btn btn-sm neon-btn" onclick="restoreHistoricalAnalysis({{ item['id'] }})">
-                                            <i class="bi bi-box-arrow-in-up-right"></i> LOAD HUD
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    <div class="card mt-6 animate-slide-up">
+        <div class="card-header">
+            <h3 class="card-title">📂 Analysis History</h3>
         </div>
+        {% for h in history[:5] %}
+        <div class="flex items-center justify-between" style="padding:var(--space-3) 0;border-bottom:1px solid var(--border-light);">
+            <div>
+                <div class="font-medium text-sm">{{ h.language|upper }} Analysis</div>
+                <div class="text-xs text-muted">{{ h.created_at.strftime('%b %d, %Y') if h.created_at else '' }}</div>
+            </div>
+            <a href="/code-assistant/{{ h.id }}" class="btn btn-sm btn-ghost">View</a>
+        </div>
+        {% endfor %}
     </div>
     {% endif %}
 </div>
+{% endblock %}
 
-<!-- Scripts -->
+{% block scripts %}
 <script>
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function analyzeCode() {
+    const code = document.getElementById('codeInput').value.trim();
+    const language = document.getElementById('langSelect').value;
 
-    // Dynamic compilation logging text animation
-    async function animateDiagnostics() {
-        const log = document.getElementById('diagnosticsLog');
-        document.getElementById('diagnosticsLogWrapper').style.display = 'block';
-        document.getElementById('hudIdlePlaceholder').style.display = 'none';
-        document.getElementById('hudResultHub').style.display = 'none';
-        document.getElementById('systemProgressStatus').innerText = 'COMPILING';
-        document.getElementById('systemProgressStatus').className = 'badge bg-danger';
-
-        const engineSelected = document.getElementById('hudEngine').value;
-        const engineName = engineSelected === 'openai' ? 'OpenAI GPT-4o-Mini' : 'Google Gemini 1.5 Flash';
-
-        const lines = [
-            "[SYS] Initialize decryptor connection...",
-            "[SYS] Resolving abstract syntax patterns...",
-            `[SYS] Querying AI cognitive layer [${engineName}]...`,
-            "[AI] Loading optimization structures...",
-            "[AI] Running code readability tests...",
-            "[AI] Estimating big-O boundaries...",
-            "[SYS] Validating schema constraints...",
-            "[SYS] Integration check successful. Decryptor complete!"
-        ];
-
-        log.innerHTML = '';
-        for (let line of lines) {
-            log.innerHTML += `<div class="mb-1">${line}</div>`;
-            log.scrollTop = log.scrollHeight;
-            await sleep(400);
-        }
+    if (!code) {
+        Toast.show('Please paste some code to analyze.', 'warning');
+        return;
     }
 
-    document.getElementById('codeHudForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const btn = document.getElementById('analyzeBtn');
+    const panel = document.getElementById('analysisContent');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
-        const formData = {
-            code: document.getElementById('hudCode').value,
-            language: document.getElementById('hudLanguage').value,
-            ai_engine: document.getElementById('hudEngine').value
-        };
+    // Show scan-line animation
+    panel.innerHTML = '<div style="position:relative;height:100%;min-height:300px;"><div class="scan-line"></div><div class="text-center" style="padding-top:120px;color:#8b949e;"><div class="spinner" style="margin:0 auto 12px;"></div><div class="text-sm">AI scanning your code...</div></div></div>';
 
-        if (!formData.code.trim()) {
-            showToast('Enter code block segments', 'warning');
-            return;
-        }
-
-        // Show Diagnostics screen
-        await animateDiagnostics();
-
-        try {
-            const response = await fetch('{{ url_for("code_assistant") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            let data;
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                data = await response.json();
-            } else {
-                const text = await response.text();
-                let errMsg = "Server responded with an invalid format.";
-                if (response.status === 504 || text.includes("Gateway Timeout") || text.includes("Gateway Time-out")) {
-                    errMsg = "Gateway Timeout (504): The code analysis took longer than 10 seconds. Try a simpler or shorter code segment.";
-                } else if (response.status === 413 || text.includes("Payload Too Large") || text.includes("Request Entity Too Large")) {
-                    errMsg = "Request Entity Too Large (413): The payload is too large. Please use a code block under 4.5MB.";
-                } else if (response.status >= 500) {
-                    errMsg = `Server Error (${response.status}): The server encountered an issue processing the request.`;
-                } else {
-                    errMsg = `Error (${response.status}): ${text.substring(0, 100)}`;
-                }
-                throw new Error(errMsg);
-            }
-
-            if (data.success) {
-                displayHudAnalysis(data.analysis, formData.code);
-                showToast('Decryption complete!', 'success');
-            } else {
-                document.getElementById('diagnosticsLogWrapper').style.display = 'none';
-                document.getElementById('hudIdlePlaceholder').style.display = 'block';
-                document.getElementById('systemProgressStatus').innerText = 'ERROR';
-                document.getElementById('systemProgressStatus').className = 'badge bg-danger';
-                showToast(data.message || 'Decryption failed', 'danger');
-            }
-        } catch (error) {
-            document.getElementById('diagnosticsLogWrapper').style.display = 'none';
-            document.getElementById('hudIdlePlaceholder').style.display = 'block';
-            document.getElementById('systemProgressStatus').innerText = 'OFFLINE';
-            showToast('Decryption engine offline: ' + error.message, 'danger');
-        }
-    });
-
-    function displayHudAnalysis(analysis, originalCode) {
-        document.getElementById('diagnosticsLogWrapper').style.display = 'none';
-        document.getElementById('hudResultHub').style.display = 'block';
-        document.getElementById('systemProgressStatus').innerText = 'STABLE';
-        document.getElementById('systemProgressStatus').className = 'badge glow-badge';
-
-        // Bind metrics
-        document.getElementById('timeComplexityVal').innerText = analysis.time_complexity || 'O(N)';
-        document.getElementById('spaceComplexityVal').innerText = analysis.space_complexity || 'O(1)';
-        document.getElementById('perfGainVal').innerText = analysis.performance_gain || '+10% Speed';
-        
-        // Progress readability
-        const readability = analysis.readability_score || 85;
-        document.getElementById('readabilityVal').innerText = readability + '%';
-        document.getElementById('readabilityBar').style.width = readability + '%';
-
-        // Bind text contents
-        document.getElementById('hudSummaryContent').innerHTML = sanitizeHTML(analysis.summary || 'Summary not found.');
-        document.getElementById('whyBetterContent').innerHTML = sanitizeHTML(analysis.why_better || 'Architectural boundaries preserved.');
-
-        // Original and Optimized
-        document.getElementById('originalCodeVal').innerText = originalCode;
-        document.getElementById('optimizedCodeVal').innerText = analysis.optimized_code || originalCode;
-
-        // Errors List
-        let errorHtml = '';
-        if (analysis.errors && analysis.errors.length > 0) {
-            analysis.errors.forEach(err => {
-                errorHtml += `<div class="alert alert-danger p-2 mb-2 small border-danger bg-dark text-danger"><i class="bi bi-x-circle-fill"></i> ${sanitizeHTML(err)}</div>`;
-            });
-        } else {
-            errorHtml = '<div class="alert alert-success p-2 small bg-dark text-success border-success"><i class="bi bi-check-circle-fill"></i> Zero critical compilation-breaking bounds isolated.</div>';
-        }
-        document.getElementById('hudErrorsContent').innerHTML = errorHtml;
-
-        // Suggestions List
-        let sugHtml = '';
-        if (analysis.suggestions && analysis.suggestions.length > 0) {
-            analysis.suggestions.forEach(sug => {
-                sugHtml += `<div class="alert alert-warning p-2 mb-2 small border-warning bg-dark text-warning"><i class="bi bi-lightbulb-fill"></i> ${sanitizeHTML(sug)}</div>`;
-            });
-        } else {
-            sugHtml = '<div class="text-muted small">No enhancements recommended.</div>';
-        }
-        document.getElementById('hudSuggestionsContent').innerHTML = sugHtml;
-
-        // Expand sections
-        const collapses = ['hudSummaryCollapse', 'hudErrorsCollapse', 'hudSuggestionsCollapse', 'hudComparisonCollapse'];
-        collapses.forEach(id => {
-            const bsCollapse = new bootstrap.Collapse(document.getElementById(id), { toggle: false });
-            bsCollapse.show();
+    try {
+        const res = await fetch('/code-assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, language, ai_engine: NeuralEngine.current })
         });
-    }
+        const data = await res.json();
 
-    async function restoreHistoricalAnalysis(analysisId) {
-        showToast('Restoring compiler session...', 'info');
-        try {
-            const response = await fetch(`/code-assistant/${analysisId}`);
-            const data = await response.json();
-
-            if (data.success) {
-                // Parse strings as JSON lists if needed
-                let errors = [];
-                let suggestions = [];
-                try {
-                    errors = typeof data.analysis.errors === 'string' ? JSON.parse(data.analysis.errors) : (data.analysis.errors || []);
-                } catch(e) {
-                    errors = [data.analysis.errors];
-                }
-                try {
-                    suggestions = typeof data.analysis.suggestions === 'string' ? JSON.parse(data.analysis.suggestions) : (data.analysis.suggestions || []);
-                } catch(e) {
-                    suggestions = [data.analysis.suggestions];
-                }
-
-                // Check for dynamic keys from new JSON engine
-                let fullParsed = {};
-                try {
-                    // Check if charts_data contains the entire analysis JSON
-                    fullParsed = JSON.parse(data.analysis.explanation);
-                } catch(e) {
-                    // Not JSON string, build representation
-                    fullParsed = {
-                        summary: data.analysis.explanation,
-                        errors: errors,
-                        suggestions: suggestions,
-                        optimized_code: data.analysis.optimized_code,
-                        time_complexity: 'O(N)',
-                        space_complexity: 'O(1)',
-                        performance_gain: '+20% Speed',
-                        readability_score: 85,
-                        why_better: 'Loaded from history database bounds.'
-                    };
-                }
-
-                // Bind back to UI inputs for rapid re-analysis
-                document.getElementById('hudCode').value = data.analysis.code;
-                document.getElementById('hudLanguage').value = data.analysis.language;
-
-                displayHudAnalysis(fullParsed, data.analysis.code);
-                showToast('Hacker HUD restored!', 'success');
-            } else {
-                showToast(data.message || 'Session restore failed', 'danger');
-            }
-        } catch (error) {
-            showToast('Offline restorer error: ' + error.message, 'danger');
+        if (data.success && data.analysis) {
+            renderAnalysis(data.analysis);
+            Toast.show('Analysis complete!', 'success');
+        } else {
+            panel.innerHTML = `<div class="alert alert-error">${data.message || data.analysis?.message || 'Analysis failed. Please try again.'}</div>`;
+            Toast.show(data.message || 'Analysis failed.', 'error');
         }
+    } catch (err) {
+        panel.innerHTML = '<div class="alert alert-error">Network error. Please check your connection.</div>';
+        Toast.show('Network error.', 'error');
     }
 
-    function sanitizeHTML(text) {
-        if (!text) return '';
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="scan-line" style="width:18px;height:18px;"></i> Analyze Code';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function renderAnalysis(a) {
+    const panel = document.getElementById('analysisContent');
+    panel.style.background = 'var(--code-bg)';
+    panel.style.color = '#e6edf3';
+
+    let html = '';
+
+    // Summary
+    if (a.summary) {
+        html += `<div class="analysis-panel"><div class="panel-title">📋 Summary</div><p class="text-sm" style="color:#c9d1d9;">${a.summary}</p></div>`;
     }
 
-    function copyOptimizedCode() {
-        const codeText = document.getElementById('optimizedCodeVal').innerText;
-        if (!codeText) {
-            showToast('No optimized code to copy.', 'warning');
-            return;
-        }
-        navigator.clipboard.writeText(codeText).then(() => {
-            showToast('Optimized code copied to clipboard!', 'success');
-        }).catch(err => {
-            showToast('Clipboard write failed. Please select and copy manually.', 'danger');
+    // Complexity
+    html += `<div class="analysis-panel"><div class="panel-title">⏱️ Complexity</div><div class="flex gap-3">`;
+    html += `<div class="complexity-badge">Time: ${a.time_complexity || 'N/A'}</div>`;
+    html += `<div class="complexity-badge">Space: ${a.space_complexity || 'N/A'}</div>`;
+    html += `</div>`;
+    if (a.complexity_explanation) {
+        html += `<p class="text-xs mt-2" style="color:#8b949e;">${a.complexity_explanation}</p>`;
+    }
+    html += `</div>`;
+
+    // Errors/Bugs
+    const errors = a.errors || [];
+    if (errors.length > 0) {
+        html += `<div class="analysis-panel"><div class="panel-title">🐛 Issues Found (${errors.length})</div>`;
+        errors.forEach(err => {
+            const e = typeof err === 'string' ? { message: err } : err;
+            const severity = e.severity || 'warning';
+            const colors = { error: '#f87171', warning: '#fbbf24', info: '#60a5fa' };
+            html += `<div style="padding:8px 12px;background:rgba(255,255,255,0.03);border-left:3px solid ${colors[severity] || colors.info};border-radius:0 6px 6px 0;margin-bottom:6px;font-size:var(--fs-sm);color:#c9d1d9;">`;
+            if (e.line) html += `<span style="color:${colors[severity]};font-family:var(--font-mono);font-size:var(--fs-xs);">Line ${e.line}</span> · `;
+            html += `${e.message || e}</div>`;
         });
+        html += `</div>`;
+    } else {
+        html += `<div class="analysis-panel"><div class="panel-title">✅ No Issues</div><p class="text-sm" style="color:#8b949e;">No bugs or syntax issues detected.</p></div>`;
     }
+
+    // Suggestions
+    if (a.suggestions && a.suggestions.length) {
+        html += `<div class="analysis-panel"><div class="panel-title">💡 Suggestions</div>`;
+        a.suggestions.forEach(s => {
+            html += `<div style="padding:6px 0;font-size:var(--fs-sm);color:#c9d1d9;display:flex;gap:8px;"><span style="color:var(--code-accent);">→</span><span>${s}</span></div>`;
+        });
+        html += `</div>`;
+    }
+
+    // Optimized Code
+    if (a.optimized_code) {
+        html += `<div class="analysis-panel"><div class="panel-title">🚀 Optimized Code</div>`;
+        html += `<pre style="background:var(--code-bg);padding:12px;border-radius:var(--radius-sm);overflow-x:auto;font-size:var(--fs-xs);line-height:1.6;border:1px solid #30363d;"><code style="color:#e6edf3;">${escapeHtml(a.optimized_code)}</code></pre>`;
+        html += `<button class="btn btn-sm btn-ghost mt-2" onclick="copyCode()" style="color:var(--code-accent);border-color:#30363d;">📋 Copy</button>`;
+        html += `</div>`;
+    }
+
+    panel.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function copyCode() {
+    const code = document.querySelector('#analysisContent pre code');
+    if (code) {
+        navigator.clipboard.writeText(code.textContent);
+        Toast.show('Code copied!', 'success', 2000);
+    }
+}
 </script>
 {% endblock %}

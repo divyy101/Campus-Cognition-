@@ -1,511 +1,302 @@
-// ==========================================
-// CAMPUS COGNITION - MAIN JAVASCRIPT
-// Interactive Features & Utilities
-// ==========================================
+/**
+ * Campus Cognition — Main JavaScript
+ * Theme toggle, Neural Engine selector, file validation, toast system,
+ * processing status polling, and page interactions.
+ */
 
-// Toast Notification System
-function showToast(message, type = 'info') {
-    const toastElement = document.getElementById('toast');
-    const toastMessage = document.getElementById('toast-message');
-    
-    toastMessage.textContent = message;
-    
-    // Remove all type classes
-    toastElement.classList.remove('bg-success', 'bg-danger', 'bg-info', 'bg-warning');
-    
-    // Add appropriate type class
-    switch(type) {
-        case 'success':
-            toastElement.classList.add('bg-success');
-            break;
-        case 'danger':
-            toastElement.classList.add('bg-danger');
-            break;
-        case 'warning':
-            toastElement.classList.add('bg-warning');
-            break;
-        case 'info':
-        default:
-            toastElement.classList.add('bg-info');
+// ==========================================
+// THEME MANAGEMENT
+// ==========================================
+const ThemeManager = {
+    init() {
+        const saved = localStorage.getItem('cc-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        const toggle = document.getElementById('themeToggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => this.toggle());
+        }
+    },
+    toggle() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('cc-theme', next);
+    },
+    get current() {
+        return document.documentElement.getAttribute('data-theme') || 'light';
     }
-    
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-}
-
-// Theme Toggle (Dark/Light Mode)
-function toggleTheme() {
-    const body = document.body;
-    const isDark = body.classList.contains('dark-mode');
-    
-    if (isDark) {
-        body.classList.remove('dark-mode');
-        localStorage.setItem('theme', 'light');
-    } else {
-        body.classList.add('dark-mode');
-        localStorage.setItem('theme', 'dark');
-    }
-}
-
-// Load saved theme on page load
-function loadTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-}
-
-// Initialize theme on page load
-document.addEventListener('DOMContentLoaded', loadTheme);
+};
 
 // ==========================================
-// FORM VALIDATION
+// TOAST NOTIFICATION SYSTEM
 // ==========================================
+const Toast = {
+    show(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
 
-// Bootstrap form validation
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        let forms = document.querySelectorAll('.needs-validation');
-        Array.prototype.slice.call(forms)
-            .forEach(function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-    }, false);
-})();
+        const colors = {
+            success: { bg: 'rgba(16,185,129,0.95)', icon: '✓' },
+            error: { bg: 'rgba(239,68,68,0.95)', icon: '✕' },
+            warning: { bg: 'rgba(245,158,11,0.95)', icon: '⚠' },
+            info: { bg: 'rgba(67,97,238,0.95)', icon: 'ℹ' },
+        };
 
-// ==========================================
-// DASHBOARD FEATURES
-// ==========================================
+        const config = colors[type] || colors.info;
 
-// Animate progress bars on page load
-function animateProgressBars() {
-    const progressBars = document.querySelectorAll('.progress-bar');
-    progressBars.forEach(bar => {
-        const width = bar.style.width;
-        bar.style.width = '0';
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            background:${config.bg}; color:white; padding:12px 20px; border-radius:10px;
+            font-family:var(--font-primary); font-size:0.875rem; font-weight:500;
+            display:flex; align-items:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15);
+            animation: slideInUp 0.3s ease-out; max-width:400px; backdrop-filter:blur(10px);
+        `;
+        toast.innerHTML = `<span style="font-size:1.1rem;">${config.icon}</span><span>${message}</span>`;
+
+        container.appendChild(toast);
+
         setTimeout(() => {
-            bar.style.transition = 'width 1s ease-out';
-            bar.style.width = width;
-        }, 100);
-    });
-}
-
-document.addEventListener('DOMContentLoaded', animateProgressBars);
-
-// ==========================================
-// STUDY MODULE FEATURES
-// ==========================================
-
-// Drag and Drop for file uploads
-function setupFileUpload(dropZoneId, inputId) {
-    const dropZone = document.getElementById(dropZoneId);
-    const fileInput = document.getElementById(inputId);
-    
-    if (!dropZone || !fileInput) return;
-
-    // Click to upload
-    dropZone.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    // Drag over
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
-
-    // Drag leave
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-    });
-
-    // Drop
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        
-        const files = e.dataTransfer.files;
-        if (files.length) {
-            fileInput.files = files;
-            updateDropZoneDisplay(dropZone, files[0].name);
-        }
-    });
-
-    // File input change
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files[0]) {
-            updateDropZoneDisplay(dropZone, fileInput.files[0].name);
-        }
-    });
-}
-
-function updateDropZoneDisplay(dropZone, fileName) {
-    dropZone.innerHTML = `
-        <i class="bi bi-check-circle" style="color: #38ef7d; font-size: 2.5rem;"></i>
-        <p>${fileName}</p>
-    `;
-}
-
-// ==========================================
-// CHART UTILITIES
-// ==========================================
-
-// Create a priority chart
-function createPriorityChart(containerId, data) {
-    const ctx = document.getElementById(containerId);
-    if (!ctx) return;
-
-    const chartData = {
-        labels: data.map(item => item.topic),
-        datasets: [{
-            label: 'Priority Score',
-            data: data.map(item => item.priority_score),
-            backgroundColor: [
-                'rgba(102, 126, 234, 0.7)',
-                'rgba(118, 75, 162, 0.7)',
-                'rgba(17, 153, 142, 0.7)',
-                'rgba(56, 239, 125, 0.7)',
-                'rgba(255, 193, 7, 0.7)',
-            ],
-            borderColor: [
-                'rgba(102, 126, 234, 1)',
-                'rgba(118, 75, 162, 1)',
-                'rgba(17, 153, 142, 1)',
-                'rgba(56, 239, 125, 1)',
-                'rgba(255, 193, 7, 1)',
-            ],
-            borderWidth: 2,
-            borderRadius: 10,
-        }]
-    };
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: chartData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: '#999'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: {
-                        color: '#999'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#999'
-                    }
-                }
-            }
-        }
-    });
-}
-
-// ==========================================
-// CODE FORMATTING
-// ==========================================
-
-// Sanitize HTML in code analysis
-function sanitizeHTML(text) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return String(text).replace(/[&<>"']/g, m => map[m]);
-}
-
-// Highlight code syntax
-function highlightCode(element) {
-    if (window.Prism) {
-        Prism.highlightElement(element);
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
     }
-}
+};
 
 // ==========================================
-// SEARCH & FILTER
+// NEURAL ENGINE SELECTOR
 // ==========================================
+const NeuralEngine = {
+    current: localStorage.getItem('cc-ai-engine') || 'gemini',
 
-// Simple search filter
-function filterList(inputId, itemClass) {
-    const searchInput = document.getElementById(inputId);
-    if (!searchInput) return;
-
-    searchInput.addEventListener('keyup', function() {
-        const query = this.value.toLowerCase();
-        const items = document.querySelectorAll('.' + itemClass);
-        
-        items.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(query) ? '' : 'none';
-        });
-    });
-}
-
-// ==========================================
-// MODAL UTILITIES
-// ==========================================
-
-// Show modal with content
-function showModal(modalId, content) {
-    const modal = new bootstrap.Modal(document.getElementById(modalId));
-    const contentElement = document.getElementById('modalContent');
-    if (contentElement) {
-        contentElement.innerHTML = content;
-    }
-    modal.show();
-}
-
-// ==========================================
-// LOADING STATES
-// ==========================================
-
-// Show loading spinner
-function showLoading(elementId) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.style.display = 'flex';
-    }
-}
-
-// Hide loading spinner
-function hideLoading(elementId) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.style.display = 'none';
-    }
-}
-
-// ==========================================
-// DATE UTILITIES
-// ==========================================
-
-// Format date
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-}
-
-// Get days remaining
-function getDaysRemaining(deadlineString) {
-    const deadline = new Date(deadlineString);
-    const today = new Date();
-    const diff = deadline - today;
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-// ==========================================
-// API UTILITIES
-// ==========================================
-
-// Fetch with error handling
-async function fetchAPI(url, options = {}) {
-    try {
-        const response = await fetch(url, options);
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Fetch error:', error);
-        showToast(error.message, 'danger');
-        throw error;
-    }
-}
-
-// ==========================================
-// SCROLLING UTILITIES
-// ==========================================
-
-// Smooth scroll to element
-function smoothScrollTo(elementId) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-// Scroll to top
-function scrollToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-}
-
-// Show/hide scroll to top button
-function handleScrollButton() {
-    const scrollBtn = document.querySelector('.scroll-to-top');
-    if (!scrollBtn) return;
-
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            scrollBtn.style.display = 'block';
-        } else {
-            scrollBtn.style.display = 'none';
-        }
-    });
-
-    scrollBtn.addEventListener('click', scrollToTop);
-}
-
-// ==========================================
-// LOCAL STORAGE UTILITIES
-// ==========================================
-
-// Save to localStorage
-function saveToLocal(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-        console.error('Error saving to localStorage:', error);
-    }
-}
-
-// Get from localStorage
-function getFromLocal(key, defaultValue = null) {
-    try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
-    } catch (error) {
-        console.error('Error reading from localStorage:', error);
-        return defaultValue;
-    }
-}
-
-// ==========================================
-// CLIPBOARD UTILITIES
-// ==========================================
-
-// Copy to clipboard
-async function copyToClipboard(text, feedbackId = null) {
-    try {
-        await navigator.clipboard.writeText(text);
-        showToast('Copied to clipboard!', 'success');
-        
-        if (feedbackId) {
-            const element = document.getElementById(feedbackId);
-            if (element) {
-                element.classList.add('copied');
-                setTimeout(() => element.classList.remove('copied'), 1500);
-            }
-        }
-    } catch (error) {
-        showToast('Failed to copy', 'danger');
-    }
-}
-
-// ==========================================
-// RESPONSIVE UTILITIES
-// ==========================================
-
-// Check if mobile
-function isMobile() {
-    return window.innerWidth <= 768;
-}
-
-// Handle window resize
-function onWindowResize(callback) {
-    window.addEventListener('resize', callback);
-}
-
-// ==========================================
-// ANALYTICS UTILITIES
-// ==========================================
-
-// Track event
-function trackEvent(eventName, eventData = {}) {
-    if (window.gtag) {
-        gtag('event', eventName, eventData);
-    }
-    console.log(`Event: ${eventName}`, eventData);
-}
-
-// ==========================================
-// KEYBOARD SHORTCUTS
-// ==========================================
-
-// Set up keyboard shortcuts
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-        // Ctrl/Cmd + K for search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.querySelector('input[type="search"]');
-            if (searchInput) searchInput.focus();
-        }
-        
-        // Escape to close modals
-        if (e.key === 'Escape') {
-            const modals = document.querySelectorAll('.modal.show');
-            modals.forEach(modal => {
-                bootstrap.Modal.getInstance(modal)?.hide();
+    init() {
+        document.querySelectorAll('.neural-engine-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const engine = btn.dataset.engine;
+                this.set(engine);
             });
+        });
+        this.updateUI();
+    },
+
+    set(engine) {
+        this.current = engine;
+        localStorage.setItem('cc-ai-engine', engine);
+        this.updateUI();
+
+        // Persist to server
+        fetch('/api/settings/provider', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ai_engine: engine })
+        }).catch(() => {});
+
+        Toast.show(`Neural Engine switched to ${engine === 'gemini' ? 'Gemini' : 'OpenAI'}`, 'info', 2000);
+    },
+
+    updateUI() {
+        document.querySelectorAll('.neural-engine-option').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.engine === this.current);
+        });
+        document.querySelectorAll('.engine-badge').forEach(badge => {
+            badge.textContent = this.current === 'gemini' ? 'Gemini' : 'OpenAI';
+        });
+    }
+};
+
+// ==========================================
+// FILE VALIDATION (700MB limit)
+// ==========================================
+const FileValidator = {
+    MAX_SIZE: 700 * 1024 * 1024, // 700MB
+    ALLOWED: ['.pdf', '.docx', '.txt', '.md', '.pptx'],
+
+    validate(file) {
+        if (!file) return { valid: false, error: 'No file selected.' };
+
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!this.ALLOWED.includes(ext)) {
+            return { valid: false, error: `Unsupported file type. Allowed: ${this.ALLOWED.join(', ')}` };
+        }
+
+        if (file.size > this.MAX_SIZE) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            return { valid: false, error: `File too large (${sizeMB}MB). Maximum: 700MB.` };
+        }
+
+        return { valid: true };
+    },
+
+    formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+};
+
+// ==========================================
+// PROCESSING STATUS POLLER
+// ==========================================
+const StatusPoller = {
+    interval: null,
+
+    start(documentId, onUpdate, onComplete, onError) {
+        this.stop();
+        let attempts = 0;
+        const maxAttempts = 120; // 2 minutes max
+
+        this.interval = setInterval(async () => {
+            attempts++;
+            if (attempts > maxAttempts) {
+                this.stop();
+                onError('Processing timed out. Please try again.');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/document/${documentId}/status`);
+                const data = await res.json();
+
+                if (data.status === 'COMPLETED') {
+                    this.stop();
+                    onComplete(data);
+                } else if (data.status === 'FAILED') {
+                    this.stop();
+                    onError('Processing failed. Please try again.');
+                } else {
+                    onUpdate(data.status);
+                }
+            } catch (e) {
+                // Network error, keep trying
+            }
+        }, 1000);
+    },
+
+    stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+    }
+};
+
+// ==========================================
+// DRAG & DROP FILE UPLOAD
+// ==========================================
+function initFileUpload(zoneId, inputId, onFileSelected) {
+    const zone = document.getElementById(zoneId);
+    const input = document.getElementById(inputId);
+    if (!zone || !input) return;
+
+    zone.addEventListener('click', () => input.click());
+
+    zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+    });
+
+    zone.addEventListener('dragleave', () => {
+        zone.classList.remove('dragover');
+    });
+
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            input.files = e.dataTransfer.files;
+            handleFileChange(input.files[0], zone, onFileSelected);
+        }
+    });
+
+    input.addEventListener('change', () => {
+        if (input.files.length) {
+            handleFileChange(input.files[0], zone, onFileSelected);
         }
     });
 }
 
-// Initialize all on page load
+function handleFileChange(file, zone, callback) {
+    const result = FileValidator.validate(file);
+    if (!result.valid) {
+        Toast.show(result.error, 'error');
+        return;
+    }
+
+    // Update zone UI
+    const textEl = zone.querySelector('.upload-text');
+    const hintEl = zone.querySelector('.upload-hint');
+    if (textEl) textEl.textContent = file.name;
+    if (hintEl) hintEl.textContent = FileValidator.formatSize(file.size);
+
+    zone.style.borderColor = 'var(--accent-success)';
+    zone.style.background = 'rgba(16,185,129,0.05)';
+
+    if (callback) callback(file);
+}
+
+// ==========================================
+// MOBILE SIDEBAR
+// ==========================================
+function initMobileSidebar() {
+    const toggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (!toggle || !sidebar) return;
+
+    // Show mobile toggle on small screens
+    const mq = window.matchMedia('(max-width: 768px)');
+    function handleMQ(e) {
+        toggle.style.display = e.matches ? 'flex' : 'none';
+        if (!e.matches) sidebar.classList.remove('open');
+    }
+    mq.addEventListener('change', handleMQ);
+    handleMQ(mq);
+
+    toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+    });
+}
+
+// ==========================================
+// FORM HELPERS
+// ==========================================
+async function submitJSON(url, data, opts = {}) {
+    const { method = 'POST', showToast = true } = opts;
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, ai_engine: NeuralEngine.current }),
+        });
+        const json = await res.json();
+
+        if (showToast) {
+            if (json.success) {
+                Toast.show(json.message || 'Success!', 'success');
+            } else {
+                Toast.show(json.message || 'Something went wrong.', 'error');
+            }
+        }
+
+        if (json.redirect) {
+            setTimeout(() => window.location.href = json.redirect, 500);
+        }
+
+        return json;
+    } catch (e) {
+        if (showToast) Toast.show('Network error. Please try again.', 'error');
+        return { success: false, message: 'Network error' };
+    }
+}
+
+// ==========================================
+// INIT ON DOM READY
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    setupKeyboardShortcuts();
-    handleScrollButton();
+    ThemeManager.init();
+    NeuralEngine.init();
+    initMobileSidebar();
+
+    // Re-init Lucide icons after dynamic content
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 });
-
-// ==========================================
-// ANIMATION UTILITIES
-// ==========================================
-
-// Fade in animation
-function fadeIn(element, duration = 300) {
-    element.style.opacity = '0';
-    element.style.transition = `opacity ${duration}ms ease-in`;
-    
-    setTimeout(() => {
-        element.style.opacity = '1';
-    }, 10);
-}
-
-// Fade out animation
-function fadeOut(element, duration = 300) {
-    element.style.transition = `opacity ${duration}ms ease-out`;
-    element.style.opacity = '0';
-}
-
-// ==========================================
-// EXPORT FOR USE IN TEMPLATES
-// ==========================================
-
-// Make functions available globally
-window.showToast = showToast;
-window.toggleTheme = toggleTheme;
-window.copyToClipboard = copyToClipboard;
-window.smoothScrollTo = smoothScrollTo;
-window.scrollToTop = scrollToTop;
-window.isMobile = isMobile;
-window.sanitizeHTML = sanitizeHTML;

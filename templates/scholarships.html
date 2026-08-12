@@ -1,366 +1,123 @@
-{% extends "base_new.html" %}
-
-{% block title %}Scholarships - Campus Cognition{% endblock %}
+{% extends "base.html" %}
+{% block title %}Scholarships — Campus Cognition{% endblock %}
 
 {% block content %}
-<div class="fade-in">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1><i class="bi bi-mortarboard-fill"></i> Scholarships & Grants</h1>
-        <p>Discover and apply for exclusive scholarships tailored to your profile</p>
-    </div>
-
-    <!-- Filters -->
-    <div class="glass-card mb-4">
-        <h4 class="mb-3">🔍 Filter Scholarships</h4>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Search</label>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search by name or company...">
+<div class="page-container animate-fade-in" style="--page-accent: var(--scholar-accent);">
+    <div class="page-header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="page-title" style="color:var(--scholar-accent);">🎓 Funding & Scholarships</h1>
+                <p class="page-subtitle">Find active government and corporate financial support matching your profile.</p>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Category</label>
-                <select class="form-select" id="categoryFilter">
-                    <option value="">All Categories</option>
-                    <option value="merit">Merit-Based</option>
-                    <option value="need">Need-Based</option>
-                    <option value="special">Special Programs</option>
-                    <option value="women">Women's Scholarship</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Min Award</label>
-                <input type="number" class="form-control" id="minAwardFilter" placeholder="Minimum amount">
-            </div>
-        </div>
-
-        <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 1.5rem 0;">
-        
-        <div class="row g-3 align-items-end">
-            <div class="col-12">
-                <h5 class="mb-1" style="color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="bi bi-robot"></i> AI Deep-Crawler Proxy
-                </h5>
-                <p class="text-muted mb-0" style="font-size: 0.85rem;">Crawl and search the web in real-time matching your custom details.</p>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Target Major / Branch</label>
-                <input type="text" class="form-control" id="aiBranchInput" value="{{ user['branch'] or 'CSE' }}" placeholder="e.g., Computer Science, Biotech">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Target CGPA</label>
-                <input type="number" step="0.1" min="0" max="10" class="form-control" id="aiCgpaInput" value="{{ user['cgpa'] or 8.0 }}" placeholder="e.g., 8.5">
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-primary w-100" id="aiExploreBtn" onclick="exploreLiveScholarships()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border: none; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); height: 42px;">
-                    <i class="bi bi-globe"></i> Deep-Scan Live Internet
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scholarships Grid -->
-    <div class="row" id="scholarshipsContainer">
-        {% if scholarships %}
-            {% for scholarship in scholarships %}
-            <div class="col-lg-6 col-xl-4 mb-4 scholarship-card" data-category="{{ scholarship.get('category', 'merit') }}">
-                <div class="glass-card h-100">
-                    <!-- Header -->
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 style="color: var(--accent-cyan);">{{ scholarship['title'] }}</h5>
-                        <i class="bi bi-bookmark-fill" style="cursor: pointer; color: var(--accent-blue); font-size: 1.5rem;"></i>
-                    </div>
-
-                    <!-- Organization -->
-                    <p style="color: var(--text-tertiary); margin-bottom: 1rem;">
-                        <i class="bi bi-building"></i> {{ scholarship.get('organization', 'Organization') }}
-                    </p>
-
-                    <!-- Details -->
-                    <div class="mb-3">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Award Amount</span>
-                            <span style="color: var(--accent-green); font-weight: 700;">₹{{ scholarship.get('award_amount', '0') }}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Eligibility</span>
-                            <span style="color: var(--accent-blue); font-weight: 600;">CGPA: {{ scholarship.get('min_cgpa', '0') }}+</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Deadline</span>
-                            <span style="color: var(--neon-pink); font-weight: 600;">{{ scholarship.get('deadline', 'N/A') }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Match Badge -->
-                    <div class="mb-3">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span style="color: var(--text-tertiary); font-size: 0.85rem;">Your Match</span>
-                            <span class="badge badge-success">{{ scholarship.get('match_percentage', 0) }}%</span>
-                        </div>
-                        <div class="progress mt-2" style="height: 6px;">
-                            <div class="progress-bar" style="width: {{ scholarship.get('match_percentage', 0) }}%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Tags -->
-                    <div class="mb-3">
-                        <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border-color: var(--accent-blue); color: var(--accent-blue); margin-right: 0.5rem;">
-                            {{ scholarship.get('category', 'Merit') }}
-                        </span>
-                        {% if scholarship.get('international') %}
-                        <span class="badge badge-warning" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.15)); border-color: #F59E0B; color: #FBBF24;">
-                            International
-                        </span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Description -->
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                        {{ scholarship.get('description', 'Exceptional scholarship opportunity for deserving students')[:100] }}...
-                    </p>
-
-                    <!-- Actions -->
-                    <div class="d-grid gap-2">
-                        <a href="{{ scholarship.get('link', '#') }}" target="_blank" class="btn btn-primary">
-                            <i class="bi bi-box-arrow-up-right"></i> Apply Now
-                        </a>
-                        <button class="btn btn-outline" onclick="saveScholarship(this, {{ scholarship.get('id', 0) }})">
-                            <i class="bi bi-bookmark"></i> Save for Later
-                        </button>
-                    </div>
+            <div class="neural-engine">
+                <span class="neural-engine-label">Neural Engine</span>
+                <div class="neural-engine-options">
+                    <button class="neural-engine-option" data-engine="gemini">Gemini</button>
+                    <button class="neural-engine-option" data-engine="openai">OpenAI</button>
                 </div>
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="col-12">
-            <div class="glass-card text-center py-5">
-                <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
-                <h4 style="color: var(--text-secondary);">No Scholarships Found</h4>
-                <p style="color: var(--text-tertiary);">Check back soon or adjust your filters</p>
+        </div>
+    </div>
+
+    <!-- Search Hero -->
+    <div class="search-workspace mb-6">
+        <div class="search-label">Describe your funding needs</div>
+        <form action="{{ url_for(request.endpoint) }}" method="GET">
+            <div class="search-input-wrapper">
+                <i data-lucide="search" style="width:20px;height:20px;color:var(--text-tertiary);"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="E.g., Merit scholarship for B.Tech CSE student with 8.5 CGPA..." autocomplete="off" id="searchInput">
+                <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            </div>
+        </form>
+
+        <div class="search-filters">
+            <span class="filter-chip" onclick="applyQuickSearch('National Scholarship Portal NSP')">NSP Govt Scheme</span>
+            <span class="filter-chip" onclick="applyQuickSearch('Merit based scholarships engineering')">Merit Scholarships</span>
+            <span class="filter-chip" onclick="applyQuickSearch('Scholarships for girl students technical degree')">Pragati Girls Scheme</span>
+            <span class="filter-chip" onclick="applyQuickSearch('DST INSPIRE scholarship research')">INSPIRE Research</span>
+        </div>
+    </div>
+
+    {% if query %}
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-md">Results for "{{ query }}"</h3>
+        <span class="text-xs text-muted">{{ items|length }} financial support resources found</span>
+    </div>
+
+    <div class="grid grid-2">
+        {% for item in items %}
+        <div class="result-card animate-slide-up stagger-{{ loop.index }}">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="result-title">{{ item.title }}</h4>
+                {% if item.match_percentage %}
+                <div class="badge badge-warning" style="background:var(--scholar-soft);color:var(--scholar-accent);">
+                    <i data-lucide="award" style="width:12px;height:12px;margin-right:4px;"></i>
+                    {{ item.match_percentage }}% Match
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="result-company mb-3">🏛️ {{ item.organization }}</div>
+
+            <div class="result-meta mb-3">
+                {% if item.award_amount % biographical %}<span class="meta-tag">💰 Award: {{ item.award_amount }}</span>{% endif %}
+                {% if item.category %}<span class="meta-tag">🏷️ {{ item.category|capitalize }}</span>{% endif %}
+                {% if item.min_cgpa %}<span class="meta-tag">📊 Min CGPA: {{ item.min_cgpa }}</span>{% endif %}
+            </div>
+
+            {% if item.description %}
+            <p class="text-sm text-secondary mb-4">{{ item.description }}</p>
+            {% endif %}
+
+            <div class="flex justify-between items-center mt-auto">
+                <div class="text-xs text-muted">
+                    Deadline: {{ item.deadline }}
+                </div>
+                <a href="{{ item.link or item.url or '#' }}" target="_blank" class="btn btn-secondary btn-sm">
+                    View Scheme
+                    <i data-lucide="external-link" style="width:12px;height:12px;margin-left:4px;"></i>
+                </a>
             </div>
         </div>
+        {% else %}
+        <div class="empty-state" style="grid-column: span 2;">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No scholarships found</div>
+            <div class="empty-text">Try adjusting your natural language query or CGPA eligibility criteria.</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if total_pages and total_pages > 1 %}
+    <div class="flex justify-center gap-3 mt-6">
+        {% if page > 1 %}
+        <a href="{{ url_for(request.endpoint, q=query, page=page-1) }}" class="btn btn-secondary btn-sm">Previous</a>
+        {% endif %}
+        <span class="btn btn-ghost btn-sm disabled">{{ page }} of {{ total_pages }}</span>
+        {% if has_next %}
+        <a href="{{ url_for(request.endpoint, q=query, page=page+1) }}" class="btn btn-secondary btn-sm">Next</a>
         {% endif %}
     </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">💡</div>
+        <div class="empty-title">Search Funding Options</div>
+        <div class="empty-text">Enter your branch, CGPA, or specific queries to discover matching scholarships.</div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    // Filter functionality
-    const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-
-    function filterCards() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const category = categoryFilter.value;
-        const cards = document.querySelectorAll('.scholarship-card');
-
-        cards.forEach(card => {
-            let visible = true;
-            
-            if (category && card.getAttribute('data-category') !== category) {
-                visible = false;
-            }
-            
-            if (searchTerm && !card.textContent.toLowerCase().includes(searchTerm)) {
-                visible = false;
-            }
-
-            card.style.display = visible ? '' : 'none';
-        });
+function applyQuickSearch(text) {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = text;
+        input.closest('form').submit();
     }
-
-    searchInput.addEventListener('input', filterCards);
-    categoryFilter.addEventListener('change', filterCards);
-
-    // Save scholarship
-    function saveScholarship(btn, id) {
-        btn.innerHTML = '<i class="bi bi-check2"></i> Saved!';
-        btn.disabled = true;
-        showToast('Scholarship saved to your list', 'success');
-    }
-
-    // AI Proxy Crawling Exploration
-    function exploreLiveScholarships() {
-        const btn = document.getElementById('aiExploreBtn');
-        const branchInput = document.getElementById('aiBranchInput');
-        const cgpaInput = document.getElementById('aiCgpaInput');
-        const container = document.getElementById('scholarshipsContainer');
-        
-        const branch = branchInput.value.trim();
-        const cgpa = cgpaInput.value.trim();
-        const query = searchInput.value.trim();
-        
-        // 1. Disable controls
-        btn.disabled = true;
-        branchInput.disabled = true;
-        cgpaInput.disabled = true;
-        
-        // 2. Render glassmorphic deep progress loader
-        container.innerHTML = `
-            <div class="col-12">
-                <div class="glass-card text-center py-5 position-relative overflow-hidden" style="border: 1px solid rgba(6, 182, 212, 0.3); box-shadow: 0 0 25px rgba(6, 182, 212, 0.1);">
-                    <div class="spinner-border mb-4" role="status" style="width: 3.5rem; height: 3.5rem; color: var(--accent-cyan);">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <h4 class="mb-3 animate-pulse" style="color: var(--accent-cyan); font-weight: 600;">🤖 Spawning Autonomous AI Crawling Proxies...</h4>
-                    <div class="progress mx-auto mb-4" style="width: 60%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="aiProgressBar" style="width: 15%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); transition: width 0.8s ease;"></div>
-                    </div>
-                    <p class="mb-0 text-muted" id="aiProgressText" style="font-size: 0.95rem;">Establishing secure proxy handshakes...</p>
-                </div>
-            </div>
-        `;
-        
-        const steps = [
-            { p: 30, t: "Establishing secure proxy tunnels to global databases..." },
-            { p: 55, t: "Crawling international and domestic scholar registers..." },
-            { p: 75, t: "Analyzing cgpa/branch eligibility criteria..." },
-            { p: 90, t: "Formatting matching opportunities using live proxy..." }
-        ];
-        
-        let currentStep = 0;
-        const progressInterval = setInterval(() => {
-            if (currentStep < steps.length) {
-                const bar = document.getElementById('aiProgressBar');
-                const text = document.getElementById('aiProgressText');
-                if (bar && text) {
-                    bar.style.width = steps[currentStep].p + "%";
-                    text.textContent = steps[currentStep].t;
-                }
-                currentStep++;
-            }
-        }, 2000);
-        
-        // 3. Make AJAX API call
-        fetch('/api/explore-scholarships', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ branch: branch, cgpa: cgpa, query: query })
-        })
-        .then(response => response.json())
-        .then(data => {
-            clearInterval(progressInterval);
-            btn.disabled = false;
-            branchInput.disabled = false;
-            cgpaInput.disabled = false;
-            
-            if (data.success && data.scholarships && data.scholarships.length > 0) {
-                let html = '';
-                data.scholarships.forEach(s => {
-                    const matchPercent = s.match_percentage || 0;
-                    const desc = (s.description || 'Exceptional scholarship opportunity for deserving students').substring(0, 100) + '...';
-                    html += `
-                    <div class="col-lg-6 col-xl-4 mb-4 scholarship-card" data-category="${s.category || 'merit'}" style="opacity: 0;">
-                        <div class="glass-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 style="color: var(--accent-cyan);">${s.title}</h5>
-                                <i class="bi bi-bookmark-fill" style="cursor: pointer; color: var(--accent-blue); font-size: 1.5rem;"></i>
-                            </div>
-
-                            <p style="color: var(--text-tertiary); margin-bottom: 1rem;">
-                                <i class="bi bi-building"></i> ${s.organization || 'Organization'}
-                            </p>
-
-                            <div class="mb-3">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span style="color: var(--text-tertiary); font-size: 0.85rem;">Award Amount</span>
-                                    <span style="color: var(--accent-green); font-weight: 700;">₹${s.award_amount || '0'}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span style="color: var(--text-tertiary); font-size: 0.85rem;">Eligibility</span>
-                                    <span style="color: var(--accent-blue); font-weight: 600;">CGPA: ${s.min_cgpa || '0'}+</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: var(--text-tertiary); font-size: 0.85rem;">Deadline</span>
-                                    <span style="color: var(--neon-pink); font-weight: 600;">${s.deadline || 'N/A'}</span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color: var(--text-tertiary); font-size: 0.85rem;">Your Match</span>
-                                    <span class="badge badge-success">${matchPercent}%</span>
-                                </div>
-                                <div class="progress mt-2" style="height: 6px;">
-                                    <div class="progress-bar" style="width: ${matchPercent}%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <span class="badge badge-info" style="background: linear-gradient(135deg, rgba(79, 156, 249, 0.2), rgba(6, 182, 212, 0.15)); border-color: var(--accent-blue); color: var(--accent-blue); margin-right: 0.5rem;">
-                                    ${s.category || 'Merit'}
-                                </span>
-                                ${s.international ? `
-                                <span class="badge badge-warning" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.15)); border-color: #F59E0B; color: #FBBF24;">
-                                    International
-                                </span>
-                                ` : ''}
-                            </div>
-
-                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                                ${desc}
-                            </p>
-
-                            <div class="d-grid gap-2">
-                                <a href="${s.link || '#'}" target="_blank" class="btn btn-primary">
-                                    <i class="bi bi-box-arrow-up-right"></i> Apply Now
-                                </a>
-                                <button class="btn btn-outline" onclick="saveScholarship(this, ${s.id || 0})">
-                                    <i class="bi bi-bookmark"></i> Save for Later
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-                });
-                container.innerHTML = html;
-                
-                // Animate dynamic cards
-                const newCards = container.querySelectorAll('.scholarship-card');
-                newCards.forEach((card, index) => {
-                    card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
-                });
-                showToast(`Crawl complete! Found ${data.scholarships.length} scholarships.`, 'success');
-            } else {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="glass-card text-center py-5">
-                            <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem; display: block;"></i>
-                            <h4 style="color: var(--text-secondary);">No Scholarships Found</h4>
-                            <p style="color: var(--text-tertiary);">The AI crawler completed the search but found no matching records. Try broader terms.</p>
-                        </div>
-                    </div>
-                `;
-                showToast('AI search complete, but no matching opportunities were found.', 'info');
-            }
-        })
-        .catch(err => {
-            clearInterval(progressInterval);
-            btn.disabled = false;
-            branchInput.disabled = false;
-            cgpaInput.disabled = false;
-            console.error(err);
-            showToast('Failed to contact crawling proxy. Please try again.', 'danger');
-            container.innerHTML = `
-                <div class="col-12">
-                    <div class="glass-card text-center py-5">
-                        <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--neon-pink); margin-bottom: 1rem; display: block;"></i>
-                        <h4 style="color: var(--text-secondary);">Crawling Failed</h4>
-                        <p style="color: var(--text-tertiary);">An error occurred connecting to the proxy servers. Please try again later.</p>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    // Animate initial cards on load
-    window.addEventListener('DOMContentLoaded', () => {
-        const initialCards = document.querySelectorAll('.scholarship-card');
-        initialCards.forEach((card, index) => {
-            card.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s both`;
-        });
-    });
+}
 </script>
 {% endblock %}

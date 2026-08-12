@@ -1,387 +1,65 @@
 {% extends "base.html" %}
+{% block title %}Sign In — Campus Cognition{% endblock %}
 
-{% block title %}Login - Campus Cognition{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* Stunning grid layout for split screen */
-    .split-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        min-height: 100vh;
-        width: 100%;
-        background: linear-gradient(135deg, #060b19 0%, #0c1033 100%);
-        overflow-x: hidden;
-    }
-
-    @media (min-width: 992px) {
-        .split-container {
-            grid-template-columns: 1.15fr 0.85fr;
-        }
-    }
-
-    /* Left panel showing the beautiful creative illustration */
-    .creative-side {
-        position: relative;
-        display: none;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 4rem;
-        background: radial-gradient(circle at center, rgba(12, 16, 51, 0.4) 0%, rgba(6, 11, 25, 0.95) 100%), 
-                    url('/static/images/campus_cognition_login_art.png') no-repeat center center/cover;
-        border-right: 1px solid rgba(0, 212, 255, 0.15);
-        overflow: hidden;
-    }
-
-    @media (min-width: 992px) {
-        .creative-side {
-            display: flex;
-        }
-    }
-
-    /* Cyberpunk scanning line overlay */
-    .creative-side::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                    linear-gradient(90deg, rgba(0, 212, 255, 0.03), rgba(123, 104, 238, 0.01), rgba(0, 212, 255, 0.03));
-        background-size: 100% 4px, 6px 100%;
-        pointer-events: none;
-        z-index: 2;
-    }
-
-    /* Floating glassmorphic content container on creative side */
-    .creative-overlay-card {
-        background: rgba(10, 25, 41, 0.5);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 2px solid rgba(0, 212, 255, 0.25);
-        border-radius: 24px;
-        padding: 3rem;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 
-                    inset 0 1px 1px rgba(0, 212, 255, 0.1);
-        max-width: 680px;
-        margin-top: auto;
-        transform: translateY(0);
-        animation: floatCreativeCard 6s ease-in-out infinite;
-        z-index: 3;
-    }
-
-    @keyframes floatCreativeCard {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-12px) rotate(0.5deg); }
-    }
-
-    /* Right panel centered login form */
-    .form-side {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2.5rem;
-        position: relative;
-        background: radial-gradient(circle at 80% 20%, rgba(123, 104, 238, 0.08) 0%, transparent 50%),
-                    radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 50%);
-        overflow-y: auto;
-    }
-
-    /* Animated background elements */
-    .bg-glow-orb {
-        position: absolute;
-        width: 350px;
-        height: 350px;
-        border-radius: 50%;
-        filter: blur(130px);
-        pointer-events: none;
-        opacity: 0.12;
-        z-index: 0;
-    }
-
-    .orb-cyan {
-        background: #00d4ff;
-        top: 15%;
-        left: 20%;
-    }
-
-    .orb-purple {
-        background: #7b68ee;
-        bottom: 15%;
-        right: 20%;
-    }
-
-    /* Glowing badges */
-    .agent-pill {
-        background: rgba(0, 212, 255, 0.06);
-        border: 1px solid rgba(0, 212, 255, 0.3);
-        color: #00d4ff;
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 6px 14px;
-        border-radius: 50px;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
-    }
-
-    .custom-auth-card {
-        width: 100%;
-        max-width: 480px;
-        background: rgba(10, 25, 41, 0.55) !important;
-        backdrop-filter: blur(25px) !important;
-        -webkit-backdrop-filter: blur(25px) !important;
-        border: 2px solid rgba(0, 212, 255, 0.25) !important;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 
-                    inset 0 1px 1px rgba(0, 212, 255, 0.1) !important;
-        border-radius: 24px !important;
-        z-index: 10;
-        padding: 2.5rem !important;
-    }
-
-    .form-control.glass-input {
-        background: rgba(10, 25, 41, 0.4) !important;
-        border: 2px solid rgba(0, 212, 255, 0.15) !important;
-        color: #fff !important;
-        border-radius: 12px !important;
-        padding: 12px 16px !important;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-
-    .form-control.glass-input:focus {
-        border-color: rgba(0, 212, 255, 0.8) !important;
-        box-shadow: 0 0 15px rgba(0, 212, 255, 0.25) !important;
-        background: rgba(10, 25, 41, 0.6) !important;
-    }
-
-    .input-group-text {
-        border-radius: 12px 0 0 12px !important;
-        padding-left: 18px !important;
-        padding-right: 18px !important;
-        background: transparent !important;
-        border: 2px solid rgba(0, 212, 255, 0.15) !important;
-        border-right: none !important;
-    }
-
-    .form-control.glass-input {
-        border-radius: 0 12px 12px 0 !important;
-        border-left: none !important;
-    }
-
-    /* Mobile creative banner */
-    .mobile-banner {
-        width: 100%;
-        height: 200px;
-        background: radial-gradient(circle at center, rgba(12, 16, 51, 0.2) 0%, rgba(6, 11, 25, 0.95) 100%), 
-                    url('/static/images/campus_cognition_login_art.png') no-repeat center center/cover;
-        border-bottom: 2px solid rgba(0, 212, 255, 0.25);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        text-align: center;
-        position: relative;
-    }
-
-    @media (min-width: 992px) {
-        .mobile-banner {
-            display: none;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="split-container">
-    
-    <!-- Left panel (Desktop Only) showing illustration -->
-    <div class="creative-side">
-        <!-- Logo -->
-        <div class="logo-container" style="z-index: 10;">
-            <span style="font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; text-shadow: 0 0 15px rgba(0,212,255,0.4);">
-                <i class="bi bi-lightning-fill" style="color: #00d4ff;"></i> CAMPUS COGNITION
-            </span>
-            <p style="color: #a0a0a0; font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; margin-top: 5px; margin-left: 36px;">
-                AGENT SYSTEM FOR ACADEMIC TRIUMPH
-            </p>
+{% block auth_content %}
+<div class="animate-fade-in" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:var(--space-6);background:var(--bg-primary);">
+    <div class="card" style="width:100%;max-width:420px;padding:var(--space-8);box-shadow:var(--shadow-lg);">
+        <div class="text-center mb-6">
+            <div class="sidebar-brand-icon" style="margin:0 auto var(--space-3);width:48px;height:48px;font-size:1.3rem;">C</div>
+            <h2 class="font-bold text-xl">Welcome Back</h2>
+            <p class="text-xs text-muted mt-1">Sign in to access your intelligence platform</p>
         </div>
 
-        <!-- Glassmorphic content drawer -->
-        <div class="creative-overlay-card">
-            <span class="agent-pill mb-3">
-                <i class="bi bi-robot"></i> MULTI-AGENT COGNITIVE BRAIN
-            </span>
-            <h2 style="color: #fff; font-size: 2.2rem; font-weight: 800; line-height: 1.2;" class="mb-3">
-                Welcome to the Future of <span style="color: #00d4ff;">Student Success</span>
-            </h2>
-            <p style="color: #d0d0d0; font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                Accelerate your learning, analyze codebase schemas with the Code Agent, structure your syllabus via the Study Agent, and unlock personalized career opportunities in real-time.
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #00d4ff;">
-                        <i class="bi bi-book"></i>
-                    </div>
-                    <span style="color: #fff; font-weight: 500; font-size: 0.95rem;"><strong>Study Agent:</strong> Auto-synthesizes exam prep priorities & timetables.</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(123, 104, 238, 0.1); border: 1px solid rgba(123, 104, 238, 0.3); display: flex; align-items: center; justify-content: center; color: #7b68ee;">
-                        <i class="bi bi-code-square"></i>
-                    </div>
-                    <span style="color: #fff; font-weight: 500; font-size: 0.95rem;"><strong>Code Agent:</strong> Diagnoses bugs and generates optimized clean code.</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(56, 239, 125, 0.1); border: 1px solid rgba(56, 239, 125, 0.3); display: flex; align-items: center; justify-content: center; color: #38ef7d;">
-                        <i class="bi bi-briefcase"></i>
-                    </div>
-                    <span style="color: #fff; font-weight: 500; font-size: 0.95rem;"><strong>Career Matcher:</strong> Connects profiles with scholarships & internships.</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Top Banner (Stops split screen on mobile view) -->
-    <div class="mobile-banner">
-        <h2 style="color: #fff; font-weight: 800; font-size: 1.8rem; margin: 0; text-shadow: 0 0 10px rgba(0,212,255,0.5);">
-            <i class="bi bi-lightning-fill" style="color: #00d4ff;"></i> Campus Cognition
-        </h2>
-        <p style="color: #a0a0a0; font-size: 0.85rem; margin-top: 5px; font-weight: 500; margin-bottom: 0;">
-            Multi-Agent AI Platform for Student Success
-        </p>
-    </div>
-
-    <!-- Right panel centered form -->
-    <div class="form-side">
-        <!-- Glowing Orbs -->
-        <div class="bg-glow-orb orb-cyan"></div>
-        <div class="bg-glow-orb orb-purple"></div>
-
-        <!-- Glassmorphic Login Form -->
-        <div class="custom-auth-card glass-card">
-            <div class="text-center mb-4">
-                <div style="width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 104, 238, 0.2)); border: 2px solid rgba(0, 212, 255, 0.4); display: inline-flex; align-items: center; justify-content: center; color: #00d4ff; font-size: 1.6rem;" class="mb-3">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <h3 style="color: #fff; font-weight: 700;" class="mb-1">Authentication</h3>
-                <p style="color: #a0a0a0; font-size: 0.9rem;">Sign in to initialize academic agents</p>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" id="username" class="form-input" placeholder="Enter your username" required autocomplete="username">
             </div>
 
-            <form id="loginForm" class="needs-validation" novalidate>
-                <div class="mb-3">
-                    <label for="username" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Username</label>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="bi bi-person" style="color: #00d4ff;"></i>
-                        </span>
-                        <input type="text" class="form-control glass-input" id="username" 
-                               name="username" placeholder="Enter your username" required>
-                    </div>
+            <div class="form-group">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="form-label" style="margin:0;">Password</label>
+                    <a href="/forgot-password" class="text-xs">Forgot password?</a>
                 </div>
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+            </div>
 
-                <div class="mb-4">
-                    <label for="password" class="form-label" style="color: #e0e0e0; font-weight: 600; font-size: 0.9rem;">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="bi bi-lock" style="color: #00d4ff;"></i>
-                        </span>
-                        <input type="password" class="form-control glass-input" id="password" 
-                               name="password" placeholder="Enter your password" required>
-                    </div>
-                </div>
+            <button type="submit" class="btn btn-primary w-full mt-4" id="submitBtn">
+                Sign In
+            </button>
+        </form>
 
-                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold gradient-btn mb-3 rounded-3" style="font-size: 1rem; border-radius: 12px !important; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Authenticate Credentials
-                </button>
-
-
-
-                <div class="text-center">
-                    <p style="color: #a0a0a0; font-size: 0.9rem;" class="mb-0">Don't have an account? 
-                        <a href="{{ url_for('signup') }}" class="text-decoration-none fw-bold" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.2);">Create one here</a>
-                    </p>
-                </div>
-
-                <div class="text-center mt-3">
-                    <a href="{{ url_for('forgot_password') }}" class="text-decoration-none fw-bold" style="color: #7b68ee; font-size: 0.85rem;"><i class="bi bi-key me-1"></i>Forgot password?</a>
-                </div>
-
-                <div class="text-center mt-3">
-                    <button type="button" class="btn btn-link text-decoration-none p-0 fw-bold" 
-                            style="color: #7b68ee; font-size: 0.85rem;" 
-                            onclick="toggleTroubleshoot()">
-                        <i class="bi bi-question-circle me-1"></i>Forgot Credentials / Troubleshooting
-                    </button>
-                </div>
-
-                <div id="troubleshootPanel" class="mt-3 p-3 rounded-3" 
-                     style="display: none; background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(123, 104, 238, 0.05) 100%); border: 2px dashed rgba(123, 104, 238, 0.25);">
-                    <h6 style="color: #00d4ff; font-weight: 600; font-size: 0.9rem;" class="mb-2">
-                        <i class="bi bi-envelope-exclamation me-1"></i>Manual Account Recovery
-                    </h6>
-                    <p style="color: #d0d0d0; font-size: 0.8rem; line-height: 1.4; margin-bottom: 0;">
-                        Forgot your username, password, or email? Contact our troubleshooting support line at:
-                        <a href="mailto:divyanshsingh74178@gmail.com" style="color: #00d4ff; font-weight: 700; text-decoration: underline;">divyanshsingh74178@gmail.com</a>
-                        for prompt manual verification and credentials recovery.
-                    </p>
-                </div>
-            </form>
+        <div class="text-center mt-6">
+            <span class="text-xs text-muted">New to Campus Cognition?</span>
+            <a href="/signup" class="text-xs font-semibold">Create account</a>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const formData = {
-        username: document.getElementById('username').value,
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    const data = {
+        username: document.getElementById('username').value.trim(),
         password: document.getElementById('password').value
     };
 
     try {
-        const response = await fetch('{{ url_for("login") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        // Guard against non-JSON responses (e.g. HTML error pages)
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            showToast('Server error occurred. Please try again later.', 'danger');
-            console.error('Non-JSON response:', response.status, contentType);
-            return;
+        const resp = await submitJSON('/login', data, { showToast: true });
+        if (!resp.success) {
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
         }
-
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Login successful! Redirecting...', 'success');
-            setTimeout(() => {
-                window.location.href = data.redirect || '{{ url_for("dashboard") }}';
-            }, 100);
-        } else {
-            showToast(data.message || 'Login failed. Please try again.', 'danger');
-        }
-    } catch (error) {
-        showToast('Connection error. Please check your internet and try again.', 'danger');
-        console.error('Login error:', error);
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
     }
 });
-
-function toggleTroubleshoot() {
-    const panel = document.getElementById('troubleshootPanel');
-    if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        panel.scrollIntoView({ behavior: 'smooth' });
-    } else {
-        panel.style.display = 'none';
-    }
-}
 </script>
 {% endblock %}

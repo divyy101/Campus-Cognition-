@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger('campus_cognition')
 
 # ---------------------------------------------------------------------------
-# Import AI services (kept from V1 — will be refactored in Phase 7)
+# Import AI services
 # ---------------------------------------------------------------------------
 from services.ai_service import (
     analyze_study_materials,
@@ -50,7 +50,7 @@ from services.search_service import execute_opportunities_search
 
 
 # ---------------------------------------------------------------------------
-# Import MongoDB repositories (Phase 4 — replaces SQLite models.py)
+# Import MongoDB repositories
 # ---------------------------------------------------------------------------
 from database.mongodb import get_db, health_check as db_health_check, init_indexes
 from database.repositories.user_repository import (
@@ -80,6 +80,7 @@ from database.repositories.document_repository import get_document, semantic_sea
 from services.ai_service import answer_rag_question
 from services.embedding_service import generate_text_embedding
 from services.roadmap_service import get_next_best_action, update_topic_mastery
+
 # ---------------------------------------------------------------------------
 # Initialize Flask app
 # ---------------------------------------------------------------------------
@@ -94,7 +95,8 @@ else:
     app.config['UPLOAD_FOLDER'] = 'static/uploads'
     Session(app)
 
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
+# 700 MB max upload
+app.config['MAX_CONTENT_LENGTH'] = 700 * 1024 * 1024
 
 # ---------------------------------------------------------------------------
 # Security headers middleware
@@ -106,17 +108,6 @@ def add_security_headers(response):
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     return response
-
-# ---------------------------------------------------------------------------
-# Initialize MongoDB
-# ---------------------------------------------------------------------------
-with app.app_context():
-    try:
-        init_indexes()
-        insert_sample_opportunities()
-        logger.info('MongoDB initialized successfully')
-    except Exception as e:
-        logger.error('MongoDB initialization failed: %s', e)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -143,6 +134,46 @@ def api_response(success=True, data=None, message='', error=None, status_code=20
         'error': error,
     }
     return jsonify(body), status_code
+
+def _get_ai_engine(request_obj, user=None):
+    """Extract AI engine preference from request or user profile."""
+    engine = None
+    if request_obj.is_json:
+        engine = (request_obj.get_json(silent=True) or {}).get('ai_engine')
+    if not engine:
+        engine = request_obj.form.get('ai_engine') or request_obj.args.get('ai_engine')
+    if not engine:
+        engine = session.get('ai_engine')
+    if not engine and user:
+        engine = user.get('ai_engine')
+    return engine or 'gemini'
+
+# ==========================================
+# SYSTEM ROUTES
+# ==========================================
+
+@app.route('/health')
+def health_check():
+    """Fast health check for Vercel and monitoring."""
+    try:
+        db_ok = db_health_check()
+        if db_ok and db_ok.get('status') == 'connected':
+            return jsonify({"status": "healthy", "database": "connected"}), 200
+        return jsonify({"status": "unhealthy", "database": "disconnected"}), 503
+    except Exception as e:
+        logger.error("Health check failed: %s", e)
+        return jsonify({"status": "unhealthy", "database": "error"}), 503
+
+@app.route('/api/admin/init-db', methods=['POST'])
+def manual_init_db():
+    """Manual trigger to initialize MongoDB indexes and samples."""
+    try:
+        init_indexes()
+        insert_sample_opportunities()
+        return jsonify({"success": True, "message": "Database initialized successfully"}), 200
+    except Exception as e:
+        logger.error("Database initialization failed: %s", e)
+        return jsonify({"success": False, "message": "Database initialization failed"}), 500
 
 # ==========================================
 # AUTHENTICATION ROUTES
@@ -211,14 +242,12 @@ def signup():
             if new_user:
                 session['user_id'] = str(new_user['id'])
                 log_activity(str(new_user['id']), 'SIGNUP', 'New user registered')
-                
-                # Send welcome email, fail gracefully
                 try:
                     email_sent = send_welcome_email(new_user)
                 except Exception as e:
                     logger.error(f"Failed to send welcome email: {e}")
                     email_sent = False
-                    
+
             return jsonify({'success': True, 'message': 'Account created successfully!' + (' A welcome email was sent.' if email_sent else ''), 'redirect': url_for('dashboard')})
 
         return jsonify({'success': False, 'message': 'Registration error occurred'})
@@ -230,22 +259,20 @@ def forgot_password():
     if request.method == 'POST':
         data = request.get_json(silent=True) or request.form
         email = (data.get('email') or '').strip().lower()
-        
-        # Rate Limiting (Basic IP-based for forgot password)
-        # In a real enterprise app, we'd use Redis or Flask-Limiter here.
+
         client_ip = request.remote_addr
         rate_key = f'reset_limit_{client_ip}'
         attempts = session.get(rate_key, 0)
-        
+
         if attempts >= 3:
             return jsonify({'success': False, 'message': 'Too many requests. Please try again later.'}), 429
-            
+
         session[rate_key] = attempts + 1
         session.modified = True
-        
+
         user = get_user_by_email(email) if email else None
         message = 'If an account exists for this email, a password reset link has been sent.'
-        
+
         if user:
             raw_token = secrets.token_urlsafe(32)
             create_password_reset_token(
@@ -253,23 +280,20 @@ def forgot_password():
                 hashlib.sha256(raw_token.encode()).hexdigest(),
                 datetime.now(timezone.utc) + timedelta(minutes=30),
             )
-            
-            # Use configured frontend URL, or fallback to relative URL
+
             frontend_url = os.getenv('FRONTEND_URL')
             if frontend_url:
                 reset_url = f"{frontend_url.rstrip('/')}/reset-password/{raw_token}"
             else:
                 reset_url = url_for('reset_password', token=raw_token, _external=True)
-                
-            # Execute asynchronously or synchronously depending on the environment
+
             try:
-                from services.email_service import send_password_reset_email
                 send_password_reset_email(user, reset_url)
             except Exception as e:
                 logger.error(f"Failed to send reset email: {e}")
-                
+
             log_activity(user['id'], 'PASSWORD_RESET_REQUEST', 'Password reset link requested')
-            
+
         return jsonify({'success': True, 'message': message})
     return render_template('forgot_password.html')
 
@@ -280,18 +304,17 @@ def reset_password(token):
         data = request.get_json(silent=True) or request.form
         password = data.get('password') or ''
         confirm_password = data.get('confirm_password') or ''
-        
+
         if len(password) < 8 or password != confirm_password:
             return jsonify({'success': False, 'message': 'Passwords must match and contain at least 8 characters.'}), 400
-            
+
         user_id = consume_password_reset_token(token_hash)
         if not user_id:
             return jsonify({'success': False, 'message': 'This reset link is invalid or has expired.'}), 400
-            
+
         update_password(user_id, hash_password(password))
         log_activity(user_id, 'PASSWORD_RESET', 'Password reset using email link')
-        
-        # Send confirmation email
+
         try:
             user = get_user_by_id(user_id)
             if user:
@@ -299,7 +322,7 @@ def reset_password(token):
                 send_password_changed_email(user)
         except Exception as e:
             logger.error(f"Failed to send password changed email: {e}")
-            
+
         return jsonify({'success': True, 'message': 'Password reset successfully. You can now log in.', 'redirect': url_for('login')})
     return render_template('reset_password.html', token=token)
 
@@ -331,7 +354,7 @@ def dashboard():
                            recent_activities=recent_activities)
 
 # ==========================================
-# STUDY AGENT ROUTE
+# STUDY AGENT ROUTE — Two-file workflow (Syllabus Required + Notes Optional)
 # ==========================================
 
 @app.route('/study', methods=['GET', 'POST'])
@@ -343,67 +366,208 @@ def study():
     if request.method == 'POST':
         title = request.form.get('session_title', 'Study Session')
         scope = request.form.get('scope', 'Exam Focused')
-        ai_engine = request.form.get('ai_engine', 'gemini')
+        ai_engine = _get_ai_engine(request, user)
         syllabus_file = request.files.get('syllabus')
-        
+        notes_file = request.files.get('notes')  # Optional
+
+        # Syllabus is REQUIRED
         if not syllabus_file or syllabus_file.filename == '':
-            return jsonify({'success': False, 'message': 'Syllabus file is required'})
+            return jsonify({'success': False, 'message': 'Syllabus file is required. Please upload your syllabus.'})
 
         try:
-            filename = secure_filename(syllabus_file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{user_id}_{filename}")
+            # Process syllabus
+            syl_filename = secure_filename(syllabus_file.filename)
+            syl_filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{user_id}_syl_{syl_filename}")
             os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            syllabus_file.save(filepath)
-            
-            file_size = os.path.getsize(filepath)
-            ext = validate_document_file(filepath)
-            doc_hash = generate_file_hash(filepath)
-            
-            doc_id = trigger_document_pipeline(
-                user_id=user_id,
-                filepath=filepath,
-                filename=filename,
-                file_type=ext,
-                file_size=file_size,
-                doc_hash=doc_hash,
-                title=title,
+            syllabus_file.save(syl_filepath)
+
+            # Validate syllabus
+            syl_ext = validate_document_file(syl_filepath)
+            syl_hash = generate_file_hash(syl_filepath)
+            syl_size = os.path.getsize(syl_filepath)
+
+            # Extract syllabus text
+            _, syllabus_text = process_document(syl_filepath)
+
+            # Process optional notes
+            notes_text = ""
+            if notes_file and notes_file.filename:
+                notes_filename = secure_filename(notes_file.filename)
+                notes_filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{user_id}_notes_{notes_filename}")
+                notes_file.save(notes_filepath)
+                try:
+                    validate_document_file(notes_filepath)
+                    _, notes_text = process_document(notes_filepath)
+                except Exception as ne:
+                    logger.warning(f"Notes processing failed (continuing without): {ne}")
+                finally:
+                    if os.path.exists(notes_filepath):
+                        os.remove(notes_filepath)
+
+            # Run AI analysis
+            analysis = analyze_study_materials(
+                syllabus_text=syllabus_text,
+                notes_text=notes_text,
+                subject_name=title,
                 scope=scope,
                 ai_engine=ai_engine
             )
-            
+
+            if not analysis.get('success'):
+                return jsonify({'success': False, 'message': 'AI analysis could not be completed. Please try again.'})
+
+            # Save to database
+            session_id = create_study_session(user_id, title)
+            important_topics = analysis.get('important_questions', [])
+            study_priority = analysis.get('repeated_topics', [])
+            weekly_plan = analysis.get('weekly_plan', [])
+
+            save_study_analysis(
+                session_id,
+                json.dumps(important_topics),
+                json.dumps(study_priority),
+                json.dumps(weekly_plan),
+                json.dumps(analysis)
+            )
+
+            log_activity(user_id, 'STUDY_ANALYSIS', f'Analyzed syllabus: {title}')
+
+            # Cleanup
+            if os.path.exists(syl_filepath):
+                os.remove(syl_filepath)
+
             return jsonify({
                 'success': True,
-                'message': 'Document uploaded and processing started.',
-                'document_id': doc_id
+                'message': 'Study plan generated successfully!',
+                'analysis': analysis,
+                'session_id': session_id
             })
-            
+
         except ValueError as ve:
             logger.error(f'Validation error: {ve}')
             return jsonify({'success': False, 'message': str(ve)})
         except Exception as e:
-            logger.error(f'Upload error: {e}')
-            return jsonify({'success': False, 'message': 'An error occurred during upload.'})
+            logger.error(f'Study upload error: {e}')
+            return jsonify({'success': False, 'message': 'An error occurred during analysis. Please try again.'})
 
     recent_sessions = get_user_study_sessions(user_id)
     return render_template('study.html', user=user, sessions=recent_sessions)
 
 
-@app.route('/api/documents/<document_id>/status', methods=['GET'])
+# ==========================================
+# DOCUMENT STATUS API  (Bug #3 fix — was missing @app.route decorator)
+# ==========================================
+
+@app.route('/api/document/<document_id>/status')
 @login_required
 def api_document_status(document_id):
     """Check the processing status of a document."""
     user_id = session['user_id']
     doc = get_document(document_id, user_id=user_id)
-    
+
     if not doc:
         return jsonify({'success': False, 'message': 'Document not found'}), 404
-        
+
     return jsonify({
         'success': True,
         'status': doc.get('status'),
         'document_id': doc.get('id'),
         'analysis': doc.get('analysis') if doc.get('status') == 'COMPLETED' else None
     })
+
+# ==========================================
+# CHUNK UPLOAD API (for large files)
+# ==========================================
+
+@app.route('/api/upload/chunk', methods=['POST'])
+@login_required
+def api_upload_chunk():
+    """Receives a file chunk and saves it to a temporary directory."""
+    import tempfile
+
+    chunk = request.files.get('chunk')
+    file_id = request.form.get('file_id')
+    chunk_index = request.form.get('chunk_index')
+
+    if not chunk or not file_id or chunk_index is None:
+        return jsonify({'success': False, 'message': 'Missing chunk data'}), 400
+
+    temp_dir = os.path.join(tempfile.gettempdir(), 'campus_cognition_uploads', file_id)
+    os.makedirs(temp_dir, exist_ok=True)
+
+    chunk_path = os.path.join(temp_dir, f'chunk_{chunk_index}')
+    chunk.save(chunk_path)
+
+    return jsonify({'success': True})
+
+@app.route('/api/upload/complete', methods=['POST'])
+@login_required
+def api_upload_complete():
+    """Assembles chunks and triggers document pipeline."""
+    import tempfile
+    import shutil
+
+    user_id = session['user_id']
+    user = get_user_by_id(user_id)
+
+    file_id = request.form.get('file_id')
+    filename = request.form.get('filename')
+    total_chunks = int(request.form.get('total_chunks', 0))
+    title = request.form.get('session_title', 'Study Session')
+    scope = request.form.get('scope', 'Exam Focused')
+    ai_engine = _get_ai_engine(request, user)
+
+    if not file_id or not filename or total_chunks == 0:
+        return jsonify({'success': False, 'message': 'Missing upload data'}), 400
+
+    temp_dir = os.path.join(tempfile.gettempdir(), 'campus_cognition_uploads', file_id)
+    secure_name = secure_filename(filename)
+    final_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{user_id}_{secure_name}")
+
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    try:
+        with open(final_path, 'wb') as final_file:
+            for i in range(total_chunks):
+                chunk_path = os.path.join(temp_dir, f'chunk_{i}')
+                if not os.path.exists(chunk_path):
+                    return jsonify({'success': False, 'message': f'Missing chunk {i}'}), 400
+                with open(chunk_path, 'rb') as chunk_file:
+                    final_file.write(chunk_file.read())
+
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+        file_size = os.path.getsize(final_path)
+        ext = validate_document_file(final_path)
+        doc_hash = generate_file_hash(final_path)
+
+        doc_id = trigger_document_pipeline(
+            user_id=user_id,
+            filepath=final_path,
+            filename=secure_name,
+            file_type=ext,
+            file_size=file_size,
+            doc_hash=doc_hash,
+            title=title,
+            scope=scope,
+            ai_engine=ai_engine
+        )
+
+        return jsonify({
+            'success': True,
+            'message': 'Document assembled and processing started.',
+            'document_id': doc_id
+        })
+    except ValueError as ve:
+        return jsonify({'success': False, 'message': str(ve)})
+    except Exception as e:
+        logger.error(f'Upload assembly error: {e}')
+        return jsonify({'success': False, 'message': 'An error occurred during file assembly.'})
+
+
+# ==========================================
+# RAG Q&A API
+# ==========================================
 
 @app.route('/api/rag/ask', methods=['POST'])
 @login_required
@@ -412,55 +576,48 @@ def ask_rag():
     user_id = session['user_id']
     data = request.get_json()
     question = data.get('question')
-    
+
     if not question:
         return jsonify({'success': False, 'message': 'Question is required'}), 400
-        
-    # Generate embedding for the question
+
     query_embedding = generate_text_embedding(question)
     if not query_embedding:
         return jsonify({'success': False, 'message': 'Failed to process question embedding'}), 500
-        
-    # Search for relevant chunks
+
     chunks = semantic_search_chunks(user_id, query_embedding, limit=5)
-    
-    # Generate RAG answer
-    answer = answer_rag_question(question, chunks)
-    
+
+    ai_engine = _get_ai_engine(request)
+    answer = answer_rag_question(question, chunks, ai_engine)
+
     return jsonify({
         'success': True,
         'answer': answer,
         'sources': [c.get('section') for c in chunks]
     })
 
+# ==========================================
+# STUDY HELPER APIs
+# ==========================================
+
 @app.route('/api/study/next-action', methods=['GET'])
 @login_required
 def api_next_action():
-    """Endpoint to get the next best study action."""
     user_id = session['user_id']
     action = get_next_best_action(user_id)
-    
     if not action:
         return jsonify({'success': False, 'message': 'No study actions available.'})
-        
-    return jsonify({
-        'success': True,
-        'action': action
-    })
+    return jsonify({'success': True, 'action': action})
 
 @app.route('/api/study/mastery', methods=['POST'])
 @login_required
 def api_update_mastery():
-    """Endpoint to update mastery score for a topic."""
     user_id = session['user_id']
     data = request.get_json()
     session_id = data.get('session_id')
     topic = data.get('topic')
     score = data.get('score')
-    
     if not all([session_id, topic, score is not None]):
         return jsonify({'success': False, 'message': 'Missing fields'}), 400
-        
     update_topic_mastery(user_id, session_id, topic, int(score))
     return jsonify({'success': True})
 
@@ -470,28 +627,21 @@ def api_ai_copilot():
     """Central AI Copilot router."""
     data = request.get_json()
     message = data.get('message', '').lower()
-    
-    # 1. Simple intent router
-    if 'internship' in message or 'job' in message or 'career' in message or 'resume' in message:
+
+    if 'internship' in message or 'job' in message or 'career' in message:
         intent = 'CAREER'
-        response = "I can help with your career! You can head over to the Opportunities tab to find internships matching your skills."
-    elif 'code' in message or 'bug' in message or 'python' in message or 'java' in message or 'optimize' in message:
+        response = "I can help with your career! Head to Opportunities to find internships matching your skills."
+    elif 'code' in message or 'bug' in message or 'python' in message or 'java' in message:
         intent = 'CODE'
-        response = "It looks like you need coding help. Head over to the Code Assistant to paste your code for an AI review."
-    elif 'study' in message or 'exam' in message or 'notes' in message or 'prepare' in message:
+        response = "Need coding help? Head to Code Lab to paste your code for AI review."
+    elif 'study' in message or 'exam' in message or 'notes' in message:
         intent = 'STUDY'
-        response = "I see you're preparing for an exam. Upload your syllabus and notes in the Study Agent to generate a personalized roadmap!"
+        response = "Upload your syllabus and notes in Study Agent to generate a personalized roadmap!"
     else:
         intent = 'GENERAL'
-        response = "I am Campus AI. I can help you study, review code, and find career opportunities. What would you like to do today?"
-        
-    # In a full implementation, this would call ai_service.py with the conversation history (Phase 21)
-    
-    return jsonify({
-        'success': True,
-        'intent': intent,
-        'response': response
-    })
+        response = "I am Campus AI. I can help you study, review code, and find career opportunities."
+
+    return jsonify({'success': True, 'intent': intent, 'response': response})
 
 # ==========================================
 # SCHOLARSHIPS ROUTE
@@ -502,8 +652,17 @@ def api_ai_copilot():
 def scholarships():
     user_id = session['user_id']
     user = get_user_by_id(user_id)
-    scholarships_data = get_default_scholarships()
-    return render_template('scholarships.html', user=user, scholarships=scholarships_data)
+    query = request.args.get('q', '')
+    page = int(request.args.get('page', 1))
+
+    if query:
+        results = execute_opportunities_search(query + " scholarship", user, page=page)
+    else:
+        results = execute_opportunities_search("scholarship", user, page=page)
+        query = ""
+
+    items = results if isinstance(results, list) else results.get('results', [])
+    return render_template('scholarships.html', user=user, query=query, items=items, page=page, total_pages=1, has_next=False)
 
 # ==========================================
 # INTERNSHIPS ROUTE
@@ -514,12 +673,17 @@ def scholarships():
 def internships():
     user_id = session['user_id']
     user = get_user_by_id(user_id)
-    internships_data = get_default_internships()
-    return render_template('internships.html', user=user, internships=internships_data)
+    query = request.args.get('q', '')
+    page = int(request.args.get('page', 1))
 
-# ==========================================
-# AI DYNAMIC SEARCH / EXPLORATION API ROUTES
-# ==========================================
+    if query:
+        results = execute_opportunities_search(query + " internship", user, page=page)
+    else:
+        results = execute_opportunities_search("internship", user, page=page)
+        query = ""
+
+    items = results if isinstance(results, list) else results.get('results', [])
+    return render_template('internships.html', user=user, query=query, items=items, page=page, total_pages=1, has_next=False)
 
 # ==========================================
 # AI DYNAMIC SEARCH / EXPLORATION API ROUTES
@@ -528,7 +692,7 @@ def internships():
 @app.route('/api/explore-scholarships', methods=['POST'])
 @login_required
 def api_explore_scholarships():
-    """API endpoint to dynamically crawl scholarships using unified search service."""
+    """API endpoint to dynamically crawl scholarships."""
     data = request.get_json() or {}
     branch = data.get('branch', '')
     cgpa_val = data.get('cgpa', '')
@@ -536,6 +700,7 @@ def api_explore_scholarships():
 
     user_id = session['user_id']
     user = get_user_by_id(user_id)
+    ai_engine = data.get('ai_engine') or _get_ai_engine(request, user)
 
     branch = branch or (user.get('branch') if user else '') or 'CSE'
     try:
@@ -544,9 +709,7 @@ def api_explore_scholarships():
         cgpa = 8.0
 
     user_profile = {
-        "id": user_id,
-        "branch": branch,
-        "cgpa": cgpa,
+        "id": user_id, "branch": branch, "cgpa": cgpa,
         "skills": user.get('skills', []) if user else [],
         "interests": user.get('interests', []) if user else [],
         "preferred_location": "remote"
@@ -554,24 +717,21 @@ def api_explore_scholarships():
 
     try:
         search_res = execute_opportunities_search(
-            query_str=f"{query} scholarship",
-            user_profile=user_profile,
-            page=1,
-            limit=20
+            query_str=f"{query} scholarship", user_profile=user_profile, page=1, limit=20
         )
         scholarships_data = search_res.get("results", [])
     except Exception:
         logger.exception('Scholarship discovery failed')
-        return jsonify({'success': False, 'message': 'Scholarship search is temporarily unavailable. Please try again.'}), 503
+        return jsonify({'success': False, 'message': 'Scholarship search is temporarily unavailable.'}), 503
 
-    log_activity(user_id, 'SCHOLARSHIP_AI_EXPLORE', f'AI explored scholarships for branch={branch}, cgpa={cgpa}, query={query}')
+    log_activity(user_id, 'SCHOLARSHIP_AI_EXPLORE', f'AI explored scholarships: {query}')
     return jsonify({'success': True, 'scholarships': scholarships_data})
 
 
 @app.route('/api/explore-internships', methods=['POST'])
 @login_required
 def api_explore_internships():
-    """API endpoint to dynamically crawl internships using unified search service."""
+    """API endpoint to dynamically crawl internships."""
     data = request.get_json() or {}
     branch = data.get('branch', '')
     cgpa_val = data.get('cgpa', '')
@@ -579,6 +739,7 @@ def api_explore_internships():
 
     user_id = session['user_id']
     user = get_user_by_id(user_id)
+    ai_engine = data.get('ai_engine') or _get_ai_engine(request, user)
 
     branch = branch or (user.get('branch') if user else '') or 'CSE'
     try:
@@ -587,9 +748,7 @@ def api_explore_internships():
         cgpa = 8.0
 
     user_profile = {
-        "id": user_id,
-        "branch": branch,
-        "cgpa": cgpa,
+        "id": user_id, "branch": branch, "cgpa": cgpa,
         "skills": user.get('skills', []) if user else [],
         "interests": user.get('interests', []) if user else [],
         "preferred_location": "remote"
@@ -597,17 +756,14 @@ def api_explore_internships():
 
     try:
         search_res = execute_opportunities_search(
-            query_str=f"{query} internship",
-            user_profile=user_profile,
-            page=1,
-            limit=20
+            query_str=f"{query} internship", user_profile=user_profile, page=1, limit=20
         )
         internships_data = search_res.get("results", [])
     except Exception:
         logger.exception('Internship discovery failed')
-        return jsonify({'success': False, 'message': 'Internship search is temporarily unavailable. Please try again.'}), 503
+        return jsonify({'success': False, 'message': 'Internship search is temporarily unavailable.'}), 503
 
-    log_activity(user_id, 'INTERNSHIP_AI_EXPLORE', f'AI explored internships for branch={branch}, cgpa={cgpa}, query={query}')
+    log_activity(user_id, 'INTERNSHIP_AI_EXPLORE', f'AI explored internships: {query}')
     return jsonify({'success': True, 'internships': internships_data})
 
 
@@ -646,9 +802,7 @@ def opportunities():
             user = get_user_by_id(user_id)
 
         user_profile = {
-            "id": user_id,
-            "branch": branch,
-            "cgpa": cgpa or 8.0,
+            "id": user_id, "branch": branch, "cgpa": cgpa or 8.0,
             "skills": [s.strip() for s in skills_str.split(",") if s.strip()] if skills_str else (user.get('skills', []) if user else []),
             "interests": [role] if role else (user.get('interests', []) if user else []),
             "preferred_location": "remote"
@@ -657,10 +811,7 @@ def opportunities():
         try:
             query = f"{role} {skills_str}".strip() or "engineering"
             search_res = execute_opportunities_search(
-                query_str=query,
-                user_profile=user_profile,
-                page=1,
-                limit=30
+                query_str=query, user_profile=user_profile, page=1, limit=30
             )
             matched_opps = search_res.get("results", [])
         except Exception as e:
@@ -677,14 +828,16 @@ def opportunities():
                 'match_percentage': opp.get('match_score', 0),
                 'type': opp.get('type', 'Full-time'),
                 'deadline': opp.get('deadline', 'N/A'),
-                'link': opp.get('url', '#')
+                'link': opp.get('url', '#'),
+                'source': opp.get('source', ''),
+                'skills': opp.get('skills', []),
             })
 
-        log_activity(user_id, 'OPPORTUNITY_AI_EXPLORE', f'AI searched opportunities for role={role}, branch={branch}, cgpa={cgpa}')
+        log_activity(user_id, 'OPPORTUNITY_AI_EXPLORE', f'AI searched opportunities: {role}')
 
         return jsonify({
             'success': True,
-            'message': f'AI Crawler found {len(formatted_matches)} matching opportunities!',
+            'message': f'Found {len(formatted_matches)} matching opportunities',
             'matched_opportunities': formatted_matches
         })
 
@@ -699,11 +852,10 @@ def opportunities():
 @app.route('/api/internships/search', methods=['GET'])
 @login_required
 def api_search_internships():
-    """Paginated search for internships."""
     q = request.args.get('q', '')
     page = int(request.args.get('page', 1))
     limit = int(request.args.get('limit', 20))
-    
+
     user_id = session['user_id']
     user = get_user_by_id(user_id)
     user_profile = {
@@ -714,20 +866,14 @@ def api_search_internships():
         "interests": user.get('interests', []) if user else [],
         "preferred_location": "remote"
     }
-    
-    query_str = f"{q} internship".strip()
+
     search_res = execute_opportunities_search(
-        query_str=query_str,
-        user_profile=user_profile,
-        page=page,
-        limit=limit
+        query_str=f"{q} internship".strip(), user_profile=user_profile, page=page, limit=limit
     )
-    
+
     return jsonify({
-        "results": search_res["results"],
-        "page": search_res["page"],
-        "limit": search_res["limit"],
-        "total": search_res["total"],
+        "results": search_res["results"], "page": search_res["page"],
+        "limit": search_res["limit"], "total": search_res["total"],
         "has_next": search_res["has_next"]
     })
 
@@ -735,11 +881,10 @@ def api_search_internships():
 @app.route('/api/opportunities/search', methods=['GET'])
 @login_required
 def api_search_opportunities():
-    """Paginated search for generic opportunities."""
     q = request.args.get('q', '')
     page = int(request.args.get('page', 1))
     limit = int(request.args.get('limit', 20))
-    
+
     user_id = session['user_id']
     user = get_user_by_id(user_id)
     user_profile = {
@@ -750,35 +895,30 @@ def api_search_opportunities():
         "interests": user.get('interests', []) if user else [],
         "preferred_location": "remote"
     }
-    
+
     search_res = execute_opportunities_search(
-        query_str=q,
-        user_profile=user_profile,
-        page=page,
-        limit=limit
+        query_str=q, user_profile=user_profile, page=page, limit=limit
     )
-    
+
     return jsonify({
-        "results": search_res["results"],
-        "page": search_res["page"],
-        "limit": search_res["limit"],
-        "total": search_res["total"],
+        "results": search_res["results"], "page": search_res["page"],
+        "limit": search_res["limit"], "total": search_res["total"],
         "has_next": search_res["has_next"]
     })
 
 
 # ==========================================
-# AI SCHOLARSHIP ANALYSIS API
+# AI ANALYSIS APIs
 # ==========================================
 
 @app.route('/api/analyze-scholarship', methods=['POST'])
 @login_required
 def api_analyze_scholarship():
-    """API endpoint for AI scholarship analysis."""
     data = request.get_json()
     scholarship_info = data.get('scholarship_info', '')
     user_id = session['user_id']
     user = get_user_by_id(user_id)
+    ai_engine = _get_ai_engine(request, user)
 
     if not scholarship_info:
         return jsonify({'success': False, 'message': 'Scholarship information required'})
@@ -789,22 +929,20 @@ def api_analyze_scholarship():
         data.get('skills', ''),
         data.get('experience', ''),
         user.get('cgpa', 0) if user else 0,
+        ai_engine=ai_engine
     )
     log_activity(user_id, 'SCHOLARSHIP_ANALYSIS', 'Analyzed scholarship')
     return jsonify(result)
 
-# ==========================================
-# AI INTERNSHIP ANALYSIS API
-# ==========================================
 
 @app.route('/api/analyze-internship', methods=['POST'])
 @login_required
 def api_analyze_internship():
-    """API endpoint for AI internship analysis."""
     data = request.get_json()
     internship_info = data.get('internship_info', '')
     user_id = session['user_id']
     user = get_user_by_id(user_id)
+    ai_engine = _get_ai_engine(request, user)
 
     if not internship_info:
         return jsonify({'success': False, 'message': 'Internship information required'})
@@ -815,21 +953,19 @@ def api_analyze_internship():
         data.get('skills', ''),
         data.get('experience', ''),
         user.get('cgpa', 0) if user else 0,
+        ai_engine=ai_engine
     )
     log_activity(user_id, 'INTERNSHIP_ANALYSIS', 'Analyzed internship')
     return jsonify(result)
 
-# ==========================================
-# AI RECOMMENDATIONS API
-# ==========================================
 
 @app.route('/api/get-recommendations', methods=['POST'])
 @login_required
 def api_get_recommendations():
-    """API endpoint for AI-powered opportunity recommendations."""
     data = request.get_json()
     user_id = session['user_id']
     user = get_user_by_id(user_id)
+    ai_engine = _get_ai_engine(request, user)
 
     opportunities_str = json.dumps(data.get('opportunities', []))
     result = recommend_opportunities(
@@ -837,13 +973,15 @@ def api_get_recommendations():
         user.get('cgpa', 0) if user else 0,
         data.get('skills', ''),
         data.get('interests', ''),
-        opportunities_str
+        opportunities_str,
+        ai_engine=ai_engine
     )
     log_activity(user_id, 'GET_RECOMMENDATIONS', 'Generated AI recommendations')
     return jsonify(result)
 
+
 # ==========================================
-# API STATUS CHECK (SECURE — no key leaks)
+# AI STATUS & SETTINGS  (Bug #6 fix — was using undefined user_repository module)
 # ==========================================
 
 @app.route('/api/ai-status', methods=['GET'])
@@ -859,13 +997,22 @@ def api_ai_status():
         'model': os.getenv('GEMINI_MODEL', 'gemini-1.5-flash'),
     })
 
-# ==========================================
-# HEALTH CHECK (MongoDB + AI)
-# ==========================================
+@app.route('/api/settings/provider', methods=['POST'])
+@login_required
+def update_provider_settings():
+    """Update user's preferred AI provider."""
+    data = request.get_json() or {}
+    engine = data.get('ai_engine')
+    if engine not in ['gemini', 'openai']:
+        return jsonify({'error': 'Invalid provider'}), 400
+
+    update_user_profile(session['user_id'], ai_engine=engine)
+    session['ai_engine'] = engine
+    return jsonify({'success': True, 'engine': engine})
+
 
 @app.route('/api/health/ai', methods=['GET'])
 def api_health_ai():
-    """Health check for AI providers and database. No credentials returned."""
     gemini_ok = bool(os.getenv('GEMINI_API_KEY', '')) and os.getenv('GEMINI_API_KEY') != 'YOUR_API_KEY_HERE'
     openai_ok = bool(os.getenv('OPENAI_API_KEY', ''))
     db_status = db_health_check()
@@ -874,6 +1021,44 @@ def api_health_ai():
         'openai': 'available' if openai_ok else 'not_configured',
         'database': db_status.get('status', 'unknown'),
     })
+
+
+# ==========================================
+# DYNAMIC UI ENDPOINTS
+# ==========================================
+
+@app.route('/api/study/task/complete', methods=['POST'])
+@login_required
+def api_study_task_complete():
+    data = request.get_json() or {}
+    task_id = data.get('task_id')
+    session_id = data.get('session_id')
+    user_id = session['user_id']
+
+    if not task_id or not session_id:
+        return jsonify({'success': False, 'message': 'Missing parameters'}), 400
+
+    log_activity(user_id, 'STUDY_TASK_COMPLETE', f'Completed task {task_id}')
+    return jsonify({'success': True, 'message': 'Task marked complete'})
+
+@app.route('/api/opportunities/status', methods=['POST'])
+@login_required
+def api_opportunities_status():
+    data = request.get_json() or {}
+    opportunity_id = data.get('opportunity_id')
+    status = data.get('status')
+    user_id = session['user_id']
+
+    if not opportunity_id or not status:
+        return jsonify({'success': False, 'message': 'Missing parameters'}), 400
+
+    try:
+        save_user_opportunity(user_id, opportunity_id, status)
+        log_activity(user_id, 'OPPORTUNITY_STATUS', f'Updated opportunity {opportunity_id} to {status}')
+        return jsonify({'success': True, 'message': 'Status updated'})
+    except Exception as e:
+        logger.error(f"Error updating status: {e}")
+        return jsonify({'success': False, 'message': 'Error updating status'}), 500
 
 # ==========================================
 # CODE AGENT ROUTE
@@ -887,34 +1072,39 @@ def code_assistant():
 
     if request.method == 'POST':
         if request.is_json:
-            data = request.get_json() or {}
+            data = request.get_json()
             code = data.get('code', '')
             language = data.get('language', 'python')
-            ai_engine = data.get('ai_engine', 'gemini')
+            ai_engine = data.get('ai_engine') or _get_ai_engine(request, user)
         else:
             code = request.form.get('code', '')
             language = request.form.get('language', 'python')
-            ai_engine = request.form.get('ai_engine', 'gemini')
+            ai_engine = request.form.get('ai_engine') or _get_ai_engine(request, user)
 
         if not code:
             return jsonify({'success': False, 'message': 'Please enter code to analyze'})
 
-        analysis_result = analyze_code(language, code)
+        try:
+            analysis_result = analyze_code(language, code, ai_engine)
 
-        if analysis_result['success']:
-            explanation = analysis_result.get('explanation', analysis_result.get('summary', ''))
-            save_code_analysis(
-                user_id,
-                code,
-                language,
-                explanation,
-                json.dumps(analysis_result.get('errors', [])),
-                json.dumps(analysis_result.get('suggestions', [])),
-                analysis_result.get('optimized_code', '')
-            )
-            log_activity(user_id, 'CODE_ANALYSIS', f'Analyzed {language} code ({len(code)} chars)')
+            if analysis_result.get('success'):
+                explanation = analysis_result.get('summary', '')
+                save_code_analysis(
+                    user_id, code, language, explanation,
+                    json.dumps(analysis_result.get('errors', [])),
+                    json.dumps(analysis_result.get('suggestions', [])),
+                    analysis_result.get('optimized_code', '')
+                )
+                log_activity(user_id, 'CODE_ANALYSIS', f'Analyzed {language} code ({len(code)} chars)')
 
-        return jsonify({'success': analysis_result['success'], 'analysis': analysis_result})
+            return jsonify({'success': analysis_result.get('success', False), 'analysis': analysis_result})
+        except Exception as e:
+            logger.error(f"Code analysis failed: {e}")
+            return jsonify({
+                'success': False,
+                'message': 'Something prevented this request from completing. Please try again.',
+                'analysis': {'success': False, 'message': str(e)}
+            })
 
     history = get_code_analysis_history(user_id)
     api_status_info = {
@@ -938,16 +1128,30 @@ def profile():
             data = request.get_json() or {}
             branch = data.get('branch', '')
             cgpa = data.get('cgpa', 0)
+            skills = data.get('skills', [])
+            interests = data.get('interests', [])
+            career_goals = data.get('career_goals', '')
+            target_companies = data.get('target_companies', [])
+            preferred_locations = data.get('preferred_locations', [])
         else:
             branch = request.form.get('branch', '')
             cgpa = request.form.get('cgpa', 0)
+            skills = request.form.getlist('skills') or []
+            interests = request.form.getlist('interests') or []
+            career_goals = request.form.get('career_goals', '')
+            target_companies = request.form.getlist('target_companies') or []
+            preferred_locations = request.form.getlist('preferred_locations') or []
 
         try:
             cgpa = float(cgpa) if cgpa else None
         except Exception:
             cgpa = None
 
-        update_user_profile(user_id, branch, cgpa)
+        update_user_profile(user_id, branch, cgpa,
+                           skills=skills, interests=interests,
+                           career_goals=career_goals,
+                           target_companies=target_companies,
+                           preferred_locations=preferred_locations)
         log_activity(user_id, 'PROFILE_UPDATE', 'Updated profile')
         return jsonify({'success': True, 'message': 'Profile updated!'})
 
@@ -996,7 +1200,7 @@ def activity():
     return render_template('activity.html', user=user, activities=activities)
 
 # ==========================================
-# STUDY DETAILS ENDPOINT
+# STUDY & CODE DETAIL ENDPOINTS
 # ==========================================
 
 @app.route('/study/<session_id>')
@@ -1034,9 +1238,6 @@ def get_study_session_details(session_id):
         }
     })
 
-# ==========================================
-# CODE ANALYSIS DETAILS ENDPOINT
-# ==========================================
 
 @app.route('/code-assistant/<analysis_id>')
 @login_required
@@ -1075,7 +1276,6 @@ def get_code_analysis_details(analysis_id):
 # ==========================================
 
 def _wants_json():
-    """Check if the request expects a JSON response."""
     return (
         request.is_json
         or request.content_type == 'application/json'
@@ -1098,10 +1298,9 @@ def server_error(error):
 
 @app.errorhandler(Exception)
 def handle_unhandled_exception(error):
-    """Catch-all for unhandled exceptions — ensures API routes never return HTML."""
     logger.exception('Unhandled exception: %s', error)
     if _wants_json():
-        return jsonify({'success': False, 'message': 'An unexpected error occurred. Please try again.', 'error': str(type(error).__name__)}), 500
+        return jsonify({'success': False, 'message': 'Something prevented this request from completing. Please try again.', 'error': str(type(error).__name__)}), 500
     return render_template('500.html'), 500
 
 # ==========================================

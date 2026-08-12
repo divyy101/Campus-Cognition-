@@ -24,7 +24,7 @@ def generate_file_hash(filepath: str) -> str:
             buf = f.read(65536)
     return hasher.hexdigest()
 
-def extract_text_from_pdf(filepath: str, max_chars: int = 15000) -> str:
+def extract_text_from_pdf(filepath: str, max_chars: int = 5000000) -> str:
     """Extract text from a PDF file up to max_chars."""
     text = ""
     try:
@@ -39,7 +39,7 @@ def extract_text_from_pdf(filepath: str, max_chars: int = 15000) -> str:
         logger.error(f"Error reading PDF {filepath}: {e}")
     return text[:max_chars]
 
-def extract_text_from_docx(filepath: str, max_chars: int = 15000) -> str:
+def extract_text_from_docx(filepath: str, max_chars: int = 5000000) -> str:
     """Extract text from a DOCX file."""
     text = ""
     try:
@@ -52,7 +52,7 @@ def extract_text_from_docx(filepath: str, max_chars: int = 15000) -> str:
         logger.error(f"Error reading DOCX {filepath}: {e}")
     return text[:max_chars]
 
-def extract_text_from_pptx(filepath: str, max_chars: int = 15000) -> str:
+def extract_text_from_pptx(filepath: str, max_chars: int = 5000000) -> str:
     """Extract text from a PPTX file."""
     text = ""
     try:
@@ -67,7 +67,7 @@ def extract_text_from_pptx(filepath: str, max_chars: int = 15000) -> str:
         logger.error(f"Error reading PPTX {filepath}: {e}")
     return text[:max_chars]
 
-def extract_text_from_txt(filepath: str, max_chars: int = 15000) -> str:
+def extract_text_from_txt(filepath: str, max_chars: int = 5000000) -> str:
     """Extract text from a TXT/MD file."""
     text = ""
     try:
@@ -77,7 +77,7 @@ def extract_text_from_txt(filepath: str, max_chars: int = 15000) -> str:
         logger.error(f"Error reading TXT {filepath}: {e}")
     return text
 
-def validate_document_file(filepath: str, max_size_mb: int = 15) -> str:
+def validate_document_file(filepath: str, max_size_mb: int = 700) -> str:
     """
     Validates a file based on size and magic bytes (file signature), not just extension.
     Returns the resolved extension ('pdf', 'docx', 'pptx', 'txt', 'md').
@@ -119,7 +119,7 @@ def validate_document_file(filepath: str, max_size_mb: int = 15) -> str:
     raise ValueError("Unsupported or corrupted file format")
 
 
-def process_document(filepath: str, max_chars: int = 15000) -> Tuple[str, str]:
+def process_document(filepath: str, max_chars: int = 5000000) -> Tuple[str, str]:
     """
     Process a document and return (file_hash, extracted_text).
     Supports .pdf, .docx, .pptx, .txt, .md with strict validation.
