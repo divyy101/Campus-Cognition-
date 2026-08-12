@@ -37,6 +37,7 @@ from services.ai_service import (
     recommend_opportunities,
     analyze_scholarship,
     analyze_internship,
+    analyze_code,
     is_api_available,
     get_api_status,
     fetch_live_scholarships,
@@ -208,8 +209,8 @@ def signup():
             email_sent = False
             new_user = get_user_by_id(user_id)
             if new_user:
-                session['user_id'] = str(new_user['id']) if '_id' not in new_user else str(new_user['_id'])
-                log_activity(new_user['id'], 'SIGNUP', 'New user registered')
+                session['user_id'] = str(new_user['id'])
+                log_activity(str(new_user['id']), 'SIGNUP', 'New user registered')
                 
                 # Send welcome email, fail gracefully
                 try:
@@ -785,8 +786,9 @@ def api_analyze_scholarship():
     result = analyze_scholarship(
         scholarship_info,
         user.get('branch', 'Not specified') if user else 'Not specified',
+        data.get('skills', ''),
+        data.get('experience', ''),
         user.get('cgpa', 0) if user else 0,
-        data.get('achievements', '')
     )
     log_activity(user_id, 'SCHOLARSHIP_ANALYSIS', 'Analyzed scholarship')
     return jsonify(result)
@@ -897,7 +899,7 @@ def code_assistant():
         if not code:
             return jsonify({'success': False, 'message': 'Please enter code to analyze'})
 
-        analysis_result = analyze_code(code, language, ai_engine=ai_engine)
+        analysis_result = analyze_code(language, code)
 
         if analysis_result['success']:
             explanation = analysis_result.get('explanation', analysis_result.get('summary', ''))
@@ -1072,12 +1074,34 @@ def get_code_analysis_details(analysis_id):
 # ERROR HANDLERS
 # ==========================================
 
+def _wants_json():
+    """Check if the request expects a JSON response."""
+    return (
+        request.is_json
+        or request.content_type == 'application/json'
+        or request.headers.get('Accept', '').startswith('application/json')
+        or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    )
+
 @app.errorhandler(404)
 def not_found(error):
+    if _wants_json():
+        return jsonify({'success': False, 'message': 'The requested resource was not found.', 'error': '404'}), 404
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def server_error(error):
+    logger.error('Internal server error: %s', error)
+    if _wants_json():
+        return jsonify({'success': False, 'message': 'An internal server error occurred. Please try again.', 'error': '500'}), 500
+    return render_template('500.html'), 500
+
+@app.errorhandler(Exception)
+def handle_unhandled_exception(error):
+    """Catch-all for unhandled exceptions — ensures API routes never return HTML."""
+    logger.exception('Unhandled exception: %s', error)
+    if _wants_json():
+        return jsonify({'success': False, 'message': 'An unexpected error occurred. Please try again.', 'error': str(type(error).__name__)}), 500
     return render_template('500.html'), 500
 
 # ==========================================

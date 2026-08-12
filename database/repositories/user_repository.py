@@ -6,10 +6,39 @@ from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 import hashlib
 import logging
+from bson import ObjectId
+from bson.errors import InvalidId
 
 from database.mongodb import get_db
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _now():
+    return datetime.now(timezone.utc)
+
+
+def _to_object_id(user_id):
+    """Safely convert a user_id (string or ObjectId) to ObjectId for MongoDB queries."""
+    if isinstance(user_id, ObjectId):
+        return user_id
+    try:
+        return ObjectId(str(user_id))
+    except (InvalidId, TypeError):
+        return user_id  # Return as-is if conversion fails
+
+
+def _user_doc(row):
+    """Normalise a MongoDB user document so existing templates keep working."""
+    if row is None:
+        return None
+    doc = dict(row)
+    doc['id'] = str(doc.pop('_id'))  # templates use user['id'], always as string
+    return doc
 
 
 # ---------------------------------------------------------------------------
@@ -41,7 +70,7 @@ def verify_password(password, hashed, user_id=None):
                 db = get_db()
                 secure_hash = hash_password(password)
                 db.users.update_one(
-                    {'_id': user_id},
+                    {'_id': _to_object_id(user_id)},
                     {'$set': {'password': secure_hash, 'updated_at': _now()}}
                 )
                 logger.info('Upgraded legacy password hash for user %s', user_id)
@@ -50,23 +79,6 @@ def verify_password(password, hashed, user_id=None):
         return True
 
     return False
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def _now():
-    return datetime.now(timezone.utc)
-
-
-def _user_doc(row):
-    """Normalise a MongoDB user document so existing templates keep working."""
-    if row is None:
-        return None
-    doc = dict(row)
-    doc['id'] = doc.pop('_id')  # templates use user['id']
-    return doc
 
 
 # ---------------------------------------------------------------------------
@@ -117,9 +129,9 @@ def get_user_by_email(email):
 
 
 def get_user_by_id(user_id):
-    """Get user by _id."""
+    """Get user by _id. Accepts both string and ObjectId."""
     db = get_db()
-    user = db.users.find_one({'_id': user_id})
+    user = db.users.find_one({'_id': _to_object_id(user_id)})
     return _user_doc(user)
 
 
@@ -132,14 +144,14 @@ def update_user_profile(user_id, branch=None, cgpa=None, **extra_fields):
     if cgpa is not None:
         update['cgpa'] = cgpa
     update.update(extra_fields)
-    db.users.update_one({'_id': user_id}, {'$set': update})
+    db.users.update_one({'_id': _to_object_id(user_id)}, {'$set': update})
 
 
 def update_password(user_id, password_hash):
     """Set a new password hash."""
     db = get_db()
     db.users.update_one(
-        {'_id': user_id},
+        {'_id': _to_object_id(user_id)},
         {'$set': {'password': password_hash, 'updated_at': _now()}}
     )
 
@@ -147,6 +159,7 @@ def update_password(user_id, password_hash):
 def delete_user(user_id):
     """Delete a user and cascading data."""
     db = get_db()
+    oid = _to_object_id(user_id)
     try:
         db.study_sessions.delete_many({'user_id': user_id})
         db.code_reviews.delete_many({'user_id': user_id})
@@ -159,10 +172,10 @@ def delete_user(user_id):
         db.documents.delete_many({'user_id': user_id})
         db.document_chunks.delete_many({'user_id': user_id})
         db.password_reset_tokens.delete_many({'user_id': user_id})
-        db.users.delete_one({'_id': user_id})
+        db.users.delete_one({'_id': oid})
         return True
     except Exception as e:
-        logger.error('update_user_profile failed: %s', e)
+        logger.error('delete_user failed: %s', e)
         return False
 
 

@@ -411,23 +411,33 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         const response = await fetch('{{ url_for("signup") }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(formData)
         });
+
+        // Guard against non-JSON responses (e.g. HTML error pages)
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            showToast('Server error occurred. Please try again later.', 'danger');
+            console.error('Non-JSON response:', response.status, contentType);
+            return;
+        }
 
         const data = await response.json();
         
         if (data.success) {
             showToast('Account created successfully! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = '{{ url_for("dashboard") }}';
+                window.location.href = data.redirect || '{{ url_for("dashboard") }}';
             }, 100);
         } else {
-            showToast(data.message, 'danger');
+            showToast(data.message || 'Registration failed. Please try again.', 'danger');
         }
     } catch (error) {
-        showToast('Error during signup: ' + error.message, 'danger');
+        showToast('Connection error. Please check your internet and try again.', 'danger');
+        console.error('Signup error:', error);
     }
 });
 
