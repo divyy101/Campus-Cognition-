@@ -75,3 +75,5 @@ scratch/
 
 # Agents
 .agents/
+
+node_modules/
