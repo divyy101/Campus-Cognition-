@@ -1,9 +1,0 @@
-def analyze_code(language: str, code: str) -> dict:
-+    """Analyze code and return feedback."""
-+    return {
-+        'success': True,
-+        'analysis': f"Static analysis for {language}:\n\nYour code looks fundamentally sound, but we recommend checking error handling and edge cases.\n\n```\n# Suggested improvements\n# Add try/except blocks\n```",
-+        'model': 'local-fallback'
-+    }
-+
-+
