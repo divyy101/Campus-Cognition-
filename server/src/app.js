@@ -17,6 +17,7 @@ const scholarshipRoutes = require('./routes/scholarshipRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const activityRoutes = require('./routes/activityRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/scholarships', scholarshipRoutes);
 app.use('/api/opportunities', opportunityRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Catch-all route for frontend static build in production
 const clientBuildPath = path.resolve(__dirname, '../../client/dist');
