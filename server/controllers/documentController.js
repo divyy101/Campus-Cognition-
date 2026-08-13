@@ -67,7 +67,7 @@ exports.deleteDocument = async (req, res, next) => {
 
     // Delete the file from the filesystem if it exists
     if (document.filename) {
-      const filePath = path.resolve(__dirname, '../../../static/uploads', document.filename);
+      const filePath = path.resolve(__dirname, '../../static/uploads', document.filename);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }

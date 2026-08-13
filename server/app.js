@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(loggerMiddleware);
 
 // Serve uploaded static files
-app.use('/static/uploads', express.static(path.resolve(__dirname, '../../static/uploads')));
+app.use('/static/uploads', express.static(path.resolve(__dirname, '../static/uploads')));
 
 // Register API Routes
 app.use('/api/auth', authRoutes);
@@ -50,7 +50,7 @@ app.use('/api/activity', activityRoutes);
 app.use('/api/documents', documentRoutes);
 
 // Catch-all route for frontend static build in production
-const clientBuildPath = path.resolve(__dirname, '../../client/dist');
+const clientBuildPath = path.resolve(__dirname, '../client/dist');
 console.log(`[Express App] Checking frontend build path: ${clientBuildPath} (exists: ${require('fs').existsSync(clientBuildPath)})`);
 if (require('fs').existsSync(clientBuildPath)) {
   app.use(express.static(clientBuildPath));
