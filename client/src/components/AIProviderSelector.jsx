@@ -22,7 +22,7 @@ const AIProviderSelector = ({ className = '' }) => {
         }`}
       >
         <Sparkles className="w-3.5 h-3.5" />
-        Campus AI
+        Grok
       </button>
 
       <button

@@ -94,7 +94,7 @@ const StudyAgent = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-transparent text-slate-100 font-sans selection:bg-indigo-500/30">
+    <div className="flex min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-emerald-900/20 text-slate-100 font-sans selection:bg-emerald-500/30">
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0">

@@ -4,7 +4,7 @@ const env = require('../../config/env');
 async function generateCampusAi({ prompt, systemPrompt = '', temperature = 0.7, jsonMode = false }) {
   const apiKey = env.campusAiKey || env.openAiKey;
   if (!apiKey) {
-    throw new Error('Campus AI / OpenAI API key is missing or empty in configuration.');
+    throw new Error('Grok / OpenAI API key is missing or empty in configuration.');
   }
 
   const messages = [];
@@ -37,7 +37,7 @@ async function generateCampusAi({ prompt, systemPrompt = '', temperature = 0.7, 
       return response.data.choices[0].message.content;
     }
   } catch (groqError) {
-    console.warn(`[CampusAIProvider] Primary Groq endpoint failed (${groqError.message}). Attempting OpenAI endpoint...`);
+    console.warn(`[GrokProvider] Primary Groq endpoint failed (${groqError.message}). Attempting OpenAI endpoint...`);
 
     if (env.openAiKey) {
       payload.model = 'gpt-4o-mini';
@@ -57,7 +57,7 @@ async function generateCampusAi({ prompt, systemPrompt = '', temperature = 0.7, 
     throw groqError;
   }
 
-  throw new Error('Empty or invalid response structure received from Campus AI provider');
+  throw new Error('Empty or invalid response structure received from Grok provider');
 }
 
 module.exports = { generateCampusAi };
