@@ -52,167 +52,175 @@ const ScholarshipAgent = () => {
   });
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-purple-900/20 text-slate-100 font-sans selection:bg-purple-500/30">
+    <div className="flex min-h-screen bg-[#FDFBF7] dark:bg-[#171717] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <Navbar title="Scholarship Agent — Financial Grant Portal" />
+        <Navbar title="Funding Desk" />
 
-        <main className="flex-1 p-6 md:px-8 md:py-6 space-y-6 overflow-y-auto">
-          {/* Header Banner */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-[32px] glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-fuchsia-500/20 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
+        <main className="flex-1 p-6 md:px-8 md:py-8 overflow-y-auto">
+          <div className="max-w-6xl mx-auto space-y-8">
             
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-[10px] font-black uppercase tracking-widest mb-4 shadow-inner">
-                  <Award className="w-3.5 h-3.5" />
-                  Verified Authoritative Sources Only
+            {/* Hero Section */}
+            <div className="bg-white dark:bg-[#262626] rounded-2xl p-8 border border-amber-100 dark:border-amber-900/30 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-50 dark:bg-amber-900/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+              
+              <div className="relative z-10 flex-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-bold tracking-widest uppercase mb-4 border border-amber-200 dark:border-amber-800/50">
+                  <Award className="w-3 h-3" />
+                  Institutional Grants
                 </div>
-                <h1 className="text-3xl font-black text-white tracking-tight">
-                  Scholarships & Academic Grants
+                <h1 className="text-3xl md:text-[36px] font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight mb-3">
+                  Academic Funding Catalog
                 </h1>
-                <p className="text-sm text-slate-400 mt-2 max-w-xl leading-relaxed">
-                  Discover government schemes, merit-based grants, and female student engineering scholarships from National Scholarship Portal & trusted trusts.
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl">
+                  Discover verified scholarships, government schemes, and merit-based financial aid for your academic journey.
                 </p>
               </div>
 
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1 lg:w-80">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              {/* Search Widget */}
+              <div className="w-full md:w-[320px] bg-[#FDFBF7] dark:bg-[#171717] p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner relative z-10 flex shrink-0">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search scholarships (e.g. girls, CGPA)..."
-                    className="w-full glass-input rounded-2xl pl-12 pr-4 py-3.5 text-xs placeholder-slate-500"
+                    placeholder="Search grants..."
+                    className="w-full bg-transparent pl-9 pr-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="px-6 py-3.5 rounded-2xl bg-fuchsia-500 hover:bg-fuchsia-400 text-slate-950 font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all flex items-center justify-center gap-2 shrink-0 group"
+                <button 
+                  onClick={handleSearch}
+                  className="px-4 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition-colors"
                 >
-                  <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   Search
                 </button>
-              </form>
-            </div>
-
-            {/* Quick Filters */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-8 pt-6 border-t border-white/5 relative z-10">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 shrink-0">
-                <Filter className="w-3.5 h-3.5" />
-                Filter Category:
-              </span>
-
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { id: 'all', label: 'All Opportunities' },
-                  { id: 'government', label: 'Govt & NSP Schemes' },
-                  { id: 'girls', label: 'Girls in Engineering' },
-                  { id: 'merit', label: 'Merit & CGPA Based' }
-                ].map(f => (
-                  <button
-                    key={f.id}
-                    onClick={() => setActiveFilter(f.id)}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
-                      activeFilter === f.id
-                        ? 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
-                        : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/5 hover:border-white/10'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
               </div>
             </div>
-          </motion.div>
 
-          {/* Scholarship Cards Grid */}
-          {loading ? (
-            <div className="p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-              <div className="w-8 h-8 border-2 border-fuchsia-500/30 border-t-fuchsia-500 rounded-full animate-spin mb-4" />
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Loading verified scholarships...</p>
-            </div>
-          ) : filteredScholarships.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredScholarships.map((sch, idx) => (
-                <motion.div
-                  key={sch.id || idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="p-6 rounded-[32px] glass-card border border-white/5 hover:bg-white/5 transition-all flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 rounded-lg bg-fuchsia-500/10 flex items-center justify-center border border-fuchsia-500/20">
-                            <Award className="w-3.5 h-3.5 text-fuchsia-400" />
+            <div className="flex flex-col lg:flex-row gap-8">
+              
+              {/* Left Sidebar (Filters) */}
+              <div className="w-full lg:w-64 shrink-0 space-y-6">
+                <div className="bg-white dark:bg-[#262626] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <Filter className="w-3.5 h-3.5" />
+                    Funding Categories
+                  </h3>
+                  
+                  <div className="space-y-2">
+                    {[
+                      { id: 'all', label: 'All Grants' },
+                      { id: 'government', label: 'Govt. Schemes' },
+                      { id: 'girls', label: 'Women in STEM' },
+                      { id: 'merit', label: 'Merit-Based' }
+                    ].map(f => (
+                      <button
+                        key={f.id}
+                        onClick={() => setActiveFilter(f.id)}
+                        className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between ${
+                          activeFilter === f.id
+                            ? 'bg-amber-50 dark:bg-[#171717] text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#171717] border border-transparent'
+                        }`}
+                      >
+                        {f.label}
+                        {activeFilter === f.id && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content (Grants List) */}
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                    {filteredScholarships.length} Available Funds
+                  </h2>
+                </div>
+
+                {loading ? (
+                  <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 bg-white dark:bg-[#262626] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div className="w-8 h-8 border-2 border-amber-200 border-t-amber-500 rounded-full animate-spin" />
+                    <p className="text-sm text-slate-500 font-medium">Verifying institutional data...</p>
+                  </div>
+                ) : filteredScholarships.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredScholarships.map((sch, idx) => (
+                      <div 
+                        key={sch.id || idx}
+                        className="bg-white dark:bg-[#262626] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-amber-200 dark:hover:border-amber-900/50 transition-all flex flex-col sm:flex-row gap-5 relative overflow-hidden group"
+                      >
+                        {/* Funding Badge */}
+                        <div className="w-16 h-16 shrink-0 rounded-full bg-[#FDFBF7] dark:bg-[#171717] border-2 border-amber-100 dark:border-amber-900/30 flex flex-col items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform relative">
+                          <div className="absolute inset-[-4px] rounded-full border border-dashed border-amber-200 dark:border-amber-800/50" />
+                          <DollarSign className="w-5 h-5 mb-0.5" />
+                          <span className="text-[9px] font-bold uppercase">Grant</span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-slate-100 dark:bg-[#171717] px-2 py-0.5 rounded">
+                              {sch.source || 'Official Source'}
+                            </span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" /> {sch.matchScore}% Match
+                            </span>
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-widest text-fuchsia-400">
-                            {sch.source || 'Official Scholarship Portal'}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-white mt-1 leading-tight group-hover:text-fuchsia-300 transition-colors">
-                          {sch.title}
-                        </h3>
-                      </div>
-                      <span className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                        {sch.matchScore}% Match
-                      </span>
-                    </div>
+                          
+                          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-tight">
+                            {sch.title}
+                          </h3>
+                          
+                          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mb-4">
+                            {sch.description}
+                          </p>
 
-                    <p className="text-xs text-slate-400 mt-4 line-clamp-3 leading-relaxed">
-                      {sch.description}
-                    </p>
+                          {/* Details Row */}
+                          <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-100 dark:border-slate-800/60">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                              <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
+                              <span className="text-emerald-700 dark:text-emerald-400">{sch.stipend || 'Financial Aid Provided'}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                              <Calendar className="w-3.5 h-3.5 text-amber-500" />
+                              <span>Ends: {sch.deadline}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 max-w-[200px] truncate">
+                              <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
+                              <span className="truncate">{sch.eligibility}</span>
+                            </div>
+                          </div>
+                        </div>
 
-                    <div className="mt-5 pt-5 border-t border-white/5 space-y-3">
-                      <div className="flex items-center gap-3 text-xs font-medium text-slate-300">
-                        <div className="w-6 h-6 rounded-md bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shrink-0">
-                          <DollarSign className="w-3 h-3 text-emerald-400" />
+                        {/* CTA */}
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 sm:border-l border-slate-100 dark:border-slate-800/60 pt-4 sm:pt-0 sm:pl-5 gap-3 shrink-0">
+                           <a
+                            href={sch.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-6 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-2"
+                          >
+                            Apply Now
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
                         </div>
-                        <span>Amount: {sch.stipend || 'Financial Grant'}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs font-medium text-slate-300">
-                        <div className="w-6 h-6 rounded-md bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shrink-0">
-                          <Calendar className="w-3 h-3 text-rose-400" />
-                        </div>
-                        <span>Deadline: {sch.deadline}</span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-
-                  <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-5 border-t border-white/5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 truncate max-w-full sm:max-w-[200px] px-3 py-1.5 rounded-xl bg-black/20">
-                      {sch.eligibility}
-                    </span>
-
-                    <a
-                      href={sch.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 font-bold text-xs flex items-center justify-center gap-2 border border-fuchsia-500/30 transition-colors shrink-0 group/btn"
-                    >
-                      Official Source
-                      <ExternalLink className="w-3.5 h-3.5 group-hover/btn:scale-110 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </a>
+                ) : (
+                  <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 bg-white dark:bg-[#262626] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <Award className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
+                    <h3 className="text-base font-bold text-slate-700 dark:text-slate-300">No grants found</h3>
+                    <p className="text-sm text-slate-500 max-w-sm">Try adjusting your filters or search terms.</p>
                   </div>
-                </motion.div>
-              ))}
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="p-12 text-center text-slate-500 text-xs font-bold uppercase tracking-widest">
-              No matching scholarships found. Try adjusting your filters!
-            </div>
-          )}
+          </div>
         </main>
       </div>
     </div>

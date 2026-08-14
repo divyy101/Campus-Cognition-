@@ -6,14 +6,15 @@ import Sidebar from '../components/Sidebar';
 import { 
   BookOpen, 
   UploadCloud, 
-  FileText, 
   Sparkles, 
   Send, 
   CheckCircle2, 
-  AlertCircle,
   HelpCircle,
   BarChart3,
-  Calendar
+  Calendar,
+  Lock,
+  BrainCircuit,
+  GraduationCap
 } from 'lucide-react';
 
 const StudyAgent = () => {
@@ -25,7 +26,6 @@ const StudyAgent = () => {
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState('');
 
-  // RAG Chat State
   const [question, setQuestion] = useState('');
   const [ragLoading, setRagLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
@@ -35,7 +35,7 @@ const StudyAgent = () => {
     setError('');
 
     if (!syllabusFile) {
-      setError('Syllabus file is required. Please select your course syllabus file.');
+      setError('Syllabus file is required.');
       return;
     }
 
@@ -52,7 +52,6 @@ const StudyAgent = () => {
       const res = await api.post('/study/analyze', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-
       if (res.data.success) {
         setAnalysis(res.data.analysis);
       } else {
@@ -77,274 +76,219 @@ const StudyAgent = () => {
     try {
       const res = await api.post('/study/rag/ask', { question: userQ });
       if (res.data.success) {
-        setChatHistory(prev => [...prev, {
-          sender: 'ai',
-          text: res.data.answer,
-          sources: res.data.sources
-        }]);
+        setChatHistory(prev => [...prev, { sender: 'ai', text: res.data.answer }]);
       }
     } catch (err) {
-      setChatHistory(prev => [...prev, {
-        sender: 'ai',
-        text: 'Sorry, I could not process your question right now.'
-      }]);
+      setChatHistory(prev => [...prev, { sender: 'ai', text: 'Sorry, I could not process your question.' }]);
     } finally {
       setRagLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-emerald-900/20 text-slate-100 font-sans selection:bg-emerald-500/30">
+    <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#07131C] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300 relative overflow-hidden">
+      
+      {/* Subtle Paper Grid Background Motif */}
+      <div className="absolute inset-0 pointer-events-none opacity-5 dark:opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+      
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar title="Study Agent — Intelligent Learning Workspace" />
+      <div className="flex-1 flex flex-col min-w-0 relative z-10">
+        <Navbar title="Learning Studio" />
 
-        <main className="flex-1 p-6 md:px-8 md:py-6 space-y-6 overflow-y-auto">
-          {/* Header Banner */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-[32px] glass-card p-6 border border-white/5 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 rounded-full blur-[80px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
+        <main className="flex-1 p-6 md:px-8 md:py-8 space-y-6 overflow-y-auto">
+          {/* Header Section */}
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-2">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold tracking-widest uppercase mb-3 border border-blue-200 dark:border-blue-800/50">
+                <BookOpen className="w-3 h-3" />
+                Study Workspace
+              </div>
+              <h1 className="text-3xl md:text-[36px] font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                Digital Learning Desk
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-xl">
+                Upload course materials to generate an AI-optimized syllabus, timeline, and personalized study modules.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-6xl mx-auto">
             
-            <div className="relative z-10">
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Academic AI Copilot</span>
-              <h1 className="text-2xl font-black text-white mt-1">Syllabus Analysis & Study Roadmap</h1>
-              <p className="text-xs text-slate-400 mt-1 max-w-2xl">Upload your course syllabus (Required) and notes (Optional). Maximum 700 MB per file.</p>
-            </div>
-            <div className="relative z-10 hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-emerald-300 shadow-inner">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              AI Topic Priority Powered
-            </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Upload Form */}
-            <div className="space-y-6">
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="glass-card rounded-[32px] p-6 border border-white/5"
-              >
-                <h2 className="text-sm font-bold text-white mb-5 flex items-center gap-2 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                    <UploadCloud className="w-4 h-4 text-emerald-400" />
-                  </div>
-                  Upload Materials
+            {/* Left Column: Upload & Materials (4 columns) */}
+            <div className="lg:col-span-4 space-y-6">
+              
+              <div className="bg-white dark:bg-[#0D1D29] rounded-[16px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm relative">
+                <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 rounded-t-[16px]" />
+                
+                <h2 className="text-base font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                  <UploadCloud className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  Course Material
                 </h2>
 
                 {error && (
-                  <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <p>{error}</p>
+                  <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-medium">
+                    {error}
                   </div>
                 )}
 
-                <form onSubmit={handleUpload} className="space-y-5">
-                  <div className="group">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 group-focus-within:text-emerald-400 transition-colors">Subject Title</label>
+                <form onSubmit={handleUpload} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Track Name</label>
                     <input
                       type="text"
                       value={sessionTitle}
                       onChange={(e) => setSessionTitle(e.target.value)}
-                      placeholder="e.g. Data Structures & Algorithms"
-                      className="w-full glass-input rounded-2xl px-4 py-3 text-sm placeholder-slate-500"
+                      placeholder="e.g. Data Structures"
+                      className="w-full bg-[#F8FAFC] dark:bg-[#07131C] border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                     />
                   </div>
 
-                  <div className="group">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 group-focus-within:text-emerald-400 transition-colors">Exam Scope</label>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Focus Mode</label>
                     <select
                       value={scope}
                       onChange={(e) => setScope(e.target.value)}
-                      className="w-full glass-input rounded-2xl px-4 py-3 text-sm [&>option]:bg-slate-900"
+                      className="w-full bg-[#F8FAFC] dark:bg-[#07131C] border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
-                      <option value="Exam Focused">Exam Focused (PYQ Prioritized)</option>
-                      <option value="Comprehensive">Comprehensive (Full Coverage)</option>
-                      <option value="Quick Revision">Quick Revision (Formula & High-Yield)</option>
+                      <option value="Exam Focused">Exam Prep</option>
+                      <option value="Comprehensive">Deep Learning</option>
+                      <option value="Quick Revision">Quick Revision</option>
                     </select>
                   </div>
 
-                  {/* Syllabus (Required) */}
                   <div>
-                    <label className="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1.5 ml-1 flex items-center gap-1">
-                      Syllabus PDF <span className="text-rose-400">* (REQUIRED)</span>
+                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">
+                      Upload Syllabus (PDF) <span className="text-red-400">*</span>
                     </label>
-                    <div className="relative">
+                    <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-[#F8FAFC] dark:bg-[#07131C] text-center hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
                       <input
                         type="file"
                         accept=".pdf,.docx,.txt"
                         onChange={(e) => setSyllabusFile(e.target.files[0])}
-                        className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-emerald-500/20 file:text-emerald-300 hover:file:bg-emerald-500/30 file:cursor-pointer transition-colors border border-dashed border-white/10 rounded-2xl p-2 bg-black/20"
+                        className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-[10px] file:uppercase file:font-bold file:bg-blue-100 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-200 cursor-pointer"
                         required
                       />
                     </div>
-                    {syllabusFile && <p className="text-[10px] text-emerald-400 mt-2 font-medium ml-1">Selected: {syllabusFile.name}</p>}
-                  </div>
-
-                  {/* Notes (Optional) */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
-                      Lecture Notes <span className="text-slate-500">(Optional)</span>
-                    </label>
-                    <input
-                      type="file"
-                      accept=".pdf,.docx,.txt,.md"
-                      onChange={(e) => setNotesFile(e.target.files[0])}
-                      className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-white/5 file:text-slate-300 hover:file:bg-white/10 file:cursor-pointer transition-colors border border-dashed border-white/10 rounded-2xl p-2 bg-black/20"
-                    />
-                    {notesFile && <p className="text-[10px] text-emerald-400 mt-2 font-medium ml-1">Selected: {notesFile.name}</p>}
                   </div>
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 rounded-2xl glass-button text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2 group"
+                    className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
                   >
                     {loading ? (
-                      <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
-                        <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        Generate AI Roadmap
+                        <Sparkles className="w-4 h-4" />
+                        Analyze Material
                       </>
                     )}
                   </button>
                 </form>
-              </motion.div>
-
-              {/* RAG Q&A Window */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="glass-card rounded-[32px] p-6 border border-white/5 flex flex-col h-96"
-              >
-                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
-                    <HelpCircle className="w-4 h-4 text-teal-400" />
-                  </div>
-                  Syllabus Assistant
-                </h3>
-
-                <div className="flex-1 overflow-y-auto space-y-4 pr-2 text-xs mb-4 custom-scrollbar">
-                  {chatHistory.length > 0 ? (
-                    chatHistory.map((msg, i) => (
-                      <div key={i} className={`p-4 rounded-2xl max-w-[85%] ${msg.sender === 'user' ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-100 ml-auto' : 'bg-white/5 border border-white/10 text-slate-300 mr-auto'}`}>
-                        <p className="leading-relaxed">{msg.text}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-center">
-                      <p className="text-[11px] text-slate-500 font-medium px-4">Ask any question about your uploaded syllabus or notes. I'll search your materials to answer.</p>
-                    </div>
-                  )}
-                  {ragLoading && (
-                    <div className="p-4 rounded-2xl max-w-[85%] bg-white/5 border border-white/10 mr-auto">
-                      <span className="flex gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce [animation-delay:0.2s]" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce [animation-delay:0.4s]" />
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <form onSubmit={handleAskRAG} className="flex gap-2 relative">
-                  <input
-                    type="text"
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="Ask about exam topics..."
-                    className="flex-1 glass-input rounded-2xl pl-4 pr-12 py-3.5 text-xs placeholder-slate-500"
-                  />
-                  <button 
-                    type="submit" 
-                    disabled={ragLoading || !question.trim()} 
-                    className="absolute right-2 top-2 p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 hover:text-emerald-300 disabled:opacity-50 disabled:hover:bg-emerald-500/20 transition-colors"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
-              </motion.div>
+              </div>
             </div>
 
-            {/* Right Column: AI Analysis Visualization */}
-            <div className="lg:col-span-2 space-y-6">
-              {analysis ? (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="space-y-6"
-                >
-                  {/* Topic Priorities */}
-                  <div className="glass-card rounded-[32px] p-6 sm:p-8 border border-white/5">
-                    <h3 className="text-base font-bold text-white mb-6 flex items-center gap-3 tracking-wide">
-                      <div className="w-10 h-10 rounded-2xl bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
-                        <BarChart3 className="w-5 h-5 text-teal-400" />
-                      </div>
-                      Important Exam Topics & PYQ Priority
-                    </h3>
-
-                    <div className="space-y-3">
-                      {(analysis.repeated_topics || []).map((t, idx) => (
-                        <div key={idx} className="p-5 rounded-2xl bg-black/20 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:bg-white/5 transition-colors">
-                          <div>
-                            <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">{t.topic}</span>
-                            <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{t.reason}</p>
-                          </div>
-                          <span className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-teal-500/10 text-teal-400 border border-teal-500/20 shrink-0">
-                            {t.weight} Priority
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+            {/* Right Column: Desk/Workspace (8 columns) */}
+            <div className="lg:col-span-8 space-y-6">
+              
+              {!analysis ? (
+                /* Empty Workspace State */
+                <div className="bg-white dark:bg-[#0D1D29] rounded-[16px] border border-slate-200 dark:border-slate-800 shadow-sm h-full min-h-[400px] flex flex-col items-center justify-center text-center p-8">
+                  <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/10 flex items-center justify-center border border-blue-100 dark:border-blue-900/20 mb-6">
+                    <BookOpen className="w-10 h-10 text-blue-300 dark:text-blue-800" />
                   </div>
-
-                  {/* Weekly Study Plan */}
-                  <div className="glass-card rounded-[32px] p-6 sm:p-8 border border-white/5">
-                    <h3 className="text-base font-bold text-white mb-6 flex items-center gap-3 tracking-wide">
-                      <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                        <Calendar className="w-5 h-5 text-emerald-400" />
-                      </div>
-                      Weekly Study Roadmap
-                    </h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {(analysis.weekly_plan || []).map((w, idx) => (
-                        <div key={idx} className="p-5 rounded-3xl bg-black/20 border border-white/5 group hover:border-emerald-500/30 transition-colors">
-                          <div className="inline-block mb-3 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-                            Week {w.week}
-                          </div>
-                          <h4 className="font-bold text-sm text-white mb-3">{w.focus}</h4>
-                          <ul className="space-y-2.5">
-                            {(w.tasks || []).map((task, tIdx) => (
-                              <li key={tIdx} className="text-xs text-slate-400 flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity" />
-                                <span className="leading-relaxed">{task}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <div className="glass-card rounded-[32px] p-12 border border-white/5 border-dashed text-center flex flex-col items-center justify-center min-h-[500px]">
-                  <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 border border-emerald-500/20 relative">
-                    <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl pointer-events-none" />
-                    <BookOpen className="w-8 h-8 text-emerald-400 relative z-10" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white">No Roadmap Generated Yet</h3>
-                  <p className="text-sm text-slate-400 max-w-sm mt-3 leading-relaxed">
-                    Upload your course syllabus PDF on the left panel to generate your AI topic prioritization and weekly study schedule.
+                  <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">Workspace Empty</h3>
+                  <p className="text-sm text-slate-500 max-w-sm">
+                    Upload your course syllabus on the left to generate an interactive timeline and personalized notes.
                   </p>
                 </div>
+              ) : (
+                /* Active Workspace State */
+                <>
+                  {/* Timeline / Roadmap Panel */}
+                  <div className="bg-white dark:bg-[#0D1D29] rounded-[16px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-teal-500 dark:text-teal-400" />
+                        Study Timeline
+                      </h3>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-slate-100 dark:bg-[#07131C] px-2 py-1 rounded">Generated Plan</span>
+                    </div>
+
+                    <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-700 before:to-transparent">
+                      {(analysis.weekly_plan || []).map((w, idx) => (
+                        <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                          {/* Timeline Marker */}
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-[#0D1D29] bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute left-0 md:left-1/2 -translate-x-0">
+                            <span className="text-xs font-bold">{idx + 1}</span>
+                          </div>
+                          
+                          {/* Card */}
+                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-xl bg-[#F8FAFC] dark:bg-[#07131C] border border-slate-200 dark:border-slate-800 shadow-sm ml-auto md:ml-0 hover:border-teal-300 dark:hover:border-teal-700 transition-colors">
+                            <div className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1">Week {w.week}</div>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-3">{w.focus}</h4>
+                            <ul className="space-y-2">
+                              {(w.tasks || []).map((task, tIdx) => (
+                                <li key={tIdx} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-teal-400 mt-1.5 shrink-0" />
+                                  <span>{task}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* AI Mentor Panel */}
+                  <div className="bg-white dark:bg-[#0D1D29] rounded-[16px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-[400px]">
+                    <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                      <BrainCircuit className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">AI Study Mentor</h3>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto space-y-4 pr-2 text-sm mb-4 custom-scrollbar">
+                      {chatHistory.length > 0 ? (
+                        chatHistory.map((msg, i) => (
+                          <div key={i} className={`p-4 rounded-xl max-w-[85%] ${msg.sender === 'user' ? 'bg-blue-600 text-white ml-auto' : 'bg-[#F8FAFC] dark:bg-[#07131C] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 mr-auto'}`}>
+                            <p className="leading-relaxed text-[13px]">{msg.text}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-center">
+                          <p className="text-xs text-slate-400 font-medium px-4">Have questions about your syllabus? Ask your mentor here.</p>
+                        </div>
+                      )}
+                      {ragLoading && (
+                        <div className="p-4 rounded-xl max-w-[85%] bg-[#F8FAFC] dark:bg-[#07131C] border border-slate-200 dark:border-slate-800 mr-auto flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce [animation-delay:0.2s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce [animation-delay:0.4s]" />
+                        </div>
+                      )}
+                    </div>
+
+                    <form onSubmit={handleAskRAG} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                        placeholder="Type a question..."
+                        className="flex-1 bg-[#F8FAFC] dark:bg-[#07131C] border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                      <button 
+                        type="submit" 
+                        disabled={ragLoading || !question.trim()} 
+                        className="px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-colors flex items-center justify-center"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </form>
+                  </div>
+                </>
               )}
             </div>
           </div>

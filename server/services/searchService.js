@@ -176,12 +176,28 @@ class SearchService {
 
       $('.result').each((i, el) => {
         if (i >= 8) return;
-        const title = $(el).find('.result__title a').text().trim();
+        const titleEl = $(el).find('.result__title a');
+        const title = titleEl.text().trim();
+        const ddgHref = titleEl.attr('href') || '';
         const urlStr = $(el).find('.result__url').text().trim();
         const snippet = $(el).find('.result__snippet').text().trim();
 
-        if (title && urlStr) {
-          const cleanUrl = urlStr.startsWith('http') ? urlStr : `https://${urlStr}`;
+        if (title) {
+          let cleanUrl = '';
+          if (ddgHref.includes('uddg=')) {
+            const paramMatch = ddgHref.match(/uddg=([^&]+)/);
+            if (paramMatch && paramMatch[1]) {
+              cleanUrl = decodeURIComponent(paramMatch[1]);
+            }
+          } else if (ddgHref && ddgHref.startsWith('http')) {
+            cleanUrl = ddgHref;
+          } else if (urlStr) {
+            let base = urlStr.split(' ')[0];
+            cleanUrl = base.startsWith('http') ? base : `https://${base}`;
+          }
+
+          if (!cleanUrl) return;
+
           let companyStr = 'Organization';
           try {
             companyStr = new URL(cleanUrl).hostname.replace('www.', '').split('.')[0];

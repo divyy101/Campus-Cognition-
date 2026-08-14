@@ -71,71 +71,69 @@ const OpportunityAgent = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-rose-900/20 text-slate-100 font-sans selection:bg-rose-500/30">
+    <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#0F0E17] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300 relative">
+      
+      {/* Network Nodes Motif */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]" 
+           style={{ 
+             backgroundImage: 'radial-gradient(circle at 50% 50%, #9333ea 2px, transparent 2px), radial-gradient(circle at 20% 80%, #db2777 2px, transparent 2px), radial-gradient(circle at 80% 20%, #e11d48 2px, transparent 2px)', 
+             backgroundSize: '100px 100px, 120px 120px, 150px 150px' 
+           }}>
+      </div>
+      
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar title="Opportunity Agent — Live MNC & Global Search" />
+      <div className="flex-1 flex flex-col min-w-0 relative z-10">
+        <Navbar title="Discovery Graph" />
 
-        <main className="flex-1 p-6 md:px-8 md:py-6 space-y-6 overflow-y-auto">
-          {/* Header Banner */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-[32px] glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-sky-500/20 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
-            <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-rose-500/10 rounded-full blur-[80px] pointer-events-none translate-y-1/3" />
+        <main className="flex-1 p-6 md:px-8 md:py-8 overflow-y-auto">
+          <div className="max-w-6xl mx-auto space-y-8">
             
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row gap-6 md:items-end justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-black uppercase tracking-widest mb-4 shadow-inner">
-                  <Compass className="w-3.5 h-3.5" />
-                  Live Discovery Engine
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400 text-[10px] font-bold tracking-widest uppercase mb-3 border border-pink-200 dark:border-pink-800/50">
+                  <Compass className="w-3 h-3" />
+                  Ecosystem Search
                 </div>
-                <h1 className="text-3xl font-black text-white tracking-tight">
-                  Hackathons & Global Fellowships
+                <h1 className="text-3xl md:text-[36px] font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                  Open Source & Hackathons
                 </h1>
-                <p className="text-sm text-slate-400 mt-2 max-w-xl leading-relaxed">
-                  Search live early career initiatives, research fellowships, and hackathons across leading MNCs.
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-xl">
+                  Connect with live hackathons, fellowships, and global developer programs from leading tech companies.
                 </p>
               </div>
 
-              {/* Search */}
-              <form onSubmit={handleSearch} className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1 lg:w-80">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Enter company (NVIDIA, Google)..."
-                    className="w-full glass-input rounded-2xl pl-12 pr-4 py-3.5 text-xs placeholder-slate-500"
-                  />
-                </div>
-                <button type="submit" className="px-6 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(14,165,233,0.3)] transition-all flex items-center justify-center gap-2 shrink-0 group">
-                  <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  Search
+              {/* Search Widget */}
+              <form onSubmit={handleSearch} className="w-full md:w-[350px] relative shrink-0">
+                <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search programs, companies..."
+                  className="w-full bg-white dark:bg-[#1A1825] border border-slate-200 dark:border-slate-800 rounded-full pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-pink-500 dark:focus:border-pink-400 transition-colors shadow-sm"
+                />
+                <button type="submit" className="absolute right-2 top-1.5 bottom-1.5 px-4 rounded-full bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs transition-colors">
+                  Find
                 </button>
               </form>
             </div>
 
-            {/* MNC Selector Chips */}
-            <div className="mt-8 pt-6 border-t border-white/5 relative z-10">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5 ml-1">
-                <Building2 className="w-3.5 h-3.5 text-sky-400" />
-                Quick MNC Search
+            {/* Top Companies Marquee/List */}
+            <div>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5" /> Featured Networks
               </p>
-              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto custom-scrollbar pr-2">
-                {MNC_LIST.map((comp) => (
+              <div className="flex flex-wrap gap-2">
+                {MNC_LIST.slice(0, 10).map((comp) => (
                   <button
                     key={comp}
                     onClick={() => handleMncClick(comp)}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all border ${
                       selectedMnc === comp
-                        ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30 shadow-[0_0_15px_rgba(14,165,233,0.3)]'
-                        : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/5 hover:border-white/10'
+                        ? 'bg-pink-600 border-pink-600 text-white shadow-md shadow-pink-500/20'
+                        : 'bg-white dark:bg-[#1A1825] border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-pink-300 dark:hover:border-pink-500/50'
                     }`}
                   >
                     {comp}
@@ -143,81 +141,82 @@ const OpportunityAgent = () => {
                 ))}
               </div>
             </div>
-          </motion.div>
 
-          {/* Opportunity Cards Grid */}
-          {loading ? (
-            <div className="p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-              <div className="w-8 h-8 border-2 border-sky-500/30 border-t-sky-500 rounded-full animate-spin mb-4" />
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Retrieving live opportunities...</p>
-            </div>
-          ) : opportunities.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {opportunities.map((opp, idx) => (
-                <motion.div
-                  key={opp.id || idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="p-6 rounded-[32px] glass-card border border-white/5 hover:bg-white/5 transition-all flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 mb-3">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">
-                            {opp.company}
-                          </span>
+            {/* Results Grid */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Code className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  Active Bounties & Events
+                </h2>
+              </div>
+
+              {loading ? (
+                <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="w-8 h-8 border-2 border-pink-200 border-t-pink-600 rounded-full animate-spin" />
+                  <p className="text-sm text-slate-500 font-medium">Scanning discovery nodes...</p>
+                </div>
+              ) : opportunities.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {opportunities.map((opp, idx) => (
+                    <div 
+                      key={opp.id || idx}
+                      className="bg-white dark:bg-[#1A1825] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full group"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 text-[10px] font-black uppercase tracking-widest border border-purple-100 dark:border-purple-800/30">
+                          {opp.company}
                         </div>
-                        <h3 className="text-lg font-bold text-white leading-tight group-hover:text-sky-300 transition-colors">
-                          {opp.title}
-                        </h3>
+                        <button 
+                          onClick={() => handleSave(opp)}
+                          className="text-slate-400 hover:text-pink-600 dark:hover:text-pink-400 transition-colors"
+                        >
+                          <Bookmark className="w-4 h-4" />
+                        </button>
                       </div>
-                      <span className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                        {opp.matchScore}% Match
-                      </span>
+
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                        {opp.title}
+                      </h3>
+                      
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed flex-1 mb-4">
+                        {opp.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1.5 mb-5">
+                        {(opp.skills || ['Hackathon', 'Open Source']).slice(0, 3).map((s, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded text-[9px] font-semibold bg-slate-100 dark:bg-[#0F0E17] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
+                            #{s}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center gap-1 text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest bg-rose-50 dark:bg-rose-900/20 px-2 py-1 rounded">
+                          <Sparkles className="w-3 h-3" />
+                          {opp.matchScore}% Match
+                        </div>
+                        <a
+                          href={opp.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-pink-600 dark:hover:text-pink-400 flex items-center gap-1 transition-colors"
+                        >
+                          Explore <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
                     </div>
-
-                    <p className="text-xs text-slate-400 mt-4 line-clamp-3 leading-relaxed">
-                      {opp.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mt-5 pt-5 border-t border-white/5">
-                      {(opp.skills || []).map((s, i) => (
-                        <span key={i} className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/5 text-slate-300 border border-white/10">
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-5 border-t border-white/5 flex items-center justify-between">
-                    <button
-                      onClick={() => handleSave(opp)}
-                      className="p-3 rounded-2xl glass-button text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition-colors flex items-center justify-center group/save"
-                      title="Save Opportunity"
-                    >
-                      <Bookmark className="w-4 h-4 group-hover/save:scale-110 transition-transform" />
-                    </button>
-
-                    <a
-                      href={opp.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 font-bold text-xs flex items-center justify-center gap-2 border border-sky-500/30 transition-colors shrink-0 group/btn"
-                    >
-                      View Details
-                      <ExternalLink className="w-3.5 h-3.5 group-hover/btn:scale-110 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
+                  ))}
+                </div>
+              ) : (
+                <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 bg-white dark:bg-[#1A1825] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <Compass className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
+                  <h3 className="text-base font-bold text-slate-700 dark:text-slate-300">No nodes found in graph</h3>
+                  <p className="text-sm text-slate-500 max-w-sm">Try exploring a different company or keyword.</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="p-12 text-center text-slate-500 text-xs font-bold uppercase tracking-widest">
-              No matching opportunities found. Try another search.
-            </div>
-          )}
+          </div>
         </main>
       </div>
     </div>

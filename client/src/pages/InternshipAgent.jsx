@@ -52,62 +52,57 @@ const InternshipAgent = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-cyan-900/20 text-slate-100 font-sans selection:bg-cyan-500/30">
+    <div className="flex min-h-screen bg-[#FFFDF8] dark:bg-[#130C08] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <Navbar title="Internship Agent — MNC & University Careers" />
+        <Navbar title="Career Radar" />
 
-        <main className="flex-1 p-6 md:px-8 md:py-6 space-y-6 overflow-y-auto">
-          {/* Header Banner */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-[32px] glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-500/20 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
+        <main className="flex-1 p-6 md:px-8 md:py-8 overflow-y-auto">
+          <div className="max-w-6xl mx-auto space-y-8">
             
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-violet-400">Live Corporate & Research Careers</span>
-                <h1 className="text-3xl font-black text-white mt-2 tracking-tight">Software & Technical Internships</h1>
-                <p className="text-sm text-slate-400 mt-2 max-w-xl leading-relaxed">
-                  Search active student programs, summer co-ops, and research internships at premier MNCs & government portals.
-                </p>
+            {/* Header & Search Area */}
+            <div className="flex flex-col gap-6 bg-white dark:bg-[#21140D] p-6 sm:p-8 rounded-2xl border border-orange-100 dark:border-orange-900/30 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 dark:bg-orange-900/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+              
+              <div className="relative z-10 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-[10px] font-bold tracking-widest uppercase mb-3 border border-orange-200 dark:border-orange-800/50">
+                  <Briefcase className="w-3 h-3" />
+                  Opportunities
+                </div>
+                <h1 className="text-3xl md:text-[40px] font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                  Find your next internship.
+                </h1>
               </div>
 
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1 lg:w-80">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              <form onSubmit={handleSearch} className="relative z-10 w-full max-w-3xl flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search company or role..."
-                    className="w-full glass-input rounded-2xl pl-12 pr-4 py-3.5 text-xs placeholder-slate-500"
+                    placeholder="Search role, company or skill..."
+                    className="w-full bg-[#FFFDF8] dark:bg-[#130C08] border border-slate-200 dark:border-slate-800 rounded-xl pl-12 pr-4 py-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors shadow-inner"
                   />
                 </div>
-                <button type="submit" className="px-6 py-3.5 rounded-2xl glass-button text-white font-bold text-xs flex items-center justify-center gap-2 shrink-0 group">
-                  <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <button 
+                  type="submit" 
+                  className="px-8 py-4 rounded-xl bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold text-sm shadow-sm transition-colors shrink-0"
+                >
                   Search
                 </button>
               </form>
-            </div>
 
-            {/* Skill Chips */}
-            <div className="mt-8 pt-6 border-t border-white/5 relative z-10">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Filter by Tech Stack</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2 relative z-10">
                 {SKILL_CHIPS.map((skill) => (
                   <button
                     key={skill}
                     onClick={() => handleSkillClick(skill)}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors ${
                       selectedSkill === skill
-                        ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30 shadow-[0_0_15px_rgba(139,92,246,0.3)]'
-                        : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/5 hover:border-white/10'
+                        ? 'bg-orange-600 text-white'
+                        : 'bg-orange-50 dark:bg-[#130C08] text-slate-600 dark:text-slate-300 hover:bg-orange-100 dark:hover:bg-white/5 border border-orange-100 dark:border-slate-800'
                     }`}
                   >
                     {skill}
@@ -115,79 +110,90 @@ const InternshipAgent = () => {
                 ))}
               </div>
             </div>
-          </motion.div>
 
-          {/* Cards Grid */}
-          {loading ? (
-            <div className="p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-              <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mb-4" />
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Searching live databases...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {internships.map((item, idx) => (
-                <motion.div
-                  key={item.id || idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="p-6 rounded-[32px] glass-card border border-white/5 hover:bg-white/5 transition-all flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
-                            <Building className="w-3.5 h-3.5 text-violet-400" />
-                          </div>
-                          <span className="font-bold text-xs text-violet-400">{item.company}</span>
-                        </div>
-                        <h3 className="text-lg font-bold text-white leading-tight group-hover:text-violet-300 transition-colors">
-                          {item.title}
-                        </h3>
-                      </div>
-                      <span className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                        {item.matchScore}% Fit
-                      </span>
-                    </div>
+            {/* Results Section */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {internships.length > 0 ? `${internships.length} opportunities found` : 'Opportunities'}
+                </h2>
+                <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400 uppercase tracking-widest bg-teal-50 dark:bg-teal-900/20 px-2 py-1 rounded">Sorted by Match</span>
+              </div>
 
-                    <p className="text-xs text-slate-400 mt-4 line-clamp-3 leading-relaxed">
-                      {item.description}
-                    </p>
-
-                    <div className="mt-5 pt-5 border-t border-white/5 space-y-3">
-                      <div className="flex items-center gap-3 text-xs text-slate-300">
-                        <div className="w-6 h-6 rounded-md bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shrink-0">
-                          <MapPin className="w-3 h-3 text-rose-400" />
-                        </div>
-                        <span className="font-medium">{item.location || 'Remote / India'}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-300">
-                        <div className="w-6 h-6 rounded-md bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shrink-0">
-                          <DollarSign className="w-3 h-3 text-emerald-400" />
-                        </div>
-                        <span className="font-medium">{item.stipend || 'Provided'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-5 border-t border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-2 py-1 rounded-lg bg-black/20">{item.source}</span>
-
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 font-bold text-xs flex items-center gap-2 border border-violet-500/30 transition-colors group/btn"
+              {loading ? (
+                <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="w-8 h-8 border-2 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
+                  <p className="text-sm text-slate-500 font-medium">Scanning career portals...</p>
+                </div>
+              ) : internships.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {internships.map((item, idx) => (
+                    <div 
+                      key={item.id || idx}
+                      className="bg-white dark:bg-[#21140D] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full group hover:border-orange-200 dark:hover:border-orange-500/30"
                     >
-                      Apply Now
-                      <ExternalLink className="w-3.5 h-3.5 group-hover/btn:scale-110 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
+                      {/* Card Header */}
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-[#130C08] flex items-center justify-center border border-orange-100 dark:border-slate-800 group-hover:border-orange-300 transition-colors">
+                            <Building className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                          </div>
+                          <div>
+                            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.company}</div>
+                            <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                              {item.title}
+                            </h3>
+                          </div>
+                        </div>
+                        <button className="text-slate-300 hover:text-amber-500 dark:text-slate-600 dark:hover:text-amber-400 transition-colors">
+                          <Bookmark className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Card Body */}
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed flex-1">
+                        {item.description}
+                      </p>
+
+                      {/* Metadata */}
+                      <div className="space-y-2 mb-6">
+                        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{item.location || 'Remote / Hybrid'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                          <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{item.stipend || 'Competitive Stipend'}</span>
+                        </div>
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center gap-1.5 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest">
+                          <Sparkles className="w-3 h-3" />
+                          {item.matchScore}% Match
+                        </div>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-bold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 flex items-center gap-1"
+                        >
+                          View Details <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 bg-white dark:bg-[#21140D] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <Search className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
+                  <h3 className="text-base font-bold text-slate-700 dark:text-slate-300">No opportunities found</h3>
+                  <p className="text-sm text-slate-500 max-w-sm">Try adjusting your search terms or selecting a different skill to find roles.</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </main>
       </div>
     </div>

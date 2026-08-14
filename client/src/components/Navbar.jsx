@@ -72,7 +72,7 @@ const Navbar = ({ title = 'Workspace' }) => {
             className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all shadow-inner border border-white/10"
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
           >
-            {theme === 'light' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            {theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
           </motion.button>
         </div>
       </motion.header>
