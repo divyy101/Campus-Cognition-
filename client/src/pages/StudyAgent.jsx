@@ -108,15 +108,15 @@ const StudyAgent = () => {
             transition={{ duration: 0.5 }}
             className="rounded-[32px] glass-card p-6 border border-white/5 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-[80px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 rounded-full blur-[80px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
             
             <div className="relative z-10">
-              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Academic AI Copilot</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Academic AI Copilot</span>
               <h1 className="text-2xl font-black text-white mt-1">Syllabus Analysis & Study Roadmap</h1>
               <p className="text-xs text-slate-400 mt-1 max-w-2xl">Upload your course syllabus (Required) and notes (Optional). Maximum 700 MB per file.</p>
             </div>
-            <div className="relative z-10 hidden sm:flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-indigo-300 shadow-inner">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
+            <div className="relative z-10 hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-emerald-300 shadow-inner">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
               AI Topic Priority Powered
             </div>
           </motion.div>
@@ -131,8 +131,8 @@ const StudyAgent = () => {
                 className="glass-card rounded-[32px] p-6 border border-white/5"
               >
                 <h2 className="text-sm font-bold text-white mb-5 flex items-center gap-2 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
-                    <UploadCloud className="w-4 h-4 text-indigo-400" />
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <UploadCloud className="w-4 h-4 text-emerald-400" />
                   </div>
                   Upload Materials
                 </h2>
@@ -146,7 +146,7 @@ const StudyAgent = () => {
 
                 <form onSubmit={handleUpload} className="space-y-5">
                   <div className="group">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 group-focus-within:text-indigo-400 transition-colors">Subject Title</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 group-focus-within:text-emerald-400 transition-colors">Subject Title</label>
                     <input
                       type="text"
                       value={sessionTitle}
@@ -157,7 +157,7 @@ const StudyAgent = () => {
                   </div>
 
                   <div className="group">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 group-focus-within:text-indigo-400 transition-colors">Exam Scope</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 group-focus-within:text-emerald-400 transition-colors">Exam Scope</label>
                     <select
                       value={scope}
                       onChange={(e) => setScope(e.target.value)}
@@ -171,7 +171,7 @@ const StudyAgent = () => {
 
                   {/* Syllabus (Required) */}
                   <div>
-                    <label className="block text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1.5 ml-1 flex items-center gap-1">
+                    <label className="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1.5 ml-1 flex items-center gap-1">
                       Syllabus PDF <span className="text-rose-400">* (REQUIRED)</span>
                     </label>
                     <div className="relative">
@@ -179,11 +179,11 @@ const StudyAgent = () => {
                         type="file"
                         accept=".pdf,.docx,.txt"
                         onChange={(e) => setSyllabusFile(e.target.files[0])}
-                        className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-indigo-500/20 file:text-indigo-300 hover:file:bg-indigo-500/30 file:cursor-pointer transition-colors border border-dashed border-white/10 rounded-2xl p-2 bg-black/20"
+                        className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-emerald-500/20 file:text-emerald-300 hover:file:bg-emerald-500/30 file:cursor-pointer transition-colors border border-dashed border-white/10 rounded-2xl p-2 bg-black/20"
                         required
                       />
                     </div>
-                    {syllabusFile && <p className="text-[10px] text-indigo-400 mt-2 font-medium ml-1">Selected: {syllabusFile.name}</p>}
+                    {syllabusFile && <p className="text-[10px] text-emerald-400 mt-2 font-medium ml-1">Selected: {syllabusFile.name}</p>}
                   </div>
 
                   {/* Notes (Optional) */}
@@ -197,7 +197,7 @@ const StudyAgent = () => {
                       onChange={(e) => setNotesFile(e.target.files[0])}
                       className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-white/5 file:text-slate-300 hover:file:bg-white/10 file:cursor-pointer transition-colors border border-dashed border-white/10 rounded-2xl p-2 bg-black/20"
                     />
-                    {notesFile && <p className="text-[10px] text-indigo-400 mt-2 font-medium ml-1">Selected: {notesFile.name}</p>}
+                    {notesFile && <p className="text-[10px] text-emerald-400 mt-2 font-medium ml-1">Selected: {notesFile.name}</p>}
                   </div>
 
                   <button
@@ -225,8 +225,8 @@ const StudyAgent = () => {
                 className="glass-card rounded-[32px] p-6 border border-white/5 flex flex-col h-96"
               >
                 <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center border border-amber-500/30">
-                    <HelpCircle className="w-4 h-4 text-amber-400" />
+                  <div className="w-8 h-8 rounded-xl bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
+                    <HelpCircle className="w-4 h-4 text-teal-400" />
                   </div>
                   Syllabus Assistant
                 </h3>
@@ -234,7 +234,7 @@ const StudyAgent = () => {
                 <div className="flex-1 overflow-y-auto space-y-4 pr-2 text-xs mb-4 custom-scrollbar">
                   {chatHistory.length > 0 ? (
                     chatHistory.map((msg, i) => (
-                      <div key={i} className={`p-4 rounded-2xl max-w-[85%] ${msg.sender === 'user' ? 'bg-indigo-500/20 border border-indigo-500/30 text-indigo-100 ml-auto' : 'bg-white/5 border border-white/10 text-slate-300 mr-auto'}`}>
+                      <div key={i} className={`p-4 rounded-2xl max-w-[85%] ${msg.sender === 'user' ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-100 ml-auto' : 'bg-white/5 border border-white/10 text-slate-300 mr-auto'}`}>
                         <p className="leading-relaxed">{msg.text}</p>
                       </div>
                     ))
@@ -265,7 +265,7 @@ const StudyAgent = () => {
                   <button 
                     type="submit" 
                     disabled={ragLoading || !question.trim()} 
-                    className="absolute right-2 top-2 p-2 rounded-xl bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 hover:text-indigo-300 disabled:opacity-50 disabled:hover:bg-indigo-500/20 transition-colors"
+                    className="absolute right-2 top-2 p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 hover:text-emerald-300 disabled:opacity-50 disabled:hover:bg-emerald-500/20 transition-colors"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -284,8 +284,8 @@ const StudyAgent = () => {
                   {/* Topic Priorities */}
                   <div className="glass-card rounded-[32px] p-6 sm:p-8 border border-white/5">
                     <h3 className="text-base font-bold text-white mb-6 flex items-center gap-3 tracking-wide">
-                      <div className="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center border border-amber-500/30">
-                        <BarChart3 className="w-5 h-5 text-amber-400" />
+                      <div className="w-10 h-10 rounded-2xl bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
+                        <BarChart3 className="w-5 h-5 text-teal-400" />
                       </div>
                       Important Exam Topics & PYQ Priority
                     </h3>
@@ -297,7 +297,7 @@ const StudyAgent = () => {
                             <span className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">{t.topic}</span>
                             <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{t.reason}</p>
                           </div>
-                          <span className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                          <span className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-teal-500/10 text-teal-400 border border-teal-500/20 shrink-0">
                             {t.weight} Priority
                           </span>
                         </div>
@@ -336,9 +336,9 @@ const StudyAgent = () => {
                 </motion.div>
               ) : (
                 <div className="glass-card rounded-[32px] p-12 border border-white/5 border-dashed text-center flex flex-col items-center justify-center min-h-[500px]">
-                  <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6 border border-indigo-500/20 relative">
-                    <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-xl pointer-events-none" />
-                    <BookOpen className="w-8 h-8 text-indigo-400 relative z-10" />
+                  <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 border border-emerald-500/20 relative">
+                    <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl pointer-events-none" />
+                    <BookOpen className="w-8 h-8 text-emerald-400 relative z-10" />
                   </div>
                   <h3 className="text-xl font-bold text-white">No Roadmap Generated Yet</h3>
                   <p className="text-sm text-slate-400 max-w-sm mt-3 leading-relaxed">

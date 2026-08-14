@@ -11,6 +11,9 @@ if (env.mailUsername && env.mailPassword) {
     auth: {
       user: env.mailUsername,
       pass: env.mailPassword
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 }
@@ -27,12 +30,39 @@ async function sendWelcomeEmail(user) {
       to: user.email,
       subject: 'Welcome to Campus Cognition!',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #1E3E62;">Welcome to Campus Cognition, ${user.firstName || user.username}!</h2>
-          <p>We are excited to help you supercharge your academic learning, code mastery, and career opportunities.</p>
-          <p>Get started by setting up your study syllabus, reviewing code in Code Lab, or discovering top MNC internships!</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #888;">Campus Cognition Team</p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #161618; color: #ffffff; border-radius: 8px;">
+          <h1 style="color: #ffffff; font-size: 24px; font-weight: bold; margin-bottom: 20px;">Welcome to Campus Cognition 🎓</h1>
+          
+          <p style="font-size: 16px; margin-bottom: 16px; color: #e5e5e5;">Hello ${user.firstName || user.username},</p>
+          
+          <p style="font-size: 16px; margin-bottom: 24px; line-height: 1.5; color: #e5e5e5;">
+            Your account has been successfully created.<br>
+            We're excited to have you on board!
+          </p>
+
+          <p style="font-size: 16px; margin-bottom: 24px; color: #e5e5e5;">
+            <strong>Registered email:</strong><br>
+            <a href="mailto:${user.email}" style="color: #60A5FA; text-decoration: none;">${user.email}</a>
+          </p>
+
+          <p style="font-size: 16px; margin-bottom: 16px; color: #e5e5e5;">You can now use Campus Cognition to:</p>
+          
+          <ul style="font-size: 15px; margin-bottom: 32px; padding-left: 20px; line-height: 1.8; color: #e5e5e5;">
+            <li>Analyze your syllabus and PYQs</li>
+            <li>Build personalized study roadmaps</li>
+            <li>Ask questions about your notes</li>
+            <li>Review and optimize code</li>
+            <li>Discover internships and scholarships</li>
+            <li>Track career opportunities</li>
+          </ul>
+
+          <div style="text-align: center; margin-bottom: 32px;">
+            <a href="${env.frontendUrl || 'http://localhost:3000'}/login" style="display: inline-block; background-color: #2563EB; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Log In to Your Account</a>
+          </div>
+
+          <div style="background-color: #27272A; padding: 16px; border-radius: 8px; font-size: 14px; color: #D4D4D8; line-height: 1.5;">
+            <strong>Security Notice:</strong> For your protection, your password is never stored in plain text and will never be sent to you by email.
+          </div>
         </div>
       `
     };

@@ -66,11 +66,11 @@ const ScholarshipAgent = () => {
             transition={{ duration: 0.5 }}
             className="rounded-[32px] glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-amber-500/20 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-fuchsia-500/20 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
             
             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest mb-4 shadow-inner">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-[10px] font-black uppercase tracking-widest mb-4 shadow-inner">
                   <Award className="w-3.5 h-3.5" />
                   Verified Authoritative Sources Only
                 </div>
@@ -96,7 +96,7 @@ const ScholarshipAgent = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all flex items-center justify-center gap-2 shrink-0 group"
+                  className="px-6 py-3.5 rounded-2xl bg-fuchsia-500 hover:bg-fuchsia-400 text-slate-950 font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all flex items-center justify-center gap-2 shrink-0 group"
                 >
                   <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   Search
@@ -123,7 +123,7 @@ const ScholarshipAgent = () => {
                     onClick={() => setActiveFilter(f.id)}
                     className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
                       activeFilter === f.id
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
+                        ? 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
                         : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/5 hover:border-white/10'
                     }`}
                   >
@@ -137,7 +137,7 @@ const ScholarshipAgent = () => {
           {/* Scholarship Cards Grid */}
           {loading ? (
             <div className="p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-              <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4" />
+              <div className="w-8 h-8 border-2 border-fuchsia-500/30 border-t-fuchsia-500 rounded-full animate-spin mb-4" />
               <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Loading verified scholarships...</p>
             </div>
           ) : filteredScholarships.length > 0 ? (
@@ -154,14 +154,14 @@ const ScholarshipAgent = () => {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                            <Award className="w-3.5 h-3.5 text-amber-400" />
+                          <div className="w-8 h-8 rounded-lg bg-fuchsia-500/10 flex items-center justify-center border border-fuchsia-500/20">
+                            <Award className="w-3.5 h-3.5 text-fuchsia-400" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-fuchsia-400">
                             {sch.source || 'Official Scholarship Portal'}
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-white mt-1 leading-tight group-hover:text-amber-300 transition-colors">
+                        <h3 className="text-lg font-bold text-white mt-1 leading-tight group-hover:text-fuchsia-300 transition-colors">
                           {sch.title}
                         </h3>
                       </div>
@@ -199,7 +199,7 @@ const ScholarshipAgent = () => {
                       href={sch.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 border border-amber-500/30 transition-colors shrink-0 group/btn"
+                      className="px-5 py-2.5 rounded-xl bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 font-bold text-xs flex items-center justify-center gap-2 border border-fuchsia-500/30 transition-colors shrink-0 group/btn"
                     >
                       Official Source
                       <ExternalLink className="w-3.5 h-3.5 group-hover/btn:scale-110 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform" />

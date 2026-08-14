@@ -37,6 +37,19 @@ const AIProviderSelector = ({ className = '' }) => {
         <Cpu className="w-3.5 h-3.5" />
         Gemini 1.5
       </button>
+
+      <button
+        type="button"
+        onClick={() => setAiEngine('openai')}
+        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+          aiEngine === 'openai'
+            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
+            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+        }`}
+      >
+        <Sparkles className="w-3.5 h-3.5" />
+        OpenAI
+      </button>
     </div>
   );
 };

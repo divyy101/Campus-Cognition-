@@ -86,7 +86,7 @@ const OpportunityAgent = () => {
             className="rounded-[32px] glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-sky-500/20 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
-            <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none translate-y-1/3" />
+            <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-rose-500/10 rounded-full blur-[80px] pointer-events-none translate-y-1/3" />
             
             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div>
@@ -164,8 +164,8 @@ const OpportunityAgent = () => {
                   <div>
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 mb-3">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                        <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 mb-3">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">
                             {opp.company}
                           </span>
                         </div>
@@ -194,7 +194,7 @@ const OpportunityAgent = () => {
                   <div className="mt-6 pt-5 border-t border-white/5 flex items-center justify-between">
                     <button
                       onClick={() => handleSave(opp)}
-                      className="p-3 rounded-2xl glass-button text-slate-400 hover:text-indigo-400 hover:border-indigo-500/30 transition-colors flex items-center justify-center group/save"
+                      className="p-3 rounded-2xl glass-button text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition-colors flex items-center justify-center group/save"
                       title="Save Opportunity"
                     >
                       <Bookmark className="w-4 h-4 group-hover/save:scale-110 transition-transform" />
