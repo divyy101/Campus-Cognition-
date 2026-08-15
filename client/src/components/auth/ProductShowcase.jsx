@@ -119,8 +119,8 @@ const ProductShowcase = () => {
           </h2>
         </motion.div>
 
-        {/* Asymmetric Cards */}
-        <div className="relative h-[480px] w-full">
+        {/* Stacked Cards */}
+        <div className="flex flex-col gap-6 w-full mt-4 pb-8 z-10">
           
           {/* Study Card */}
           <AgentPreviewCard
@@ -130,7 +130,7 @@ const ProductShowcase = () => {
             metric="82%"
             metricLabel="Mastery"
             delay={0.2}
-            className="absolute top-0 left-4 w-72 bg-white/80 dark:bg-[#111827]/80"
+            className="w-full sm:w-[85%] self-start bg-white/80 dark:bg-[#111827]/80"
             colors={{
               border: "59, 130, 246", // blue-500
               shadow: "59, 130, 246",
@@ -148,7 +148,7 @@ const ProductShowcase = () => {
             metric="0"
             metricLabel="Errors"
             delay={0.4}
-            className="absolute top-36 right-4 w-72 bg-white/80 dark:bg-[#111827]/80 z-20"
+            className="w-full sm:w-[85%] self-end bg-white/80 dark:bg-[#111827]/80 z-20"
             colors={{
               border: "168, 85, 247", // purple-500
               shadow: "168, 85, 247",
@@ -166,7 +166,7 @@ const ProductShowcase = () => {
             metric="12"
             metricLabel="High Matches"
             delay={0.6}
-            className="absolute bottom-8 left-16 w-72 bg-white/80 dark:bg-[#111827]/80 z-10"
+            className="w-full sm:w-[85%] self-start bg-white/80 dark:bg-[#111827]/80 z-10"
             colors={{
               border: "245, 158, 11", // amber-500
               shadow: "245, 158, 11",
@@ -176,30 +176,7 @@ const ProductShowcase = () => {
             }}
           />
           
-          {/* Decorative Connecting Lines (SVG) */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ stroke: 'currentColor' }}>
-            <motion.path 
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.1 }}
-              transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
-              d="M 160 140 C 200 160, 320 160, 350 200" 
-              fill="none" 
-              strokeWidth="2"
-              className="text-slate-400 dark:text-slate-500"
-              strokeDasharray="4 4"
-            />
-            <motion.path 
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.1 }}
-              transition={{ duration: 1.5, delay: 1, ease: "easeInOut" }}
-              d="M 350 280 C 320 320, 250 340, 200 350" 
-              fill="none" 
-              strokeWidth="2"
-              className="text-slate-400 dark:text-slate-500"
-              strokeDasharray="4 4"
-            />
-          </svg>
-
+          {/* Decorative Connecting Lines (Removed as absolute positioning is gone, but we can keep empty block or remove completely) */}
         </div>
       </div>
 

@@ -30,19 +30,19 @@ const Navbar = ({ title = 'Workspace' }) => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="h-20 glass-card mx-4 mt-4 rounded-3xl px-8 flex items-center justify-between sticky top-4 z-30 shadow-lg border border-white/5 backdrop-blur-xl"
+        className="h-20 bg-[var(--bg-surface-elevated)] mx-4 mt-4 rounded-3xl px-8 flex items-center justify-between sticky top-4 z-30 shadow-sm border border-[var(--border-subtle)] backdrop-blur-xl"
       >
         <div className="flex items-center gap-3">
-          <h2 className="font-extrabold text-xl text-white tracking-tight hidden md:block">{title}</h2>
+          <h2 className="font-extrabold text-xl text-[var(--text-primary)] tracking-tight hidden md:block">{title}</h2>
         </div>
 
         <div className="flex items-center gap-4">
           {/* Global Search Trigger */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="hidden md:flex items-center gap-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl px-4 py-2.5 transition-colors shadow-inner"
+            className="hidden md:flex items-center gap-4 bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] border border-[var(--border-subtle)] rounded-2xl px-4 py-2.5 transition-colors shadow-inner"
           >
-            <div className="flex items-center gap-2 text-slate-400">
+            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <Search className="w-4 h-4" />
               <span className="text-xs font-semibold">Search platform...</span>
             </div>
@@ -54,7 +54,7 @@ const Navbar = ({ title = 'Workspace' }) => {
           
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="md:hidden p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400"
+            className="md:hidden p-3 rounded-2xl bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
           >
             <Search className="w-4 h-4" />
           </button>
@@ -69,10 +69,10 @@ const Navbar = ({ title = 'Workspace' }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleTheme}
-            className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all shadow-inner border border-white/10"
+            className="p-3 rounded-2xl bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] text-[var(--text-primary)] transition-all shadow-inner border border-[var(--border-subtle)]"
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
           >
-            {theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            {theme === 'light' ? <Moon className="w-4 h-4 text-indigo-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
           </motion.button>
         </div>
       </motion.header>
@@ -94,22 +94,22 @@ const Navbar = ({ title = 'Workspace' }) => {
               exit={{ scale: 0.95, opacity: 0, y: -20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl bg-[#0F172A] border border-white/10 rounded-[24px] shadow-2xl overflow-hidden mx-4"
+              className="w-full max-w-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[24px] shadow-2xl overflow-hidden mx-4"
             >
               {/* Search Input */}
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10">
-                <Search className="w-5 h-5 text-indigo-400 shrink-0" />
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-[var(--border-subtle)]">
+                <Search className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" />
                 <input
                   type="text"
                   autoFocus
                   placeholder="Search companies, scholarships, internships..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-transparent border-none text-white focus:outline-none placeholder-slate-500 text-sm font-medium"
+                  className="flex-1 bg-transparent border-none text-[var(--text-primary)] focus:outline-none placeholder:text-[var(--text-secondary)] text-sm font-medium"
                 />
                 <button
                   onClick={() => setIsSearchOpen(false)}
-                  className="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-white/5 px-2 py-1 rounded-lg hover:bg-white/10"
+                  className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] bg-[var(--border-subtle)] px-2 py-1 rounded-lg hover:bg-[var(--border-strong)]"
                 >
                   ESC
                 </button>
@@ -118,23 +118,23 @@ const Navbar = ({ title = 'Workspace' }) => {
               {/* Mock Search Results Content */}
               <div className="p-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 {!searchQuery ? (
-                  <div className="py-8 text-center text-slate-500 flex flex-col items-center justify-center">
+                  <div className="py-8 text-center text-[var(--text-secondary)] flex flex-col items-center justify-center">
                     <Command className="w-8 h-8 mb-3 opacity-20" />
                     <p className="text-xs font-bold uppercase tracking-widest">Type to start searching</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Suggestions</div>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-sm text-slate-300 flex items-center gap-3 group transition-colors">
-                      <Search className="w-4 h-4 text-slate-500 group-hover:text-indigo-400" />
+                    <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Suggestions</div>
+                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
+                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500" />
                       Google Internships 2025
                     </button>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-sm text-slate-300 flex items-center gap-3 group transition-colors">
-                      <Search className="w-4 h-4 text-slate-500 group-hover:text-indigo-400" />
+                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
+                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500" />
                       NVIDIA Research Fellowships
                     </button>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 text-sm text-slate-300 flex items-center gap-3 group transition-colors">
-                      <Search className="w-4 h-4 text-slate-500 group-hover:text-indigo-400" />
+                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
+                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500" />
                       Women in Engineering Scholarships
                     </button>
                   </div>

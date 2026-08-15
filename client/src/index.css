@@ -4,25 +4,59 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
-  --color-glass-white: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
-  --color-glass-dark: rgba(15, 23, 42, 0.6);
+  /* Semantic Color Tokens */
+  --color-background: var(--bg-main);
+  --color-surface: var(--bg-surface);
+  --color-surface-elevated: var(--bg-surface-elevated);
+  --color-foreground: var(--text-primary);
+  --color-foreground-secondary: var(--text-secondary);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
 }
 
-/* Global Reset & Base Styles */
+/* Global Semantic Variables */
 :root {
-  color-scheme: dark light;
+  color-scheme: light;
+  
+  /* Light Mode Palette - Warm, crisp, clear */
+  --bg-main: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: rgba(255, 255, 255, 0.9);
+  
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.15);
+}
+
+:root.dark {
+  color-scheme: dark;
+  
+  /* Dark Mode Palette - Layered, sophisticated, no pure black */
+  --bg-main: #0B0D14;
+  --bg-surface: #131620;
+  --bg-surface-elevated: #1A1E2C;
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.15);
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
-    @apply bg-slate-50 text-slate-900 dark:bg-[#020617] dark:text-[#f8fafc] subpixel-antialiased dark:antialiased;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    @apply subpixel-antialiased dark:antialiased;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
-/* Premium Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -31,77 +65,47 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
+  background: var(--border-strong);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: var(--text-secondary);
 }
 
-/* Premium Utilities */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.5s ease;
-}
-
-.dark .glass-card {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
-
-.glass-input {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #0f172a;
+/* Semantic Component Classes */
+.semantic-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  border-radius: 1rem;
   transition: all 0.3s ease;
 }
-
-.dark .glass-input {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+:root.dark .semantic-card {
+  box-shadow: 0 4px 30px -2px rgba(0, 0, 0, 0.3);
 }
 
-.glass-input:focus {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(99, 102, 241, 0.5); /* Indigo 500 */
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+.semantic-input {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+.semantic-input:focus {
   outline: none;
+  border-color: var(--text-secondary);
+  box-shadow: 0 0 0 2px var(--border-subtle);
 }
 
-.dark .glass-input:focus {
-  background: rgba(15, 23, 42, 0.6);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+/* Legacy Glass Support (to avoid breaking unrefactored components) */
+.glass-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
-
-.glass-button {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(79, 70, 229, 0.8) 100%);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-  transition: all 0.3s ease;
-}
-
-.glass-button:hover {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 1) 0%, rgba(79, 70, 229, 1) 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+.dark .glass-card {
+  background: var(--bg-surface);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Animations */
@@ -111,33 +115,24 @@
   66% { transform: translate(-20px, 20px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
-
 .animate-blob {
   animation: blob 10s infinite;
 }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* Scanning Beam (CodeLab) */
 @keyframes scan-beam {
   0% { top: 0%; opacity: 0.8; }
   50% { top: 98%; opacity: 0.9; }
   100% { top: 0%; opacity: 0.8; }
 }
-
 .code-scanner-beam {
   position: absolute;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, transparent, #10b981, transparent);
-  box-shadow: 0 0 15px #10b981;
+  background: linear-gradient(90deg, transparent, #8B5CF6, transparent);
+  box-shadow: 0 0 15px #8B5CF6;
   animation: scan-beam 3s ease-in-out infinite;
   pointer-events: none;
   z-index: 10;

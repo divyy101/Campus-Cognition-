@@ -87,7 +87,7 @@ const Register = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="John"
-                className="w-full h-14 bg-white dark:bg-[#0c1324] border border-slate-200 dark:border-slate-800 rounded-xl px-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                className="w-full h-14 bg-[#FFF9F5] dark:bg-[#0c0806] border border-slate-200 dark:border-orange-900/30 rounded-xl px-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 transition-all shadow-inner"
                 required
               />
             </div>
@@ -101,7 +101,7 @@ const Register = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Doe"
-                className="w-full h-14 bg-white dark:bg-[#0c1324] border border-slate-200 dark:border-slate-800 rounded-xl px-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                className="w-full h-14 bg-[#FFF9F5] dark:bg-[#0c0806] border border-slate-200 dark:border-orange-900/30 rounded-xl px-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 transition-all shadow-inner"
                 required
               />
             </div>
@@ -117,10 +117,10 @@ const Register = () => {
               value={formData.username}
               onChange={handleChange}
               placeholder="johndoe2026"
-              className="w-full h-14 bg-white dark:bg-[#0c1324] border border-slate-200 dark:border-slate-800 rounded-xl pl-4 pr-10 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              className="w-full h-14 bg-[#FFF9F5] dark:bg-[#0c0806] border border-slate-200 dark:border-orange-900/30 rounded-xl pl-4 pr-10 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 transition-all shadow-inner"
               required
             />
-            <User className="w-5 h-5 text-slate-400 absolute right-4 top-4.5 group-focus-within:text-blue-500 transition-colors" style={{ top: '18px' }} />
+            <User className="w-5 h-5 text-slate-400 absolute right-4 top-4.5 group-focus-within:text-orange-500 transition-colors" style={{ top: '18px' }} />
           </div>
         </div>
 
@@ -133,10 +133,10 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="john@university.edu"
-              className="w-full h-14 bg-white dark:bg-[#0c1324] border border-slate-200 dark:border-slate-800 rounded-xl pl-4 pr-10 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              className="w-full h-14 bg-[#FFF9F5] dark:bg-[#0c0806] border border-slate-200 dark:border-orange-900/30 rounded-xl pl-4 pr-10 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 transition-all shadow-inner"
               required
             />
-            <Mail className="w-5 h-5 text-slate-400 absolute right-4 top-4.5 group-focus-within:text-blue-500 transition-colors" style={{ top: '18px' }} />
+            <Mail className="w-5 h-5 text-slate-400 absolute right-4 top-4.5 group-focus-within:text-orange-500 transition-colors" style={{ top: '18px' }} />
           </div>
         </div>
 
@@ -149,7 +149,7 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full h-14 bg-white dark:bg-[#0c1324] border border-slate-200 dark:border-slate-800 rounded-xl pl-4 pr-12 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              className="w-full h-14 bg-[#FFF9F5] dark:bg-[#0c0806] border border-slate-200 dark:border-orange-900/30 rounded-xl pl-4 pr-12 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 transition-all shadow-inner"
               required
             />
             <button
@@ -178,7 +178,7 @@ const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-14 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-sm shadow-[0_8px_30px_-10px_rgba(37,99,235,0.4)] hover:shadow-[0_12px_40px_-12px_rgba(37,99,235,0.6)] transform hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 mt-6"
+          className="w-full h-14 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold text-sm shadow-[0_8px_30px_-10px_rgba(249,115,22,0.4)] hover:shadow-[0_12px_40px_-12px_rgba(249,115,22,0.6)] transform hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 mt-6"
         >
           {loading ? (
             <div className="flex items-center gap-1.5">
@@ -193,9 +193,9 @@ const Register = () => {
       <div className="mt-8 text-center">
         <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
           By signing up, you agree to our{' '}
-          <Link to="/terms" className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-400 transition-colors">Terms of Service</Link>
+          <Link to="/terms" className="text-orange-600 hover:text-orange-700 dark:hover:text-orange-400 transition-colors">Terms of Service</Link>
           {' '}and{' '}
-          <Link to="/privacy" className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-400 transition-colors">Privacy Policy</Link>.
+          <Link to="/privacy" className="text-orange-600 hover:text-orange-700 dark:hover:text-orange-400 transition-colors">Privacy Policy</Link>.
         </p>
       </div>
 
