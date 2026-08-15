@@ -26,7 +26,23 @@ app.use(helmet({
   contentSecurityPolicy: false // Allow inline scripts / styles in SPA
 }));
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost and vercel.app domains
+    const allowedOrigins = [
+      /^https?:\/\/localhost:\d+$/,
+      /^https:\/\/.*\.vercel\.app$/
+    ];
+    
+    const isAllowed = allowedOrigins.some(regex => regex.test(origin));
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
