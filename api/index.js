@@ -1,4 +1,9 @@
 const mongoose = require('mongoose');
+
+// Crucial: Disable Mongoose buffering GLOBALLY before any models are imported.
+// This prevents the 10000ms "buffering timed out" hang when the database isn't connected.
+mongoose.set('bufferCommands', false);
+
 const app = require('../backend/app');
 const env = require('../backend/config/env');
 
@@ -16,13 +21,16 @@ async function connectToDatabase() {
   }
   
   try {
-    // Disable buffering to prevent 10s hangs when disconnected
-    mongoose.set('bufferCommands', false);
-    
+    // Prevent accidental local DB connections on Vercel
+    if (!env.mongoUri || env.mongoUri.includes('localhost') || env.mongoUri.includes('127.0.0.1')) {
+      throw new Error('MONGODB_URI environment variable is missing or pointing to localhost. Please configure it in Vercel settings.');
+    }
+
     const db = await mongoose.connect(env.mongoUri, {
       dbName: env.dbName,
-      serverSelectionTimeoutMS: 15000, // Increased to 15s for Vercel cold starts
+      serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
+      bufferCommands: false, // Crucial for serverless: fail instantly if disconnected
     });
     cachedDb = db.connection;
     console.log(`[Vercel Serverless] MongoDB Connected: ${cachedDb.host}`);
