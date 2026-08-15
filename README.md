@@ -72,14 +72,14 @@ Campus Cognition features a dynamic, state-of-the-art UI utilizing Semantic CSS 
 
 ```text
 campus-cognition/
-├── client/                    # React (Vite) Frontend Application
+├── frontend/                  # React (Vite) Frontend Application
 │   ├── src/
 │   │   ├── components/        # Reusable UI components (Navbar, Sidebar, etc.)
 │   │   ├── pages/             # Route-specific pages (CodeLab, StudyAgent, etc.)
 │   │   ├── api/               # Axios configurations
 │   │   └── context/           # React Context (Auth)
 │   └── index.css              # Global semantic theme variables
-├── server/                    # Node.js/Express Backend Application
+├── backend/                   # Node.js/Express Backend Application
 │   ├── src/
 │   │   ├── controllers/       # Route logic (auth, AI, activity)
 │   │   ├── models/            # Mongoose schemas

@@ -109,7 +109,7 @@ dist
 .DS_Store
 
 # Vite / React Build output
-client/dist/
+frontend/dist/
 
 # Local Scratch Workspace
 scratch/

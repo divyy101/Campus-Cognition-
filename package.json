@@ -2,14 +2,14 @@
   "name": "campus-cognition",
   "version": "2.0.0",
   "description": "Campus Cognition — Intelligent Student Learning & Career Platform (MERN)",
-  "main": "server/src/server.js",
+  "main": "backend/src/server.js",
   "scripts": {
-    "setup": "npm install && cd server && npm install && cd ../client && npm install",
-    "server": "cd server && npm start",
-    "server:dev": "cd server && npm run dev",
-    "client": "cd client && npm run dev",
-    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
-    "build": "cd client && npm run build && cd ../server && npm run build"
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "backend": "cd backend && npm start",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend\"",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
