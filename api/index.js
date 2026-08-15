@@ -32,8 +32,12 @@ async function connectToDatabase() {
 
 // Vercel serverless function export
 module.exports = async (req, res) => {
-  // Ensure database is connected before handling the request
-  await connectToDatabase();
+  try {
+    // Ensure database is connected before handling the request
+    await connectToDatabase();
+  } catch (err) {
+    console.error('[Vercel Serverless] DB Connection failed, but continuing to Express app:', err.message);
+  }
   
   // Pass the request to the Express application
   return app(req, res);

@@ -1,5 +1,5 @@
 {
-  "name": "campus-cognition-server",
+  "name": "backend",
   "version": "2.0.0",
   "description": "Node.js Express Backend for Campus Cognition",
   "main": "server.js",

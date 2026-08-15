@@ -7,13 +7,7 @@ const { generateGemini } = require('../services/ai/geminiProvider');
 // @desc    General health check
 // @route   GET /api/health
 exports.healthCheck = async (req, res) => {
-  const dbState = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    database: dbState,
-    nodeEnv: env.nodeEnv
-  });
+  res.send('Backend is running');
 };
 
 // @desc    AI Health status diagnosis
