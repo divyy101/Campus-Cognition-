@@ -199,13 +199,13 @@ const CodeLab = () => {
                         <div className="space-y-2">
                           {result.bugs.map((b, i) => (
                             <div key={i} className="px-4 py-3 rounded-xl bg-red-950/20 border border-red-900/30 text-xs text-red-400 font-mono shadow-sm">
-                              > {b.message || b}
+                              &gt; {b.message || b}
                             </div>
                           ))}
                         </div>
                       ) : (
                         <div className="px-4 py-3 rounded-xl bg-emerald-900/20 border border-emerald-500/30 text-xs text-emerald-400 flex items-center gap-2 font-mono shadow-sm">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" /> > System secure. No anomalies.
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400" /> &gt; System secure. No anomalies.
                         </div>
                       )}
                     </div>

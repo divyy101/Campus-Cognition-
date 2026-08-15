@@ -33,8 +33,6 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(loggerMiddleware);
 
-// Serve uploaded static files
-app.use('/static/uploads', express.static(path.resolve(__dirname, '../static/uploads')));
 
 // Register API Routes
 app.use('/api/auth', authRoutes);
@@ -49,23 +47,14 @@ app.use('/api/health', healthRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/documents', documentRoutes);
 
-// Catch-all route for frontend static build in production
-const clientBuildPath = path.resolve(__dirname, '../client/dist');
-console.log(`[Express App] Checking frontend build path: ${clientBuildPath} (exists: ${require('fs').existsSync(clientBuildPath)})`);
-if (require('fs').existsSync(clientBuildPath)) {
-  app.use(express.static(clientBuildPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
+// Catch-all API route if no endpoint matched
+app.use('*', (req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'API endpoint does not exist',
+    path: req.originalUrl
   });
-} else {
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Campus Cognition Node.js Express API Server V2',
-      status: 'online',
-      docs: '/api/health'
-    });
-  });
-}
+});
 
 // Global Error Handler Middleware
 app.use(errorHandler);
