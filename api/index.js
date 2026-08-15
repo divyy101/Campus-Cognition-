@@ -16,9 +16,12 @@ async function connectToDatabase() {
   }
   
   try {
+    // Disable buffering to prevent 10s hangs when disconnected
+    mongoose.set('bufferCommands', false);
+    
     const db = await mongoose.connect(env.mongoUri, {
       dbName: env.dbName,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 15000, // Increased to 15s for Vercel cold starts
       socketTimeoutMS: 45000,
     });
     cachedDb = db.connection;
@@ -36,7 +39,17 @@ module.exports = async (req, res) => {
     // Ensure database is connected before handling the request
     await connectToDatabase();
   } catch (err) {
-    console.error('[Vercel Serverless] DB Connection failed, but continuing to Express app:', err.message);
+    console.error('[Vercel Serverless] DB Connection failed:', err.message);
+    
+    // If it's not a health check, return 503 immediately instead of buffering indefinitely
+    if (!req.url.includes('/health')) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database Connection Error',
+        message: 'Could not connect to MongoDB. If this is deployed on Vercel, please ensure that MONGODB_URI is set correctly and that 0.0.0.0/0 is whitelisted in your MongoDB Atlas Network Access settings.',
+        details: err.message
+      });
+    }
   }
   
   // Pass the request to the Express application
