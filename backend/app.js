@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const loggerMiddleware = require('./middleware/loggerMiddleware');
 const errorHandler = require('./middleware/errorHandler');
+const connectDB = require('./config/db');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -48,6 +49,23 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(loggerMiddleware);
+
+// Global DB Connection Middleware for Vercel
+// This guarantees that all requests establish/verify connection using the backend's mongoose instance
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('[App] Global DB Connection failed:', error.message);
+    res.status(503).json({
+      success: false,
+      error: 'Database Connection Error',
+      message: 'Could not connect to MongoDB. If this is deployed on Vercel, please ensure that MONGODB_URI is set correctly.',
+      details: error.message
+    });
+  }
+});
 
 
 // Register API Routes
