@@ -1,8 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
-const uploadDir = path.resolve(__dirname, '../../static/uploads');
+// Use OS temporary directory which resolves to /tmp on Vercel and local Temp on Windows/Mac
+const uploadDir = path.join(os.tmpdir(), 'campus-cognition-uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
