@@ -1,5 +1,7 @@
 # 📚 Campus Cognition - AI-Powered Student Platform (MERN)
 
+**Live Demo:** [https://campus-cognition-frontend.vercel.app/](https://campus-cognition-frontend.vercel.app/)
+
 Campus Cognition is a modern, production-ready academic dashboard equipped with advanced AI agents and secure systems to assist with exam preparation, code analysis, and scholarship/internship discovery.
 
 *Note: This project was recently migrated from Python/Flask to a full MERN Stack (MongoDB, Express, React, Node.js) for improved scalability and performance.*

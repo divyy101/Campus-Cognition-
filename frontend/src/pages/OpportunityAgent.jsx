@@ -71,18 +71,13 @@ const OpportunityAgent = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-emerald-50/40 dark:bg-[#071311] font-sans text-slate-900 dark:text-emerald-50 transition-colors duration-500 relative overflow-hidden">
-      
-      {/* Network Nodes Motif */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]" 
-           style={{ 
-             backgroundImage: 'radial-gradient(circle at 50% 50%, #10b981 2px, transparent 2px), radial-gradient(circle at 20% 80%, #059669 2px, transparent 2px), radial-gradient(circle at 80% 20%, #0d9488 2px, transparent 2px)', 
-             backgroundSize: '100px 100px, 120px 120px, 150px 150px' 
-           }}>
-      </div>
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-500/10 dark:bg-teal-600/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/3" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-emerald-600/10 dark:bg-emerald-600/10 blur-[100px] rounded-full pointer-events-none" />
-      
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.4 }}
+      className="flex min-h-screen bg-transparent font-sans text-[var(--text-primary)] relative overflow-hidden"
+    >
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 relative z-10">
@@ -92,33 +87,33 @@ const OpportunityAgent = () => {
           <div className="max-w-6xl mx-auto space-y-8">
             
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row gap-6 md:items-end justify-between bg-white/80 dark:bg-[#0B1A17]/90 p-6 sm:p-8 rounded-[24px] border border-teal-100 dark:border-teal-900/40 shadow-sm relative overflow-hidden backdrop-blur-xl z-10">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-100 dark:bg-emerald-900/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+            <div className="flex flex-col md:flex-row gap-6 md:items-end justify-between semantic-card p-6 sm:p-8 group relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent)]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-transform group-hover:scale-110" />
               
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 text-[10px] font-bold tracking-widest uppercase mb-3 border border-teal-200 dark:border-teal-800/50 shadow-sm">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[var(--accent-secondary)]/10 text-[var(--accent-secondary)] text-[10px] font-bold tracking-widest uppercase mb-3 border border-[var(--accent-secondary)]/30 shadow-sm">
                   <Compass className="w-3 h-3" />
                   Ecosystem Search
                 </div>
-                <h1 className="text-3xl md:text-[36px] font-extrabold tracking-tight text-teal-950 dark:text-emerald-50 leading-tight">
+                <h1 className="text-3xl md:text-[36px] font-extrabold tracking-tight leading-tight">
                   Open Source & Hackathons
                 </h1>
-                <p className="text-sm text-teal-900/70 dark:text-teal-100/60 mt-2 max-w-xl font-medium">
+                <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl font-medium">
                   Connect with live hackathons, fellowships, and global developer programs from leading tech companies.
                 </p>
               </div>
 
               {/* Search Widget */}
               <form onSubmit={handleSearch} className="w-full md:w-[350px] relative shrink-0 z-10">
-                <Search className="w-4 h-4 text-teal-500 absolute left-4 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[var(--accent)] absolute left-4 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search programs, companies..."
-                  className="w-full bg-teal-50/50 dark:bg-[#071311] border border-teal-200 dark:border-teal-900/50 rounded-full pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-emerald-50 placeholder-teal-400 dark:placeholder-teal-700 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 transition-colors shadow-inner"
+                  className="semantic-input w-full rounded-full pl-11 pr-4 py-3 text-sm shadow-inner"
                 />
-                <button type="submit" className="absolute right-2 top-1.5 bottom-1.5 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-sm">
+                <button type="submit" className="absolute right-2 top-1.5 bottom-1.5 px-4 rounded-full bg-[var(--accent)] hover:brightness-110 text-white font-bold text-xs transition-colors shadow-sm">
                   Find
                 </button>
               </form>
@@ -126,7 +121,7 @@ const OpportunityAgent = () => {
 
             {/* Top Companies Marquee/List */}
             <div>
-              <p className="text-[10px] font-bold text-slate-500 dark:text-teal-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-3 flex items-center gap-1.5">
                 <Building2 className="w-3.5 h-3.5" /> Featured Networks
               </p>
               <div className="flex flex-wrap gap-2">
@@ -136,8 +131,8 @@ const OpportunityAgent = () => {
                     onClick={() => handleMncClick(comp)}
                     className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all border ${
                       selectedMnc === comp
-                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-500/20'
-                        : 'bg-white dark:bg-[#0B1A17]/90 border-teal-100 dark:border-teal-900/40 text-slate-600 dark:text-teal-200 hover:border-emerald-300 dark:hover:border-emerald-500/50 backdrop-blur-md'
+                        ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-glow'
+                        : 'bg-[var(--surface-elevated)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {comp}
@@ -149,54 +144,54 @@ const OpportunityAgent = () => {
             {/* Results Grid */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-emerald-50 flex items-center gap-2">
-                  <Code className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <Code className="w-5 h-5 text-[var(--accent)]" />
                   Active Bounties & Events
                 </h2>
               </div>
 
               {loading ? (
-                <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="w-8 h-8 border-2 border-teal-200 border-t-emerald-600 rounded-full animate-spin" />
-                  <p className="text-sm text-slate-500 dark:text-teal-400 font-medium">Scanning discovery nodes...</p>
+                <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 semantic-card">
+                  <div className="w-8 h-8 border-2 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin" />
+                  <p className="text-sm text-[var(--text-secondary)] font-medium">Scanning discovery nodes...</p>
                 </div>
               ) : opportunities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
                   {opportunities.map((opp, idx) => (
                     <div 
                       key={opp.id || idx}
-                      className="bg-white dark:bg-[#0B1A17]/90 rounded-xl p-5 border border-teal-100 dark:border-teal-900/40 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full group hover:border-emerald-300 dark:hover:border-emerald-500/60 backdrop-blur-xl"
+                      className="semantic-card p-5 hover:border-[var(--accent)] transition-shadow flex flex-col h-full group"
                     >
                       <div className="flex items-start justify-between mb-3">
-                        <div className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${opp.isCompanyDiscovery ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border-teal-200 dark:border-teal-800/40' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/40'}`}>
+                        <div className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${opp.isCompanyDiscovery ? 'bg-[var(--accent-secondary)]/10 text-[var(--accent-secondary)] border-[var(--accent-secondary)]/30' : 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30'}`}>
                           {opp.company}
                         </div>
                         <button 
                           onClick={() => handleSave(opp)}
-                          className="text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                          className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
                         >
                           <Bookmark className="w-4 h-4" />
                         </button>
                       </div>
 
-                      <h3 className="font-bold text-sm text-slate-900 dark:text-emerald-50 mb-2 leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h3 className="font-bold text-sm mb-2 leading-tight group-hover:text-[var(--accent)] transition-colors">
                         {opp.title}
                       </h3>
                       
-                      <p className="text-xs text-slate-600 dark:text-teal-100/60 line-clamp-2 leading-relaxed flex-1 mb-4">
+                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed flex-1 mb-4">
                         {opp.description}
                       </p>
 
                       <div className="flex flex-wrap gap-1.5 mb-5">
                         {(opp.requiredSkills || opp.skills || ['Hackathon', 'Open Source']).slice(0, 3).map((s, i) => (
-                          <span key={i} className="px-2 py-0.5 rounded text-[9px] font-semibold bg-teal-50/50 dark:bg-[#071311] text-teal-700 dark:text-teal-300 border border-teal-100 dark:border-teal-900/40">
+                          <span key={i} className="px-2 py-0.5 rounded text-[9px] font-semibold bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border-strong)]">
                             #{s}
                           </span>
                         ))}
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-teal-50 dark:border-teal-900/30">
-                        <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded shadow-sm" title={opp.matchReason}>
+                      <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
+                        <div className="flex items-center gap-1 text-[10px] font-bold text-[var(--accent)] uppercase tracking-widest bg-[var(--accent)]/10 px-2 py-1 rounded shadow-sm" title={opp.matchReason}>
                           <Sparkles className="w-3 h-3" />
                           {opp.matchScore}% Match
                         </div>
@@ -204,7 +199,7 @@ const OpportunityAgent = () => {
                           href={opp.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-bold text-teal-700 dark:text-teal-300 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 transition-colors"
+                          className="text-xs font-bold text-[var(--accent-secondary)] hover:text-[var(--accent)] flex items-center gap-1 transition-colors"
                         >
                           Explore <ExternalLink className="w-3 h-3" />
                         </a>
@@ -213,17 +208,17 @@ const OpportunityAgent = () => {
                   ))}
                 </div>
               ) : (
-                <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 bg-white dark:bg-[#0B1A17]/90 rounded-xl border border-teal-100 dark:border-teal-900/40 shadow-sm backdrop-blur-xl z-10 relative">
-                  <Compass className="w-8 h-8 text-teal-200 dark:text-teal-800 mb-2" />
-                  <h3 className="text-base font-bold text-slate-700 dark:text-teal-200">No nodes found in graph</h3>
-                  <p className="text-sm text-slate-500 dark:text-teal-100/50 max-w-sm">Try exploring a different company or keyword.</p>
+                <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 semantic-card relative">
+                  <Compass className="w-8 h-8 text-[var(--text-secondary)] mb-2" />
+                  <h3 className="text-base font-bold">No nodes found in graph</h3>
+                  <p className="text-sm text-[var(--text-secondary)] max-w-sm">Try exploring a different company or keyword.</p>
                 </div>
               )}
             </div>
           </div>
         </main>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

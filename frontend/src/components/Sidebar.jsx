@@ -34,12 +34,12 @@ const Sidebar = () => {
       initial={{ x: -250, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="w-64 bg-[var(--bg-surface)] text-[var(--text-primary)] min-h-screen flex flex-col border-r border-[var(--border-strong)] shadow-lg shrink-0 z-40 relative overflow-hidden"
+      className="w-64 bg-[var(--surface)] text-[var(--text-primary)] min-h-screen flex flex-col border-r border-[var(--border-strong)] shadow-lg shrink-0 z-40 relative overflow-hidden backdrop-blur-2xl"
     >
       {/* Brand Header */}
       <div className="p-6 border-b border-[var(--border-subtle)] flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 via-indigo-600 to-amber-500 p-0.5 shadow-sm">
-          <div className="w-full h-full bg-[var(--bg-surface)] rounded-[10px] flex items-center justify-center">
+          <div className="w-full h-full bg-[var(--surface)] rounded-[10px] flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-[var(--text-primary)]" />
           </div>
         </div>
@@ -81,10 +81,10 @@ const Sidebar = () => {
 
       {/* User Footer */}
       {user && (
-        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-main)]">
+        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-main)]/50 backdrop-blur-md">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold flex items-center justify-center border border-[var(--border-subtle)] text-xs shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-[var(--surface)] text-[var(--text-primary)] font-bold flex items-center justify-center border border-[var(--border-subtle)] text-xs shadow-sm">
                 {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="truncate">

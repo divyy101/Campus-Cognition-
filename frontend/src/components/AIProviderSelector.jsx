@@ -6,9 +6,9 @@ const AIProviderSelector = ({ className = '' }) => {
   const { aiEngine, setAiEngine } = useAuth();
 
   return (
-    <div className={`flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 ${className}`}>
-      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-2 flex items-center gap-1">
-        <Cpu className="w-3.5 h-3.5 text-indigo-500" />
+    <div className={`flex items-center gap-2 bg-[var(--surface-elevated)] p-1.5 rounded-xl border border-[var(--border)] ${className}`}>
+      <span className="text-xs font-semibold text-[var(--text-secondary)] px-2 flex items-center gap-1">
+        <Cpu className="w-3.5 h-3.5 text-[var(--accent)]" />
         Neural Engine:
       </span>
 
@@ -17,8 +17,8 @@ const AIProviderSelector = ({ className = '' }) => {
         onClick={() => setAiEngine('campus_ai')}
         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
           aiEngine === 'campus_ai'
-            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            ? 'bg-[var(--accent)] text-white shadow-glow'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Sparkles className="w-3.5 h-3.5" />
@@ -30,8 +30,8 @@ const AIProviderSelector = ({ className = '' }) => {
         onClick={() => setAiEngine('gemini')}
         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
           aiEngine === 'gemini'
-            ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            ? 'bg-[var(--accent)] text-white shadow-glow'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Cpu className="w-3.5 h-3.5" />
@@ -43,8 +43,8 @@ const AIProviderSelector = ({ className = '' }) => {
         onClick={() => setAiEngine('openai')}
         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
           aiEngine === 'openai'
-            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
-            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            ? 'bg-[var(--accent)] text-white shadow-glow'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Sparkles className="w-3.5 h-3.5" />

@@ -11,6 +11,28 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
+        page: {
+          main: 'var(--bg-main)',
+          secondary: 'var(--bg-secondary)',
+        },
+        surface: {
+          DEFAULT: 'var(--surface)',
+          elevated: 'var(--surface-elevated)',
+        },
+        theme: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          accent: 'var(--accent)',
+          accent2: 'var(--accent-secondary)',
+          border: 'var(--border)',
+          'border-strong': 'var(--border-strong)',
+          glow: 'var(--glow)',
+        },
+        status: {
+          success: 'var(--success)',
+          warning: 'var(--warning)',
+          danger: 'var(--danger)',
+        },
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -33,6 +55,10 @@ export default {
           400: '#f59e0b',
           500: '#d97706',
         }
+      },
+      boxShadow: {
+        glow: '0 0 20px 2px var(--glow)',
+        card: '0 4px 20px -2px var(--shadow)',
       }
     },
   },

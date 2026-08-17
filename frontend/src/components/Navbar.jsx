@@ -72,7 +72,7 @@ const Navbar = ({ title = 'Workspace' }) => {
             className="p-3 rounded-2xl bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] text-[var(--text-primary)] transition-all shadow-inner border border-[var(--border-subtle)]"
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
           >
-            {theme === 'light' ? <Moon className="w-4 h-4 text-indigo-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            {theme === 'light' ? <Moon className="w-4 h-4 text-[var(--accent-secondary)]" /> : <Sun className="w-4 h-4 text-[var(--accent)]" />}
           </motion.button>
         </div>
       </motion.header>
@@ -98,7 +98,7 @@ const Navbar = ({ title = 'Workspace' }) => {
             >
               {/* Search Input */}
               <div className="flex items-center gap-3 px-6 py-4 border-b border-[var(--border-subtle)]">
-                <Search className="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                <Search className="w-5 h-5 text-[var(--accent)] shrink-0" />
                 <input
                   type="text"
                   autoFocus
@@ -126,15 +126,15 @@ const Navbar = ({ title = 'Workspace' }) => {
                   <div className="space-y-2">
                     <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Suggestions</div>
                     <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
-                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500" />
+                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
                       Google Internships 2025
                     </button>
                     <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
-                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500" />
+                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
                       NVIDIA Research Fellowships
                     </button>
                     <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
-                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500" />
+                      <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
                       Women in Engineering Scholarships
                     </button>
                   </div>

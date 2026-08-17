@@ -10,14 +10,14 @@ const AuthLayout = ({ children, title, subtitle }) => {
   const isLogin = location.pathname === '/login';
 
   return (
-    <div className="min-h-screen flex w-full bg-white dark:bg-[#070B14] transition-colors duration-500 overflow-hidden">
+    <div className="min-h-screen flex w-full bg-transparent transition-colors duration-500 overflow-hidden text-[var(--text-primary)]">
       
       {/* Left Panel: Authentication (40% Desktop, 100% Mobile) */}
       <div className="w-full lg:w-[40%] flex flex-col items-center justify-center relative z-10 px-6 sm:px-12 py-10 overflow-y-auto custom-scrollbar">
         
         {/* Subtle Ambient Glow for Auth Panel (Mobile only) */}
         <div className="absolute inset-0 pointer-events-none lg:hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent)]/10 blur-[80px] rounded-full" />
         </div>
 
         <div className="w-full max-w-[420px] relative z-10 flex flex-col gap-8">
@@ -28,9 +28,9 @@ const AuthLayout = ({ children, title, subtitle }) => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="w-12 h-12 rounded-xl bg-slate-900 dark:bg-white flex items-center justify-center shadow-lg"
+              className="w-12 h-12 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center shadow-lg border border-[var(--accent)]/30"
             >
-              <Sparkles className="w-6 h-6 text-white dark:text-slate-900" />
+              <Sparkles className="w-6 h-6 text-[var(--accent)]" />
             </motion.div>
             
             <div>
@@ -38,16 +38,16 @@ const AuthLayout = ({ children, title, subtitle }) => {
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-2xl sm:text-3xl font-light text-slate-800 dark:text-slate-200 tracking-tight leading-snug"
+                className="text-2xl sm:text-3xl font-light tracking-tight leading-snug"
               >
                 Welcome back,<br/>
-                <span className="font-bold text-slate-900 dark:text-white">Creative.</span>
+                <span className="font-bold">Creative.</span>
               </motion.h1>
               <motion.p 
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium"
+                className="text-sm text-[var(--text-secondary)] mt-2 font-medium"
               >
                 Continue your journey with Campus Cognition.
               </motion.p>
@@ -59,28 +59,28 @@ const AuthLayout = ({ children, title, subtitle }) => {
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex p-1 rounded-xl bg-slate-100 dark:bg-[#111827] border border-slate-200 dark:border-[#263247] w-full"
+            className="flex p-1 rounded-xl bg-[var(--surface)] border border-[var(--border)] w-full"
           >
             <button
               onClick={() => navigate('/login')}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all relative ${isLogin ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all relative ${isLogin ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
             >
               {isLogin && (
                 <motion.div 
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-white dark:bg-[#1e293b] rounded-lg shadow-sm border border-slate-200/50 dark:border-white/5"
+                  className="absolute inset-0 bg-[var(--surface-elevated)] rounded-lg shadow-sm border border-[var(--border)]"
                 />
               )}
               <span className="relative z-10">Sign In</span>
             </button>
             <button
               onClick={() => navigate('/register')}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all relative ${!isLogin ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all relative ${!isLogin ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
             >
               {!isLogin && (
                 <motion.div 
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-white dark:bg-[#1e293b] rounded-lg shadow-sm border border-slate-200/50 dark:border-white/5"
+                  className="absolute inset-0 bg-[var(--surface-elevated)] rounded-lg shadow-sm border border-[var(--border)]"
                 />
               )}
               <span className="relative z-10">Sign Up</span>
