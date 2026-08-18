@@ -1,163 +1,105 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 const Background = ({ location }) => {
   let page = location?.pathname?.substring(1).split('/')[0] || 'dashboard';
   if (!page) page = 'dashboard';
 
-  // Define unique background configurations for each page
-  const configs = {
-    dashboard: (
-      <motion.div
-        key="dashboard-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-[var(--accent)] opacity-20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[var(--accent-secondary)] opacity-20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute top-[40%] left-[20%] w-[40%] h-[40%] bg-purple-500 opacity-10 blur-[120px] rounded-full mix-blend-screen" />
-      </motion.div>
-    ),
-    study: (
-      <motion.div
-        key="study-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-[10%] left-[10%] w-[40%] h-[40%] bg-[var(--accent)] opacity-15 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[10%] w-[50%] h-[50%] bg-[var(--accent-secondary)] opacity-15 blur-[140px] rounded-full" />
-        
-        {/* Animated Connecting Lines (CSS/SVG) */}
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at center, var(--accent) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-      </motion.div>
-    ),
-    'code-lab': (
-      <motion.div
-        key="code-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-0 right-1/4 w-[30%] h-[100%] bg-[var(--accent)] opacity-[0.03] blur-[80px] transform -skew-x-12" />
-        <div className="absolute bottom-0 left-1/4 w-[30%] h-[100%] bg-[var(--text-primary)] opacity-[0.03] blur-[80px] transform skew-x-12" />
-        
-        {/* Terminal Grid */}
-        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:30px_30px] dark:bg-[linear-gradient(rgba(0,255,65,1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,65,1)_1px,transparent_1px)]" />
-      </motion.div>
-    ),
-    internships: (
-      <motion.div
-        key="internship-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-[-20%] left-[20%] w-[70%] h-[70%] bg-[var(--accent)] opacity-20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[-20%] right-[20%] w-[60%] h-[60%] bg-[var(--accent-secondary)] opacity-15 blur-[150px] rounded-full mix-blend-screen" />
-      </motion.div>
-    ),
-    scholarships: (
-      <motion.div
-        key="scholarship-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-1/4 left-1/4 w-[50%] h-[50%] bg-[var(--accent)] opacity-20 blur-[160px] rounded-full" />
-        <div className="absolute bottom-1/4 right-1/4 w-[40%] h-[40%] bg-[var(--accent-secondary)] opacity-15 blur-[120px] rounded-full" />
-        {/* Soft Golden Particles / Stars (CSS approximation) */}
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,var(--accent)_1px,transparent_1px)] bg-[size:60px_60px]" />
-      </motion.div>
-    ),
-    opportunities: (
-      <motion.div
-        key="opportunity-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-[0%] left-[0%] w-[100%] h-[50%] bg-gradient-to-b from-[var(--accent)]/10 to-transparent blur-[60px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-[var(--accent-secondary)] opacity-15 blur-[130px] rounded-full" />
-      </motion.div>
-    ),
-    profile: (
-      <motion.div
-        key="profile-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-[-20%] right-[-10%] w-[70%] h-[70%] bg-[var(--accent)] opacity-10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[var(--accent-secondary)] opacity-10 blur-[130px] rounded-full" />
-      </motion.div>
-    ),
-    activity: (
-      <motion.div
-        key="activity-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-[20%] left-[-10%] w-[40%] h-[60%] bg-[var(--accent)] opacity-15 blur-[120px] rounded-[100px] transform rotate-45" />
-        <div className="absolute bottom-[20%] right-[-10%] w-[40%] h-[60%] bg-[var(--accent-secondary)] opacity-15 blur-[120px] rounded-[100px] transform -rotate-45" />
-      </motion.div>
-    ),
-    login: (
-      <motion.div
-        key="login-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-0 right-0 w-[100%] h-[100%] bg-gradient-to-bl from-[var(--accent)]/20 via-[var(--accent-secondary)]/10 to-transparent blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-[80%] h-[80%] bg-[var(--accent-secondary)] opacity-20 blur-[150px] rounded-full mix-blend-screen" />
-      </motion.div>
-    ),
-    register: (
-      <motion.div
-        key="register-bg"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-0 left-0 w-[100%] h-[100%] bg-gradient-to-br from-[var(--accent)]/20 via-[var(--accent-secondary)]/10 to-transparent blur-[100px]" />
-        <div className="absolute bottom-0 right-0 w-[80%] h-[80%] bg-[var(--accent-secondary)] opacity-20 blur-[150px] rounded-full mix-blend-screen" />
-      </motion.div>
-    ),
-  };
+  // State for subtle mouse parallax
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  const currentBg = configs[page] || configs['dashboard'];
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      // Normalize mouse position between -1 and 1
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = (e.clientY / window.innerHeight) * 2 - 1;
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Generate stable random positions for particles
+  const particles = React.useMemo(() => {
+    return Array.from({ length: 15 }).map((_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: Math.random() * 1.5 + 0.5,
+      duration: Math.random() * 15 + 20,
+      delay: Math.random() * -20,
+    }));
+  }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-[-1] bg-[var(--bg-main)] transition-colors duration-700 ease-in-out">
-      <AnimatePresence mode="wait">
-        {currentBg}
-      </AnimatePresence>
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-[-1] bg-[var(--bg-main)] transition-colors duration-1000 ease-in-out">
+      
+      {/* Deep Environment Lighting Layer */}
+      <motion.div 
+        className="absolute inset-0"
+        animate={{ 
+          x: mousePos.x * -5,
+          y: mousePos.y * -5
+        }}
+        transition={{ type: 'tween', ease: 'easeOut', duration: 4 }}
+      >
+        {/* Very subtle environmental light sources */}
+        <div className="absolute top-[5%] right-[15%] w-[45%] h-[55%] bg-[var(--accent)] opacity-[0.03] blur-[180px] rounded-full mix-blend-screen transition-colors duration-1000" />
+        <div className="absolute bottom-[5%] left-[10%] w-[50%] h-[40%] bg-[var(--accent-secondary)] opacity-[0.02] blur-[150px] rounded-full mix-blend-screen transition-colors duration-1000" />
+      </motion.div>
 
-      {/* Global Subtle Noise/Texture Overlay for Cinematic Feel */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTUwLDE1MCwxNTAsMC4wMikiLz48L3N2Zz4=')] bg-[length:24px_24px] opacity-100" />
+      {/* Abstract Intelligence Network (SVG) */}
+      <motion.div 
+        className="absolute inset-0 opacity-[0.05]"
+        animate={{ 
+          x: mousePos.x * -10,
+          y: mousePos.y * -10
+        }}
+        transition={{ type: 'tween', ease: 'easeOut', duration: 3 }}
+      >
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="120" height="120" patternUnits="userSpaceOnUse">
+              <path d="M 120 0 L 0 0 0 120" fill="none" stroke="var(--text-secondary)" strokeWidth="0.5" />
+              <circle cx="0" cy="0" r="1.5" fill="var(--accent)" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </motion.div>
+
+      {/* Mid Layer - Very Subtle Particles */}
+      <motion.div 
+        className="absolute inset-0"
+        animate={{ 
+          x: mousePos.x * -15,
+          y: mousePos.y * -15
+        }}
+        transition={{ type: 'tween', ease: 'easeOut', duration: 2.5 }}
+      >
+        {particles.map((p) => (
+          <div
+            key={p.id}
+            className="absolute rounded-full bg-[var(--accent)]"
+            style={{
+              top: p.top,
+              left: p.left,
+              width: p.size,
+              height: p.size,
+              opacity: 0.15,
+              animation: `float ${p.duration}s ease-in-out infinite alternate`,
+              animationDelay: `${p.delay}s`,
+            }}
+          />
+        ))}
+      </motion.div>
+      
+      {/* Noise Texture for Cinematic Feel */}
+      <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMSkiLz48L3N2Zz4=')] bg-[length:4px_4px] mix-blend-overlay" />
+      
+      {/* Soft Vignette */}
+      <div className="absolute inset-0 shadow-[inset_0_0_200px_var(--bg-main)]" />
     </div>
   );
 };

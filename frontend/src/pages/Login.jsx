@@ -42,8 +42,8 @@ const Login = () => {
     <AuthLayout>
       
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/20 text-[var(--danger)] text-sm font-semibold flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-[var(--danger)] shrink-0" />
+        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
           {error}
         </div>
       )}
@@ -90,8 +90,8 @@ const Login = () => {
         <div className="flex items-center justify-between pt-1 pb-2">
           <label className="flex items-center gap-2 cursor-pointer group">
             <div className="relative flex items-center justify-center w-4 h-4">
-              <input type="checkbox" className="peer appearance-none w-4 h-4 border border-[var(--border)] rounded bg-transparent checked:bg-[var(--accent)] checked:border-[var(--accent)] transition-colors" />
-              <svg className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none">
+              <input type="checkbox" className="peer appearance-none w-4 h-4 border border-[var(--border-strong)] rounded bg-transparent checked:bg-[var(--accent)] checked:border-[var(--accent)] transition-colors" />
+              <svg className="absolute w-3 h-3 text-[var(--bg-main)] pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none">
                 <path d="M3 8L6 11L11 3.5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
               </svg>
             </div>
@@ -105,15 +105,15 @@ const Login = () => {
         <button
           type="submit"
           disabled={loading}
-          className="semantic-btn w-full h-14 flex justify-center items-center gap-2 mt-6"
+          className="w-full h-14 rounded-xl font-bold flex justify-center items-center gap-2 mt-6 bg-[var(--text-primary)] hover:bg-[var(--text-secondary)] text-[var(--bg-main)] transition-colors disabled:opacity-50"
         >
           {loading ? (
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.2s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.4s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce [animation-delay:0.2s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce [animation-delay:0.4s]" />
             </div>
-          ) : 'Login'}
+          ) : 'Authenticate'}
         </button>
       </form>
     </AuthLayout>

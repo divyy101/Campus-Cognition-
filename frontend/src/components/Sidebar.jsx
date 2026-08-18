@@ -34,18 +34,16 @@ const Sidebar = () => {
       initial={{ x: -250, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="w-64 bg-[var(--surface)] text-[var(--text-primary)] min-h-screen flex flex-col border-r border-[var(--border-strong)] shadow-lg shrink-0 z-40 relative overflow-hidden backdrop-blur-2xl"
+      className="w-64 bg-[var(--surface)] text-[var(--text-primary)] min-h-screen flex flex-col border-r border-[var(--border)] shrink-0 z-40 relative overflow-hidden"
     >
       {/* Brand Header */}
       <div className="p-6 border-b border-[var(--border-subtle)] flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 via-indigo-600 to-amber-500 p-0.5 shadow-sm">
-          <div className="w-full h-full bg-[var(--surface)] rounded-[10px] flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-[var(--text-primary)]" />
-          </div>
+        <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-[var(--accent)]" />
         </div>
         <div>
-          <h1 className="font-extrabold text-[15px] tracking-tight">Campus Cognition</h1>
-          <p className="text-[10px] font-bold text-[var(--text-secondary)] tracking-widest uppercase">Intelligence</p>
+          <h1 className="font-extrabold text-[15px] tracking-tight">Cognition</h1>
+          <p className="text-[10px] font-bold text-[var(--accent)] tracking-widest uppercase opacity-80">Intelligence</p>
         </div>
       </div>
 
@@ -58,19 +56,19 @@ const Sidebar = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 relative group overflow-hidden ${
+                `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative group overflow-hidden ${
                   isActive
-                    ? 'bg-[var(--border-subtle)] text-[var(--text-primary)]'
-                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-main)] hover:text-[var(--text-primary)]'
+                    ? 'bg-[var(--surface-elevated)] text-[var(--text-primary)] border border-[var(--border-strong)]'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-primary)] border border-transparent hover:border-[var(--border-subtle)]'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   {isActive && (
-                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[var(--text-primary)] rounded-r-full" />
+                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[var(--accent)] rounded-r-full" />
                   )}
-                  <Icon className={`w-4 h-4 relative z-10 transition-colors ${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} />
+                  <Icon className={`w-4 h-4 relative z-10 transition-colors duration-300 ${isActive ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} />
                   <span className="relative z-10 tracking-wide">{item.name}</span>
                 </>
               )}
@@ -81,10 +79,10 @@ const Sidebar = () => {
 
       {/* User Footer */}
       {user && (
-        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-main)]/50 backdrop-blur-md">
+        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--surface)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-[var(--surface)] text-[var(--text-primary)] font-bold flex items-center justify-center border border-[var(--border-subtle)] text-xs shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-[var(--surface-elevated)] text-[var(--text-primary)] font-bold flex items-center justify-center border border-[var(--border-strong)] text-xs shadow-sm">
                 {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="truncate">
@@ -96,7 +94,7 @@ const Sidebar = () => {
             <button
               onClick={logout}
               title="Log out"
-              className="p-2 text-[var(--text-secondary)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+              className="p-2 text-[var(--text-secondary)] hover:text-red-500 hover:bg-[var(--surface-elevated)] rounded-xl transition-all"
             >
               <LogOut className="w-4 h-4" />
             </button>

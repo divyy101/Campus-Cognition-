@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
 import AIProviderSelector from './AIProviderSelector';
-import { Sun, Moon, Search, Command } from 'lucide-react';
+import { Search, Command, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ title = 'Workspace' }) => {
-  const { theme, toggleTheme } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   // Handle Cmd+K
   useEffect(() => {
@@ -30,7 +40,7 @@ const Navbar = ({ title = 'Workspace' }) => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="h-20 bg-[var(--bg-surface-elevated)] mx-4 mt-4 rounded-3xl px-8 flex items-center justify-between sticky top-4 z-30 shadow-sm border border-[var(--border-subtle)] backdrop-blur-xl"
+        className="h-20 glass-panel mx-4 mt-4 rounded-3xl px-8 flex items-center justify-between sticky top-4 z-30 transition-all duration-300"
       >
         <div className="flex items-center gap-3">
           <h2 className="font-extrabold text-xl text-[var(--text-primary)] tracking-tight hidden md:block">{title}</h2>
@@ -40,13 +50,13 @@ const Navbar = ({ title = 'Workspace' }) => {
           {/* Global Search Trigger */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="hidden md:flex items-center gap-4 bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] border border-[var(--border-subtle)] rounded-2xl px-4 py-2.5 transition-colors shadow-inner"
+            className="hidden md:flex items-center gap-4 bg-[var(--surface-elevated)] hover:bg-[var(--surface)] border border-[var(--border-subtle)] rounded-2xl px-4 py-2.5 transition-all duration-300 shadow-sm group"
           >
-            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-              <Search className="w-4 h-4" />
-              <span className="text-xs font-semibold">Search platform...</span>
+            <div className="flex items-center gap-2 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+              <Search className="w-4 h-4 transition-colors" />
+              <span className="text-xs font-semibold">Search intelligence...</span>
             </div>
-            <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 bg-black/30 px-2 py-1 rounded-lg">
+            <div className="flex items-center gap-1 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--border-subtle)] px-2 py-1 rounded-lg">
               <Command className="w-3 h-3" />
               <span>K</span>
             </div>
@@ -54,26 +64,24 @@ const Navbar = ({ title = 'Workspace' }) => {
           
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="md:hidden p-3 rounded-2xl bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
+            className="md:hidden p-3 rounded-2xl bg-[var(--surface-elevated)] hover:bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <Search className="w-4 h-4" />
+          </button>
+
+          {/* Theme Switcher */}
+          <button
+            onClick={toggleTheme}
+            className="p-3 rounded-2xl bg-[var(--surface-elevated)] hover:bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            title="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           {/* Neural Engine Switcher */}
           <div className="hidden sm:block">
             <AIProviderSelector />
           </div>
-
-          {/* Theme Toggle Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleTheme}
-            className="p-3 rounded-2xl bg-[var(--border-subtle)] hover:bg-[var(--border-strong)] text-[var(--text-primary)] transition-all shadow-inner border border-[var(--border-subtle)]"
-            title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-          >
-            {theme === 'light' ? <Moon className="w-4 h-4 text-[var(--accent-secondary)]" /> : <Sun className="w-4 h-4 text-[var(--accent)]" />}
-          </motion.button>
         </div>
       </motion.header>
 
@@ -85,7 +93,7 @@ const Navbar = ({ title = 'Workspace' }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-start justify-center pt-[10vh]"
+            className="fixed inset-0 z-[100] bg-[var(--bg-main)]/80 backdrop-blur-md flex items-start justify-center pt-[10vh]"
             onClick={() => setIsSearchOpen(false)}
           >
             <motion.div
@@ -94,7 +102,7 @@ const Navbar = ({ title = 'Workspace' }) => {
               exit={{ scale: 0.95, opacity: 0, y: -20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[24px] shadow-2xl overflow-hidden mx-4"
+              className="w-full max-w-2xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] rounded-[24px] shadow-2xl overflow-hidden mx-4"
             >
               {/* Search Input */}
               <div className="flex items-center gap-3 px-6 py-4 border-b border-[var(--border-subtle)]">
@@ -125,15 +133,15 @@ const Navbar = ({ title = 'Workspace' }) => {
                 ) : (
                   <div className="space-y-2">
                     <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Suggestions</div>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
+                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--surface)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
                       <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
                       Google Internships 2025
                     </button>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
+                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--surface)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
                       <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
                       NVIDIA Research Fellowships
                     </button>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--border-subtle)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
+                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[var(--surface)] text-sm text-[var(--text-primary)] flex items-center gap-3 group transition-colors">
                       <Search className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
                       Women in Engineering Scholarships
                     </button>

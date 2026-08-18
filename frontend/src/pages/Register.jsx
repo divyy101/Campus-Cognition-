@@ -26,9 +26,9 @@ const Register = () => {
   const getPasswordStrength = () => {
     const p = formData.password;
     if (!p) return { score: 0, text: 'Empty', color: 'bg-[var(--border-strong)]' };
-    if (p.length < 6) return { score: 1, text: 'Weak', color: 'bg-[var(--danger)]' };
+    if (p.length < 6) return { score: 1, text: 'Weak', color: 'bg-red-500' };
     if (p.length < 10) return { score: 2, text: 'Medium', color: 'bg-amber-500' };
-    return { score: 3, text: 'Strong', color: 'bg-[var(--success)]' };
+    return { score: 3, text: 'Strong', color: 'bg-green-500' };
   };
 
   const strength = getPasswordStrength();
@@ -69,8 +69,8 @@ const Register = () => {
     <AuthLayout>
       
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/20 text-[var(--danger)] text-sm font-semibold flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-[var(--danger)] shrink-0" />
+        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
           {error}
         </div>
       )}
@@ -166,9 +166,9 @@ const Register = () => {
           {formData.password && (
             <div className="mt-3 flex items-center gap-2 px-1">
               <div className="flex-1 h-1.5 bg-[var(--surface-elevated)] rounded-full overflow-hidden flex gap-1">
-                <div className={`h-full ${strength.score >= 1 ? strength.color : 'transparent'} flex-1 transition-all`} />
-                <div className={`h-full ${strength.score >= 2 ? strength.color : 'transparent'} flex-1 transition-all`} />
-                <div className={`h-full ${strength.score >= 3 ? strength.color : 'transparent'} flex-1 transition-all`} />
+                <div className={`h-full ${strength.score >= 1 ? strength.color : 'transparent'} flex-1 transition-colors`} />
+                <div className={`h-full ${strength.score >= 2 ? strength.color : 'transparent'} flex-1 transition-colors`} />
+                <div className={`h-full ${strength.score >= 3 ? strength.color : 'transparent'} flex-1 transition-colors`} />
               </div>
               <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{strength.text}</span>
             </div>
@@ -178,24 +178,24 @@ const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="semantic-btn w-full h-14 flex justify-center items-center gap-2 mt-6"
+          className="w-full h-14 rounded-xl font-bold flex justify-center items-center gap-2 mt-6 bg-[var(--text-primary)] hover:bg-[var(--text-secondary)] text-[var(--bg-main)] transition-colors disabled:opacity-50"
         >
           {loading ? (
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.2s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.4s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce [animation-delay:0.2s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce [animation-delay:0.4s]" />
             </div>
-          ) : 'Create Account'}
+          ) : 'Initialize Account'}
         </button>
       </form>
 
       <div className="mt-8 text-center">
         <p className="text-xs text-[var(--text-secondary)] font-medium">
           By signing up, you agree to our{' '}
-          <Link to="/terms" className="text-[var(--accent)] hover:brightness-110 transition-colors">Terms of Service</Link>
+          <Link to="/terms" className="text-[var(--text-primary)] hover:underline transition-colors">Terms of Service</Link>
           {' '}and{' '}
-          <Link to="/privacy" className="text-[var(--accent)] hover:brightness-110 transition-colors">Privacy Policy</Link>.
+          <Link to="/privacy" className="text-[var(--text-primary)] hover:underline transition-colors">Privacy Policy</Link>.
         </p>
       </div>
 
