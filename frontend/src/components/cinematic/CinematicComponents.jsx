@@ -35,23 +35,45 @@ export const ParallaxLayer = ({ children, speed = 1, className = '', zIndex = 0 
   );
 };
 
-export const FloatingVisual = ({ src, alt, speed = 'slow', className = '', style = {} }) => {
+export const FloatingVisual = ({ src, videoSrc, alt, speed = 'slow', className = '', style = {} }) => {
   const floatClass = speed === 'slow' ? 'animate-float-slow' : speed === 'medium' ? 'animate-float-medium' : 'animate-float-fast';
   
+  // Derive WebP src: if src ends in .jpg, also try .webp version
+  const webpSrc = src ? src.replace(/\.jpg$/, '.webp') : null;
+
   return (
     <div className={`relative pointer-events-none ${className}`} style={style}>
-      <motion.img 
-        src={src} 
-        alt={alt}
-        className={`w-full h-full object-cover object-center rounded-3xl ${floatClass}`}
-        style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      />
+      {videoSrc ? (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={webpSrc || src}
+          className={`w-full h-full object-cover object-center rounded-3xl ${floatClass}`}
+          style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}
+        >
+          <source src={videoSrc} type="video/mp4" />
+          {/* Fallback image if video can't play */}
+          <img src={src} alt={alt} className="w-full h-full object-cover object-center rounded-3xl" />
+        </video>
+      ) : (
+        <motion.img
+          src={webpSrc || src}
+          alt={alt}
+          className={`w-full h-full object-cover object-center rounded-3xl ${floatClass}`}
+          style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          onError={(e) => { if (src && e.target.src !== src) e.target.src = src; }}
+        />
+      )}
     </div>
   );
 };
+
 
 export const ScrollSection = ({ children, className = '' }) => {
   const { ref, scrollYProgress } = useScrollProgress(["start end", "end start"]);

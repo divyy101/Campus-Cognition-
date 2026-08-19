@@ -7,12 +7,15 @@ const api = axios.create({
   }
 });
 
-// Attach JWT token from localStorage to every request
+// Attach JWT token from localStorage to every request and handle FormData headers
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('cc_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
     }
     return config;
   },

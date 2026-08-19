@@ -71,13 +71,14 @@ const ScholarshipAgent = () => {
           {/* Visual Anchor Hero Section */}
           <ScrollSection className="w-full relative min-h-[50vh] flex flex-col justify-center px-6 md:px-12 pt-12 pb-16 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
             
-            {/* Visual Anchor */}
-            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[60%] opacity-30 md:opacity-100 z-[-1] pointer-events-none mask-image-left mix-blend-screen">
+            {/* Cinematic Full-Screen Background */}
+            <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
               <FloatingVisual 
                 src="/visuals/opportunity-visual.jpg" 
+                videoSrc="/visuals/opportunity-visual-motion.mp4"
                 alt="Scholarship Network"
                 speed="medium"
-                className="w-full h-full object-cover object-center"
+                className="absolute inset-0 w-full h-full object-cover object-center"
               />
             </div>
             

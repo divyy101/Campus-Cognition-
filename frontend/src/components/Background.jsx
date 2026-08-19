@@ -10,11 +10,16 @@ const Background = ({ location }) => {
   const { rawX, rawY } = useMouseParallax(50, 30);
 
   // Asset selection based on page
-  let atmosphericImage = '/visuals/dashboard-atmosphere.jpg';
-  if (page === 'study') atmosphericImage = '/visuals/study-visual.jpg';
-  if (page === 'code') atmosphericImage = '/visuals/code-visual.jpg';
-  if (page === 'opportunity' || page === 'internship' || page === 'scholarship') atmosphericImage = '/visuals/opportunity-visual.jpg';
-  if (page === 'dashboard' || page === 'login' || page === 'register') atmosphericImage = '/visuals/dashboard-atmosphere.jpg';
+  const getAssets = (pg) => {
+    if (pg === 'study')       return { img: '/visuals/study-visual.jpg', video: '/visuals/study-visual-motion.mp4', poster: '/visuals/study-visual.webp' };
+    if (pg === 'code-lab')    return { img: '/visuals/code-visual.jpg',  video: '/visuals/code-visual-motion.mp4',  poster: '/visuals/code-visual.webp' };
+    if (pg === 'opportunities' || pg === 'internships' || pg === 'scholarships')
+                              return { img: '/visuals/opportunity-visual.jpg', video: '/visuals/opportunity-visual-motion.mp4', poster: '/visuals/opportunity-visual.webp' };
+    // dashboard / login / register / everything else
+    return { img: '/visuals/dashboard-atmosphere.jpg', video: '/visuals/dashboard-atmosphere-motion.mp4', poster: '/visuals/dashboard-atmosphere.webp' };
+  };
+
+  const { img: atmosphericImage, video: atmosphericVideo, poster: atmosphericPoster } = getAssets(page);
 
   // Generate stable random positions for particles (Layer 3)
   const particles = React.useMemo(() => {
@@ -44,25 +49,32 @@ const Background = ({ location }) => {
         <div className="absolute bottom-[5%] left-[10%] w-[50%] h-[40%] bg-[var(--accent-secondary)] opacity-[0.04] blur-[150px] rounded-full transition-colors duration-1000" />
       </motion.div>
 
-      {/* LAYER 2: Generated Visual (Atmospheric Depth) */}
+      {/* LAYER 2: Cinematic Video / Atmospheric Depth */}
       <motion.div 
         className="absolute inset-0 opacity-[0.12] mix-blend-screen transition-opacity duration-1000"
         animate={{ 
           x: rawX * -8,
           y: rawY * -8,
-          scale: [1, 1.02, 1]
         }}
         transition={{ 
-          scale: { duration: 20, repeat: Infinity, ease: 'easeInOut' },
           x: { type: 'tween', ease: 'easeOut', duration: 3.5 },
           y: { type: 'tween', ease: 'easeOut', duration: 3.5 }
         }}
       >
-        <img 
-          src={atmosphericImage} 
-          alt="Atmosphere" 
-          className="w-full h-full object-cover object-center" 
-        />
+        <video
+          key={atmosphericVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={atmosphericPoster}
+          className="w-full h-full object-cover object-center"
+        >
+          <source src={atmosphericVideo} type="video/mp4" />
+          {/* Fallback to static image if video can't play */}
+          <img src={atmosphericImage} alt="Atmosphere" className="w-full h-full object-cover object-center" />
+        </video>
         {/* Deep fade for edges */}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-main)] via-transparent to-[var(--bg-main)] opacity-80" />
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-main)] via-transparent to-[var(--bg-main)] opacity-80" />

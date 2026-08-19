@@ -83,13 +83,14 @@ const CodeLab = () => {
 
         <main className="flex-1 px-6 md:px-12 py-8 max-w-[1800px] mx-auto w-full relative">
           
-          {/* Visual Anchor Background (CodeLab) */}
-          <div className="absolute top-0 right-0 w-[40%] h-[70vh] opacity-20 pointer-events-none mask-image-left z-[-1] mix-blend-screen">
+          {/* Cinematic Full-Screen Background */}
+          <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
              <FloatingVisual 
                 src="/visuals/code-visual.jpg" 
+                videoSrc="/visuals/code-visual-motion.mp4"
                 alt="Code Intelligence"
                 speed="slow"
-                className="w-full h-full object-cover object-center"
+                className="absolute inset-0 w-full h-full object-cover object-center"
              />
           </div>
 
@@ -312,7 +313,7 @@ const CodeLab = () => {
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <h3 className="text-xs font-bold uppercase tracking-widest">Optimized Code</h3>
                           </div>
-                          <pre className="text-xs font-mono text-[var(--text-primary)] whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-48 overflow-y-auto custom-scrollbar">
+                          <pre className="text-xs font-mono text-[var(--text-primary)] whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar">
                             {results.improvedCode}
                           </pre>
                           <button

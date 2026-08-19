@@ -68,13 +68,14 @@ const Dashboard = () => {
           {/* --- CINEMATIC HERO SECTION --- */}
           <ScrollSection className="w-full relative min-h-[70vh] flex flex-col justify-center px-6 md:px-12 pt-16 pb-12 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
             
-            {/* Visual Anchor (40-60% of viewport right side on desktop) */}
-            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[55%] opacity-20 md:opacity-100 z-[-1] pointer-events-none mask-image-left">
+            {/* Cinematic Full-Screen Background */}
+            <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
               <FloatingVisual 
-                src="/visuals/hero-visual.jpg" 
+                src="/visuals/dashboard-atmosphere.jpg" 
+                videoSrc="/visuals/dashboard-atmosphere-motion.mp4"
                 alt="Neural Network Intelligence"
                 speed="slow"
-                className="w-full h-full object-cover object-left"
+                className="absolute inset-0 w-full h-full object-cover object-center"
               />
             </div>
             

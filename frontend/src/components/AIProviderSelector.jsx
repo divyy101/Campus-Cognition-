@@ -17,7 +17,7 @@ const AIProviderSelector = ({ className = '' }) => {
         onClick={() => setAiEngine('campus_ai')}
         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
           aiEngine === 'campus_ai'
-            ? 'bg-[var(--accent)] text-white shadow-glow'
+            ? 'bg-[var(--accent)] text-[var(--bg-main)] shadow-glow'
             : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
         }`}
       >
@@ -30,7 +30,7 @@ const AIProviderSelector = ({ className = '' }) => {
         onClick={() => setAiEngine('gemini')}
         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
           aiEngine === 'gemini'
-            ? 'bg-[var(--accent)] text-white shadow-glow'
+            ? 'bg-[var(--accent)] text-[var(--bg-main)] shadow-glow'
             : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
         }`}
       >
@@ -43,7 +43,7 @@ const AIProviderSelector = ({ className = '' }) => {
         onClick={() => setAiEngine('openai')}
         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
           aiEngine === 'openai'
-            ? 'bg-[var(--accent)] text-white shadow-glow'
+            ? 'bg-[var(--accent)] text-[var(--bg-main)] shadow-glow'
             : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
         }`}
       >

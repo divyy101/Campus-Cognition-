@@ -116,13 +116,14 @@ const StudyAgent = () => {
 
         <main className="flex-1 px-6 md:px-12 py-8 max-w-[1800px] mx-auto w-full relative">
           
-          {/* Visual Anchor Background */}
-          <div className="absolute top-0 right-0 w-[45%] h-[60vh] opacity-20 pointer-events-none mask-image-left z-[-1] mix-blend-screen">
+          {/* Cinematic Full-Screen Background */}
+          <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
              <FloatingVisual 
                 src="/visuals/study-visual.jpg" 
+                videoSrc="/visuals/study-visual-motion.mp4"
                 alt="Learning Intelligence"
                 speed="medium"
-                className="w-full h-full object-cover object-center"
+                className="absolute inset-0 w-full h-full object-cover object-center"
              />
           </div>
 

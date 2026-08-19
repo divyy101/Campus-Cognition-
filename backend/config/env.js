@@ -13,7 +13,7 @@ module.exports = {
   dbName: process.env.MONGODB_DB_NAME || 'campus_cognition',
   campusAiKey: process.env.CAMPUS_AI_API_KEY || '',
   campusAiEndpoint: process.env.CAMPUS_AI_ENDPOINT || 'https://api.groq.com/openai/v1/chat/completions',
-  campusAiModel: process.env.CAMPUS_AI_MODEL || 'llama-3.3-70b-versatile',
+  campusAiModel: process.env.CAMPUS_AI_MODEL || 'llama3-8b-8192',
   geminiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
   openAiKey: process.env.OPENAI_API_KEY || '',

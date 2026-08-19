@@ -14,7 +14,7 @@ async function generateCampusAi({ prompt, systemPrompt = '', temperature = 0.7, 
   messages.push({ role: 'user', content: prompt });
 
   const payload = {
-    model: env.campusAiModel || 'llama-3.3-70b-versatile',
+    model: env.campusAiModel || 'llama3-8b-8192',
     messages: messages,
     temperature: temperature,
   };

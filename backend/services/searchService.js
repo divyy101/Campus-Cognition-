@@ -15,26 +15,31 @@ class SearchService {
     const cleanQuery = (query || '').trim().toLowerCase();
     const queryHash = this.generateHash(`${cleanQuery}_${type}`);
 
-    try {
-      const cached = await SearchCache.findOne({ queryHash, expiresAt: { $gt: new Date() } });
-      if (cached && cached.results && cached.results.length > 0) {
-        return this.filterAndPaginate(cached.results, userProfile, page, limit);
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const cached = await SearchCache.findOne({ queryHash, expiresAt: { $gt: new Date() } });
+        if (cached && cached.results && cached.results.length > 0) {
+          return this.filterAndPaginate(cached.results, userProfile, page, limit);
+        }
+      } catch (e) {
+        console.warn('[SearchService] Cache lookup error:', e.message);
       }
-    } catch (e) {
-      console.warn('[SearchService] Cache lookup error:', e.message);
     }
 
     const liveResults = await this.performLiveRetrieval(cleanQuery, type, userProfile);
 
-    try {
-      const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000);
-      await SearchCache.findOneAndUpdate(
-        { queryHash },
-        { queryHash, query: cleanQuery, results: liveResults, expiresAt },
-        { upsert: true, new: true }
-      );
-    } catch (e) {
-      console.warn('[SearchService] Cache write error:', e.message);
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000);
+        await SearchCache.findOneAndUpdate(
+          { queryHash },
+          { queryHash, query: cleanQuery, results: liveResults, expiresAt },
+          { upsert: true, new: true }
+        );
+      } catch (e) {
+        console.warn('[SearchService] Cache write error:', e.message);
+      }
     }
 
     return this.filterAndPaginate(liveResults, userProfile, page, limit);
