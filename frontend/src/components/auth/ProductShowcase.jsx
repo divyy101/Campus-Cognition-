@@ -68,39 +68,15 @@ const ProductShowcase = () => {
     <div className="hidden lg:flex w-[60%] relative bg-[#F7F9FC] dark:bg-[#070B14] overflow-hidden items-center justify-center p-12 transition-colors duration-500">
       
       {/* Abstract Animated Atmospheric Background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Study Blue Glow */}
-        <motion.div 
-          animate={{ 
-            x: [0, 50, 0], 
-            y: [0, -30, 0],
-            scale: [1, 1.1, 1]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-500/10 dark:bg-blue-500/5 blur-[120px]" 
-        />
-        {/* Code Purple Glow */}
-        <motion.div 
-          animate={{ 
-            x: [0, -40, 0], 
-            y: [0, 40, 0],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear", delay: 2 }}
-          className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-[120px]" 
-        />
-        {/* Opportunity Orange Glow */}
-        <motion.div 
-          animate={{ 
-            x: [0, 30, 0], 
-            y: [0, 30, 0]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 4 }}
-          className="absolute top-[30%] right-[10%] w-[40%] h-[40%] rounded-full bg-orange-500/10 dark:bg-orange-500/5 blur-[100px]" 
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 mask-image-left">
+        <img 
+          src="/visuals/hero-visual.jpg" 
+          alt="Campus Cognition Intelligence"
+          className="w-full h-full object-cover opacity-30 mix-blend-screen"
         />
         
         {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTQ4LDE2MywxODQsMC4wNSkiLz48L3N2Zz4=')] bg-[length:32px_32px]" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTQ4LDE2MywxODQsMC4wNSkiLz48L3N2Zz4=')] bg-[length:32px_32px] opacity-20" />
       </div>
 
       {/* Main Composition */}

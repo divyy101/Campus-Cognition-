@@ -16,35 +16,12 @@ exports.dbHealthCheck = async (req, res) => {
   try {
     const isConfigured = !!process.env.MONGODB_URI;
     const readyState = mongoose.connection.readyState;
-    const host = mongoose.connection.host || null;
     const isConnected = readyState === 1;
-    
-    // Check if the User model uses the same connection
-    const User = mongoose.model('User');
-    const userModelReadyState = User.db.readyState;
-    
-    // Attempt a lightweight operation to verify buffering isn't hanging
-    let pingSuccess = false;
-    let operationError = null;
-    if (isConnected) {
-      try {
-        await mongoose.connection.db.admin().ping();
-        pingSuccess = true;
-      } catch (err) {
-        operationError = err.message;
-      }
-    }
 
     res.json({
       configured: isConfigured,
       readyState: readyState,
-      connected: isConnected,
-      host: host ? 'Connected Host exists' : 'None', // Don't expose actual host explicitly if requested, but user said "report MongoDB hostname only" in summary, so we can return host string
-      // Oh wait, user said: "It should return only something like: { configured: true, readyState: 1, connected: true } Do NOT return any credentials or connection string."
-      // In the response I will return the requested format.
-      userModelReadyState: userModelReadyState,
-      pingSuccess: pingSuccess,
-      operationError: operationError
+      connected: isConnected
     });
   } catch (error) {
     res.status(500).json({

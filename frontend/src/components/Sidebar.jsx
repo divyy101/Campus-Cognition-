@@ -14,15 +14,16 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { AgentStatusIndicator } from './cinematic/CinematicComponents';
 
 const Sidebar = () => {
   const { logout, user } = useAuth();
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Study Agent', path: '/study', icon: BookOpen },
-    { name: 'Code Lab', path: '/code-lab', icon: Code2 },
-    { name: 'Internships', path: '/internships', icon: Briefcase },
+    { name: 'Study Agent', path: '/study', icon: BookOpen, status: 'active', type: 'study' },
+    { name: 'Code Lab', path: '/code-lab', icon: Code2, status: 'analyzing', type: 'code' },
+    { name: 'Internships', path: '/internships', icon: Briefcase, status: 'searching', type: 'opportunity' },
     { name: 'Scholarships', path: '/scholarships', icon: GraduationCap },
     { name: 'Opportunities', path: '/opportunities', icon: Compass },
     { name: 'Profile', path: '/profile', icon: User },
@@ -34,15 +35,15 @@ const Sidebar = () => {
       initial={{ x: -250, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="w-64 bg-[var(--surface)] text-[var(--text-primary)] min-h-screen flex flex-col border-r border-[var(--border)] shrink-0 z-40 relative overflow-hidden"
+      className="hidden md:flex w-64 bg-[var(--surface)]/80 backdrop-blur-xl text-[var(--text-primary)] min-h-screen flex-col border-r border-[var(--border)] shrink-0 z-40 relative overflow-hidden"
     >
       {/* Brand Header */}
       <div className="p-6 border-b border-[var(--border-subtle)] flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center shadow-glow">
             <Sparkles className="w-5 h-5 text-[var(--accent)]" />
         </div>
         <div>
-          <h1 className="font-extrabold text-[15px] tracking-tight">Cognition</h1>
+          <h1 className="font-extrabold text-[15px] tracking-tight font-['Outfit']">Cognition</h1>
           <p className="text-[10px] font-bold text-[var(--accent)] tracking-widest uppercase opacity-80">Intelligence</p>
         </div>
       </div>
@@ -56,9 +57,9 @@ const Sidebar = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative group overflow-hidden ${
+                `flex flex-col gap-1 px-4 py-3 rounded-2xl transition-all duration-300 relative group overflow-hidden ${
                   isActive
-                    ? 'bg-[var(--surface-elevated)] text-[var(--text-primary)] border border-[var(--border-strong)]'
+                    ? 'bg-[var(--surface-elevated)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-card'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-primary)] border border-transparent hover:border-[var(--border-subtle)]'
                 }`
               }
@@ -66,10 +67,18 @@ const Sidebar = () => {
               {({ isActive }) => (
                 <>
                   {isActive && (
-                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[var(--accent)] rounded-r-full" />
+                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[var(--accent)] rounded-r-full shadow-glow" />
                   )}
-                  <Icon className={`w-4 h-4 relative z-10 transition-colors duration-300 ${isActive ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} />
-                  <span className="relative z-10 tracking-wide">{item.name}</span>
+                  <div className="flex items-center gap-3 w-full">
+                    <Icon className={`w-4 h-4 relative z-10 transition-colors duration-300 ${isActive ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} />
+                    <span className="relative z-10 text-sm font-bold tracking-wide flex-1">{item.name}</span>
+                  </div>
+                  
+                  {item.status && isActive && (
+                    <div className="pl-7 pt-1">
+                      <AgentStatusIndicator status={item.status} type={item.type} />
+                    </div>
+                  )}
                 </>
               )}
             </NavLink>
@@ -79,10 +88,10 @@ const Sidebar = () => {
 
       {/* User Footer */}
       {user && (
-        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--surface)]">
+        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--surface)]/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-[var(--surface-elevated)] text-[var(--text-primary)] font-bold flex items-center justify-center border border-[var(--border-strong)] text-xs shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-[var(--surface-elevated)] text-[var(--text-primary)] font-bold flex items-center justify-center border border-[var(--border-strong)] text-xs shadow-card">
                 {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="truncate">

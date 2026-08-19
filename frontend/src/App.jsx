@@ -40,64 +40,42 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Component to handle route changes, set page theme, and manage AnimatePresence
-const RouteManager = () => {
+function RouteManager() {
   const location = useLocation();
-
-  useEffect(() => {
-    // Extract page name from pathname
-    let page = location.pathname.substring(1).split('/')[0];
-    if (!page) page = 'dashboard';
-    
-    // Map routes to theme names
-    const pageMapping = {
-      'login': 'login',
-      'register': 'register',
-      'dashboard': 'dashboard',
-      'study': 'study',
-      'code-lab': 'code',
-      'internships': 'internship',
-      'scholarships': 'scholarship',
-      'opportunities': 'opportunity',
-      'profile': 'profile',
-      'activity': 'activity',
-    };
-    
-    const themeName = pageMapping[page] || 'dashboard';
-    document.documentElement.setAttribute('data-page', themeName);
-  }, [location.pathname]);
 
   return (
     <>
       <Background location={location} />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          {/* Public Auth Routes */}
+          {/* Public / Auth Routes */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          {/* Protected Application Routes */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Protected Main Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/study" element={<ProtectedRoute><StudyAgent /></ProtectedRoute>} />
           <Route path="/code-lab" element={<ProtectedRoute><CodeLab /></ProtectedRoute>} />
-          <Route path="/internships" element={<ProtectedRoute><InternshipAgent /></ProtectedRoute>} />
+          
           <Route path="/scholarships" element={<ProtectedRoute><ScholarshipAgent /></ProtectedRoute>} />
+          <Route path="/internships" element={<ProtectedRoute><InternshipAgent /></ProtectedRoute>} />
           <Route path="/opportunities" element={<ProtectedRoute><OpportunityAgent /></ProtectedRoute>} />
+          
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
 
-          {/* Fallback */}
+          {/* 404 Catch All */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
     </>
   );
-};
+}
 
-const App = () => {
+function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -107,6 +85,6 @@ const App = () => {
       </AuthProvider>
     </ThemeProvider>
   );
-};
+}
 
 export default App;

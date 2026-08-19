@@ -4,42 +4,29 @@ import api from '../api/axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { 
-  Compass, 
+  Compass,
+  Briefcase, 
   Search, 
-  Building2, 
+  MapPin, 
   ExternalLink, 
   Sparkles, 
-  Code, 
-  Award,
-  Bookmark
+  Bookmark,
+  Target
 } from 'lucide-react';
-
-const MNC_LIST = [
-  'NVIDIA', 'DRDO', 'Google', 'Microsoft', 'TCS', 'Infosys', 'Amazon', 
-  'IBM', 'Oracle', 'Adobe', 'Accenture', 'Deloitte', 'Wipro', 'Cisco', 
-  'Intel', 'Meta', 'Samsung', 'Qualcomm', 'AMD', 'Salesforce'
-];
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-
-const itemVariant = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-};
+import { CinematicReveal, FloatingVisual, AgentStatusIndicator, ScrollSection } from '../components/cinematic/CinematicComponents';
 
 const OpportunityAgent = () => {
   const [query, setQuery] = useState('');
-  const [selectedMnc, setSelectedMnc] = useState('');
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedTag, setSelectedTag] = useState('');
+
+  const TAGS = ['AI/ML', 'Frontend', 'Backend', 'Data Science', 'Product Management', 'DevOps', 'UI/UX', 'Remote'];
 
   const fetchOpportunities = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const res = await api.get(`/opportunities/search?q=${encodeURIComponent(searchQuery)}`);
+      const res = await api.get(`/internships/search?q=${encodeURIComponent(searchQuery)}`);
       if (res.data.success && res.data.data) {
         setOpportunities(res.data.data.results || []);
       }
@@ -51,13 +38,13 @@ const OpportunityAgent = () => {
   };
 
   useEffect(() => {
-    fetchOpportunities('software engineering');
+    fetchOpportunities('Entry level');
   }, []);
 
-  const handleMncClick = (company) => {
-    setSelectedMnc(company);
-    setQuery(company);
-    fetchOpportunities(company);
+  const handleTagClick = (tag) => {
+    setSelectedTag(tag);
+    setQuery(tag);
+    fetchOpportunities(tag);
   };
 
   const handleSearch = (e) => {
@@ -65,104 +52,105 @@ const OpportunityAgent = () => {
     fetchOpportunities(query);
   };
 
-  const handleSave = async (opp) => {
-    try {
-      await api.post('/opportunities/status', {
-        opportunityId: opp.id,
-        title: opp.title,
-        company: opp.company,
-        url: opp.url,
-        status: 'SAVED'
-      });
-      alert(`Saved '${opp.title}' to your profile!`);
-    } catch (e) {
-      alert('Error saving opportunity.');
-    }
-  };
-
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      exit={{ opacity: 0, transition: { duration: 0.3 } }}
       transition={{ duration: 0.8 }}
       className="flex min-h-screen bg-transparent font-sans text-[var(--text-primary)] relative overflow-hidden z-10"
     >
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 relative z-10 h-screen overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col min-w-0 z-10 h-screen overflow-y-auto overflow-x-hidden custom-scrollbar">
         <Navbar title="" />
 
-        <main className="flex-1 px-6 md:px-12 py-8 space-y-12 max-w-[1600px] mx-auto w-full">
+        <main className="flex-1 pb-24 relative">
           
-          {/* Header Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col md:flex-row gap-8 md:items-end justify-between bg-[var(--surface)] border border-[var(--border-subtle)] p-8 sm:p-12 relative overflow-hidden rounded-3xl"
-          >
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-strong)] text-[var(--accent)] text-[10px] font-bold tracking-widest uppercase mb-4">
-                Ecosystem Search
-              </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight mb-4">
-                Open Source & Hackathons
-              </h1>
-              <p className="text-sm md:text-base text-[var(--text-secondary)] max-w-2xl font-medium leading-relaxed">
-                Connect with live hackathons, fellowships, and global developer programs from leading tech companies in a unified network graph.
-              </p>
-            </div>
-
-            {/* Search Widget */}
-            <form onSubmit={handleSearch} className="w-full md:w-[400px] relative shrink-0 z-10">
-              <Search className="w-5 h-5 text-[var(--text-secondary)] absolute left-5 top-1/2 -translate-y-1/2 z-10" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Query network..."
-                className="w-full bg-[var(--surface-elevated)] rounded-2xl pl-14 pr-24 py-4 text-sm font-medium border border-[var(--border-strong)] focus:border-[var(--accent)] transition-colors outline-none placeholder:text-[var(--text-secondary)]/50"
+          {/* Visual Anchor Hero Section */}
+          <ScrollSection className="w-full relative min-h-[50vh] flex flex-col justify-center px-6 md:px-12 pt-12 pb-16 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
+            
+            {/* Visual Anchor */}
+            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[60%] opacity-30 md:opacity-100 z-0 mask-image-left mix-blend-screen">
+              <FloatingVisual 
+                src="/visuals/opportunity-visual.jpg" 
+                alt="Career Network"
+                speed="medium"
+                className="w-full h-full object-cover object-left"
               />
-              <button type="submit" className="absolute right-2 top-2 bottom-2 px-6 rounded-xl bg-[var(--surface)] hover:bg-[var(--accent)] hover:text-[var(--bg-main)] text-[var(--text-primary)] border border-[var(--border-subtle)] font-bold text-xs transition-colors">
-                SCAN
-              </button>
-            </form>
-          </motion.div>
-
-          {/* Top Companies Marquee/List */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-[var(--accent)]" /> Featured Networks
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {MNC_LIST.slice(0, 10).map((comp) => (
-                <button
-                  key={comp}
-                  onClick={() => handleMncClick(comp)}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors border ${
-                    selectedMnc === comp
-                      ? 'bg-[var(--accent)] border-[var(--accent)] text-[var(--bg-main)]'
-                      : 'bg-[var(--surface-elevated)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  {comp}
-                </button>
-              ))}
             </div>
-          </motion.div>
+            
+            <div className="relative z-20 max-w-3xl">
+              <CinematicReveal delay={0.1} direction="up" className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center shadow-[0_0_15px_var(--cinematic-coral)]">
+                  <Compass className="w-5 h-5 text-[var(--cinematic-coral)]" />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-3xl font-extrabold font-['Outfit']">Opportunity Agent</h1>
+                  <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest flex items-center gap-2">
+                     Network Scanner 
+                     <AgentStatusIndicator status={loading ? 'searching' : 'active'} type="opportunity" />
+                  </p>
+                </div>
+              </CinematicReveal>
+              
+              <CinematicReveal delay={0.2} direction="up">
+                <h2 className="text-5xl font-extrabold tracking-tight leading-[1.1] mb-6 font-['Outfit']">
+                  Discover roles that fit <br/>
+                  <span className="text-[var(--cinematic-coral)]">your skill graph.</span>
+                </h2>
+              </CinematicReveal>
 
-          {/* Results Grid */}
-          <motion.div variants={staggerContainer} initial="hidden" animate="show">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border-subtle)]">
-              <h2 className="text-xl font-bold flex items-center gap-3">
-                <Code className="w-6 h-6 text-[var(--text-secondary)]" />
-                Active Bounties & Events
-              </h2>
+              <CinematicReveal delay={0.3} direction="up">
+                <form onSubmit={handleSearch} className="w-full max-w-2xl flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Search className="w-5 h-5 text-[var(--text-secondary)] absolute left-5 top-1/2 -translate-y-1/2 z-10" />
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search role, company, or skills..."
+                      className="w-full bg-[var(--surface-elevated)]/80 backdrop-blur-md rounded-2xl pl-14 pr-6 py-4 text-sm font-bold border border-[var(--border-strong)] focus:border-[var(--cinematic-coral)] shadow-glow outline-none transition-all placeholder:text-[var(--text-secondary)]/50"
+                    />
+                  </div>
+                  <button 
+                    type="submit" 
+                    className="px-10 py-4 rounded-2xl bg-[var(--cinematic-coral)] text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 shadow-[0_0_15px_rgba(240,138,138,0.4)] transition-all shrink-0"
+                  >
+                    Scan Network
+                  </button>
+                </form>
+              </CinematicReveal>
+
+              <CinematicReveal delay={0.4} direction="up" className="mt-8 flex flex-wrap gap-2">
+                {TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagClick(tag)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                      selectedTag === tag
+                        ? 'bg-[var(--cinematic-coral)] border-[var(--cinematic-coral)] text-black'
+                        : 'bg-[var(--surface-elevated)]/50 border-[var(--border-strong)] text-[var(--text-secondary)] hover:border-[var(--cinematic-coral)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </CinematicReveal>
             </div>
+          </ScrollSection>
+
+          {/* Results Section */}
+          <div className="px-6 md:px-12 pt-12 max-w-[1800px] mx-auto w-full relative z-20">
+            <CinematicReveal delay={0.5}>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-bold font-['Outfit'] flex items-center gap-3">
+                  <Target className="w-6 h-6 text-[var(--cinematic-coral)]" />
+                  {opportunities.length > 0 ? `${opportunities.length} Neural Matches` : 'Awaiting Scan'}
+                </h3>
+                <span className="text-[10px] font-bold text-[var(--cinematic-coral)] uppercase tracking-widest bg-[var(--cinematic-coral)]/10 px-3 py-1.5 rounded-lg border border-[var(--cinematic-coral)]/20">Ranked by Match Score</span>
+              </div>
+            </CinematicReveal>
 
             <AnimatePresence mode="wait">
               {loading ? (
@@ -171,62 +159,74 @@ const OpportunityAgent = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="py-32 flex flex-col items-center justify-center text-center space-y-6 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl"
+                  className="py-32 flex flex-col items-center justify-center text-center space-y-6 bg-[var(--surface)]/50 border border-[var(--border-subtle)] rounded-3xl backdrop-blur-sm"
                 >
-                  <div className="w-12 h-12 border-2 border-[var(--border-strong)] border-t-[var(--accent)] rounded-full animate-spin" />
-                  <p className="text-sm text-[var(--text-secondary)] font-mono uppercase tracking-widest">Scanning discovery nodes...</p>
+                  <div className="w-16 h-16 border-2 border-[var(--border-strong)] border-t-[var(--cinematic-coral)] rounded-full animate-spin" />
+                  <p className="text-xs font-mono uppercase tracking-widest text-[var(--cinematic-coral)] animate-pulse">Scanning Global Career Networks</p>
                 </motion.div>
               ) : opportunities.length > 0 ? (
                 <motion.div 
                   key="results"
-                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 relative z-10"
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
                 >
-                  {opportunities.map((opp, idx) => (
+                  {opportunities.map((item, idx) => (
                     <motion.div 
-                      variants={itemVariant}
-                      key={opp.id || idx}
-                      className="bg-[var(--surface)] border border-[var(--border-subtle)] p-6 hover:border-[var(--border-strong)] transition-colors flex flex-col h-full group rounded-2xl"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.05, duration: 0.5 }}
+                      key={item.id || idx}
+                      className="glass-panel p-8 hover:border-[var(--cinematic-coral)] transition-colors flex flex-col h-full group rounded-3xl"
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-[var(--surface-elevated)] border border-[var(--border-strong)] text-[var(--text-secondary)]">
-                          {opp.company}
+                      {/* Card Header */}
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-colors bg-[var(--surface-elevated)] border-[var(--border-strong)] text-[var(--cinematic-coral)]`}>
+                            <Briefcase className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">{item.company}</div>
+                            <h4 className="font-bold text-lg line-clamp-1 group-hover:text-[var(--cinematic-coral)] transition-colors font-['Outfit']">
+                              {item.title}
+                            </h4>
+                          </div>
                         </div>
-                        <button 
-                          onClick={() => handleSave(opp)}
-                          className="w-8 h-8 rounded-full border border-transparent hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                        >
+                        <button className="w-8 h-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--cinematic-coral)] transition-colors shrink-0">
                           <Bookmark className="w-4 h-4" />
                         </button>
                       </div>
 
-                      <h3 className="font-bold text-base mb-3 leading-tight group-hover:text-[var(--text-primary)] text-[var(--text-primary)] transition-colors">
-                        {opp.title}
-                      </h3>
-                      
-                      <p className="text-sm text-[var(--text-secondary)] line-clamp-3 leading-relaxed flex-1 mb-6">
-                        {opp.description}
+                      {/* Card Body */}
+                      <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mb-6 leading-relaxed flex-1">
+                        {item.description}
                       </p>
 
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {(opp.requiredSkills || opp.skills || ['Hackathon', 'Open Source']).slice(0, 3).map((s, i) => (
-                          <span key={i} className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[var(--surface-elevated)] text-[var(--text-secondary)] border border-[var(--border-strong)] uppercase tracking-wider">
-                            #{s}
-                          </span>
-                        ))}
+                      {/* Metadata */}
+                      <div className="space-y-4 mb-8">
+                        <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-main)] px-3 py-2 rounded-lg border border-[var(--border-strong)] w-fit">
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>{item.location || 'Remote / Hybrid'}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                           {(item.requiredSkills || item.skills || []).slice(0, 3).map((sk, i) => (
+                             <span key={i} className="px-2.5 py-1 bg-[var(--surface-elevated)] rounded-md text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">{sk}</span>
+                           ))}
+                        </div>
                       </div>
 
+                      {/* Footer Actions */}
                       <div className="flex items-center justify-between pt-5 border-t border-[var(--border-subtle)] mt-auto">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--accent)] uppercase tracking-widest">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          {opp.matchScore}% Match
+                        <div className="flex items-center gap-1.5 text-xs font-black text-[var(--cinematic-coral)] font-['Outfit']">
+                          <Sparkles className="w-4 h-4" />
+                          {item.matchScore}% Match
                         </div>
                         <a
-                          href={opp.url}
+                          href={item.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1.5 transition-colors group/link"
+                          className="text-xs font-bold text-black bg-[var(--text-secondary)] group-hover:bg-[var(--cinematic-coral)] flex items-center gap-1.5 px-4 py-2 rounded-xl transition-colors"
                         >
-                          Explore <ExternalLink className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                          Details <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                       </div>
                     </motion.div>
@@ -237,15 +237,15 @@ const OpportunityAgent = () => {
                   key="empty"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="py-32 flex flex-col items-center justify-center text-center space-y-4 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl"
+                  className="py-32 flex flex-col items-center justify-center text-center space-y-4 bg-[var(--surface)]/50 border border-[var(--border-subtle)] rounded-3xl backdrop-blur-sm"
                 >
-                  <Compass className="w-12 h-12 text-[var(--text-secondary)] mb-2 opacity-50" />
-                  <h3 className="text-xl font-bold">No nodes found in graph</h3>
-                  <p className="text-sm text-[var(--text-secondary)] max-w-sm font-mono">Try exploring a different company or adjusting your search parameters.</p>
+                  <Search className="w-12 h-12 text-[var(--text-secondary)] mb-2 opacity-50" />
+                  <h3 className="text-xl font-bold font-['Outfit']">No matches found</h3>
+                  <p className="text-xs text-[var(--text-secondary)] max-w-sm font-mono uppercase tracking-widest">Adjust neural search parameters.</p>
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         </main>
       </div>
     </motion.div>

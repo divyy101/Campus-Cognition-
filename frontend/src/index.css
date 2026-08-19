@@ -23,16 +23,17 @@
   --animate-float-slow: float 12s ease-in-out infinite;
   --animate-float-medium: float 8s ease-in-out infinite;
   --animate-float-fast: float 6s ease-in-out infinite;
+  --animate-pulse-opacity: pulse-opacity 4s ease-in-out infinite;
   --animate-pulse-slow: pulse-opacity 6s ease-in-out infinite;
   --animate-spin-slow: spin 30s linear infinite;
 
   @keyframes float {
     0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.01); }
+    50% { transform: translateY(-15px) scale(1.02); }
   }
   @keyframes pulse-opacity {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 0.9; }
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
   }
 }
 
