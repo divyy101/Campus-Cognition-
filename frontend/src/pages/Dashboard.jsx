@@ -69,7 +69,7 @@ const Dashboard = () => {
           <ScrollSection className="w-full relative min-h-[70vh] flex flex-col justify-center px-6 md:px-12 pt-16 pb-12 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
             
             {/* Visual Anchor (40-60% of viewport right side on desktop) */}
-            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[55%] opacity-20 md:opacity-100 z-0 mask-image-left">
+            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[55%] opacity-20 md:opacity-100 z-[-1] pointer-events-none mask-image-left">
               <FloatingVisual 
                 src="/visuals/hero-visual.jpg" 
                 alt="Neural Network Intelligence"

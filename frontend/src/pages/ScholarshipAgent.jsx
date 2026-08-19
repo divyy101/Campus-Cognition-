@@ -71,7 +71,7 @@ const OpportunityAgent = () => {
           <ScrollSection className="w-full relative min-h-[50vh] flex flex-col justify-center px-6 md:px-12 pt-12 pb-16 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
             
             {/* Visual Anchor */}
-            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[60%] opacity-30 md:opacity-100 z-0 mask-image-left mix-blend-screen">
+            <div className="absolute right-0 top-0 bottom-0 w-full md:w-[60%] opacity-30 md:opacity-100 z-[-1] pointer-events-none mask-image-left mix-blend-screen">
               <FloatingVisual 
                 src="/visuals/opportunity-visual.jpg" 
                 alt="Career Network"

@@ -39,16 +39,16 @@ export const FloatingVisual = ({ src, alt, speed = 'slow', className = '', style
   const floatClass = speed === 'slow' ? 'animate-float-slow' : speed === 'medium' ? 'animate-float-medium' : 'animate-float-fast';
   
   return (
-    <div className={`relative ${className}`} style={style}>
+    <div className={`relative pointer-events-none ${className}`} style={style}>
       <motion.img 
         src={src} 
         alt={alt}
-        className={`w-full h-full object-cover rounded-3xl ${floatClass}`}
+        className={`w-full h-full object-cover object-center rounded-3xl ${floatClass}`}
+        style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
       />
-      <div className="absolute inset-0 shadow-[inset_0_0_100px_var(--bg-main)] pointer-events-none rounded-3xl mix-blend-overlay opacity-50" />
     </div>
   );
 };
