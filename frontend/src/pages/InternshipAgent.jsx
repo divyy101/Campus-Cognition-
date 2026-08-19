@@ -4,7 +4,6 @@ import api from '../api/axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { 
-  Compass,
   Briefcase, 
   Search, 
   MapPin, 
@@ -15,41 +14,43 @@ import {
 } from 'lucide-react';
 import { CinematicReveal, FloatingVisual, AgentStatusIndicator, ScrollSection } from '../components/cinematic/CinematicComponents';
 
-const OpportunityAgent = () => {
+const InternshipAgent = () => {
   const [query, setQuery] = useState('');
-  const [opportunities, setOpportunities] = useState([]);
+  const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('');
 
   const TAGS = ['AI/ML', 'Frontend', 'Backend', 'Data Science', 'Product Management', 'DevOps', 'UI/UX', 'Remote'];
 
-  const fetchOpportunities = async (searchQuery = '') => {
+  // GET /api/internships/search?q=<query>
+  // Response: { success, data: { results, total, page, limit, has_next } }
+  const fetchInternships = async (searchQuery = '') => {
     setLoading(true);
     try {
       const res = await api.get(`/internships/search?q=${encodeURIComponent(searchQuery)}`);
       if (res.data.success && res.data.data) {
-        setOpportunities(res.data.data.results || []);
+        setInternships(res.data.data.results || []);
       }
     } catch (err) {
-      console.error('Failed to fetch opportunities:', err);
+      console.error('Failed to fetch internships:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOpportunities('Entry level');
+    fetchInternships('Entry level');
   }, []);
 
   const handleTagClick = (tag) => {
     setSelectedTag(tag);
     setQuery(tag);
-    fetchOpportunities(tag);
+    fetchInternships(tag);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchOpportunities(query);
+    fetchInternships(query);
   };
 
   return (
@@ -74,19 +75,19 @@ const OpportunityAgent = () => {
             <div className="absolute right-0 top-0 bottom-0 w-full md:w-[60%] opacity-30 md:opacity-100 z-[-1] pointer-events-none mask-image-left mix-blend-screen">
               <FloatingVisual 
                 src="/visuals/opportunity-visual.jpg" 
-                alt="Career Network"
+                alt="Internship Network"
                 speed="medium"
-                className="w-full h-full object-cover object-left"
+                className="w-full h-full object-cover object-center"
               />
             </div>
             
             <div className="relative z-20 max-w-3xl">
               <CinematicReveal delay={0.1} direction="up" className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center shadow-[0_0_15px_var(--cinematic-coral)]">
-                  <Compass className="w-5 h-5 text-[var(--cinematic-coral)]" />
+                  <Briefcase className="w-5 h-5 text-[var(--cinematic-coral)]" />
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="text-3xl font-extrabold font-['Outfit']">Opportunity Agent</h1>
+                  <h1 className="text-3xl font-extrabold font-['Outfit']">Internship Agent</h1>
                   <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest flex items-center gap-2">
                      Network Scanner 
                      <AgentStatusIndicator status={loading ? 'searching' : 'active'} type="opportunity" />
@@ -96,7 +97,7 @@ const OpportunityAgent = () => {
               
               <CinematicReveal delay={0.2} direction="up">
                 <h2 className="text-5xl font-extrabold tracking-tight leading-[1.1] mb-6 font-['Outfit']">
-                  Discover roles that fit <br/>
+                  Find internships that match <br/>
                   <span className="text-[var(--cinematic-coral)]">your skill graph.</span>
                 </h2>
               </CinematicReveal>
@@ -146,7 +147,7 @@ const OpportunityAgent = () => {
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xl font-bold font-['Outfit'] flex items-center gap-3">
                   <Target className="w-6 h-6 text-[var(--cinematic-coral)]" />
-                  {opportunities.length > 0 ? `${opportunities.length} Neural Matches` : 'Awaiting Scan'}
+                  {internships.length > 0 ? `${internships.length} Neural Matches` : 'Awaiting Scan'}
                 </h3>
                 <span className="text-[10px] font-bold text-[var(--cinematic-coral)] uppercase tracking-widest bg-[var(--cinematic-coral)]/10 px-3 py-1.5 rounded-lg border border-[var(--cinematic-coral)]/20">Ranked by Match Score</span>
               </div>
@@ -164,12 +165,12 @@ const OpportunityAgent = () => {
                   <div className="w-16 h-16 border-2 border-[var(--border-strong)] border-t-[var(--cinematic-coral)] rounded-full animate-spin" />
                   <p className="text-xs font-mono uppercase tracking-widest text-[var(--cinematic-coral)] animate-pulse">Scanning Global Career Networks</p>
                 </motion.div>
-              ) : opportunities.length > 0 ? (
+              ) : internships.length > 0 ? (
                 <motion.div 
                   key="results"
                   className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
                 >
-                  {opportunities.map((item, idx) => (
+                  {internships.map((item, idx) => (
                     <motion.div 
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -178,10 +179,9 @@ const OpportunityAgent = () => {
                       key={item.id || idx}
                       className="glass-panel p-8 hover:border-[var(--cinematic-coral)] transition-colors flex flex-col h-full group rounded-3xl"
                     >
-                      {/* Card Header */}
                       <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-colors bg-[var(--surface-elevated)] border-[var(--border-strong)] text-[var(--cinematic-coral)]`}>
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center border transition-colors bg-[var(--surface-elevated)] border-[var(--border-strong)] text-[var(--cinematic-coral)]">
                             <Briefcase className="w-5 h-5" />
                           </div>
                           <div>
@@ -196,12 +196,10 @@ const OpportunityAgent = () => {
                         </button>
                       </div>
 
-                      {/* Card Body */}
                       <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mb-6 leading-relaxed flex-1">
                         {item.description}
                       </p>
 
-                      {/* Metadata */}
                       <div className="space-y-4 mb-8">
                         <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-main)] px-3 py-2 rounded-lg border border-[var(--border-strong)] w-fit">
                           <MapPin className="w-3.5 h-3.5" />
@@ -214,7 +212,6 @@ const OpportunityAgent = () => {
                         </div>
                       </div>
 
-                      {/* Footer Actions */}
                       <div className="flex items-center justify-between pt-5 border-t border-[var(--border-subtle)] mt-auto">
                         <div className="flex items-center gap-1.5 text-xs font-black text-[var(--cinematic-coral)] font-['Outfit']">
                           <Sparkles className="w-4 h-4" />
@@ -252,4 +249,4 @@ const OpportunityAgent = () => {
   );
 };
 
-export default OpportunityAgent;
+export default InternshipAgent;

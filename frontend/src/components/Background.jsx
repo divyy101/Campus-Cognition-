@@ -46,7 +46,7 @@ const Background = ({ location }) => {
 
       {/* LAYER 2: Generated Visual (Atmospheric Depth) */}
       <motion.div 
-        className="absolute inset-0 opacity-[0.05] mix-blend-screen transition-opacity duration-1000"
+        className="absolute inset-0 opacity-[0.12] mix-blend-screen transition-opacity duration-1000"
         animate={{ 
           x: rawX * -8,
           y: rawY * -8,

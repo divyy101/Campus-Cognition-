@@ -56,8 +56,10 @@ export const FloatingVisual = ({ src, alt, speed = 'slow', className = '', style
 export const ScrollSection = ({ children, className = '' }) => {
   const { ref, scrollYProgress } = useScrollProgress(["start end", "end start"]);
   
-  const yOffset = useTransform(scrollYProgress, [0, 1], [50, -50]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  // Keep y movement subtle so content stays in viewport
+  const yOffset = useTransform(scrollYProgress, [0, 1], [20, -20]);
+  // Never go fully transparent — min opacity 0.4 keeps content and buttons always visible
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.4, 1, 1, 0.6]);
 
   return (
     <motion.div ref={ref} style={{ y: yOffset, opacity }} className={className}>
@@ -65,6 +67,7 @@ export const ScrollSection = ({ children, className = '' }) => {
     </motion.div>
   );
 };
+
 
 export const AgentStatusIndicator = ({ status = 'active', type = 'study' }) => {
   let colorVar = 'var(--accent)';

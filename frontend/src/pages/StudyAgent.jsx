@@ -11,47 +11,61 @@ import {
   Send,
   Loader2,
   Sparkles,
-  Zap
+  Zap,
+  Calendar,
+  Target,
+  AlertCircle
 } from 'lucide-react';
 import { CinematicReveal, FloatingVisual, AgentStatusIndicator } from '../components/cinematic/CinematicComponents';
 
 const StudyAgent = () => {
-  const [file, setFile] = useState(null);
+  const [syllabusFile, setSyllabusFile] = useState(null);
+  const [notesFile, setNotesFile] = useState(null);
+  const [title, setTitle] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
+
   const [chatMsg, setChatMsg] = useState('');
   const [chatHistory, setChatHistory] = useState([
     { role: 'agent', content: 'Initialize cognitive sync. Upload your study material or ask me a question.' }
   ]);
   const [isChatting, setIsChatting] = useState(false);
-  const fileInputRef = useRef(null);
+
+  const syllabusInputRef = useRef(null);
+  const notesInputRef = useRef(null);
   const chatEndRef = useRef(null);
 
-  const handleFileSelect = (e) => {
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
-
   const handleUpload = async () => {
-    if (!file) return;
+    if (!syllabusFile) return;
     setIsUploading(true);
+    setUploadError(null);
+
+    // Backend: POST /api/study/analyze
+    // Fields: syllabus (required), notes (optional), title, scope
     const formData = new FormData();
-    formData.append('document', file);
+    formData.append('syllabus', syllabusFile);
+    if (notesFile) formData.append('notes', notesFile);
+    formData.append('title', title || syllabusFile.name.replace(/\.[^/.]+$/, ''));
+    formData.append('scope', 'Exam Focused');
 
     try {
-      const res = await api.post('/study/upload', formData, {
+      const res = await api.post('/study/analyze', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (res.data.success) {
-        setUploadResult(res.data.data.analysis);
+        // Backend returns: { success, sessionId, analysis: { subject, syllabus_summary, repeated_topics, important_questions, weekly_plan } }
+        setUploadResult(res.data.analysis);
         setChatHistory(prev => [...prev, { 
           role: 'agent', 
-          content: `Document processed. I've extracted ${res.data.data.analysis.keyConcepts.length} key concepts. What would you like to explore?` 
+          content: `Study plan generated for "${res.data.analysis?.subject || title}". I found ${res.data.analysis?.repeated_topics?.length || 0} key topics and ${res.data.analysis?.weekly_plan?.length || 0} weekly modules. What would you like to explore?`
         }]);
+      } else {
+        setUploadError(res.data.message || 'Analysis failed.');
       }
     } catch (err) {
       console.error('Upload failed:', err);
+      setUploadError(err.response?.data?.message || 'Failed to process study material.');
     } finally {
       setIsUploading(false);
     }
@@ -67,13 +81,17 @@ const StudyAgent = () => {
     setIsChatting(true);
 
     try {
-      const res = await api.post('/study/chat', { message: newMsg });
+      // Backend: POST /api/study/rag/ask  body: { question }  response: { success, answer, sources }
+      const res = await api.post('/study/rag/ask', { question: newMsg });
       if (res.data.success) {
-        setChatHistory(prev => [...prev, { role: 'agent', content: res.data.data.reply }]);
+        setChatHistory(prev => [...prev, { role: 'agent', content: res.data.answer }]);
+      } else {
+        setChatHistory(prev => [...prev, { role: 'agent', content: res.data.message || 'Could not process your question.' }]);
       }
     } catch (err) {
       console.error('Chat failed:', err);
-      setChatHistory(prev => [...prev, { role: 'agent', content: "Neural sync interrupted. Please try again." }]);
+      const msg = err.response?.data?.message || 'Neural sync interrupted. Upload study material first, then ask questions.';
+      setChatHistory(prev => [...prev, { role: 'agent', content: msg }]);
     } finally {
       setIsChatting(false);
     }
@@ -99,7 +117,7 @@ const StudyAgent = () => {
         <main className="flex-1 px-6 md:px-12 py-8 max-w-[1800px] mx-auto w-full relative">
           
           {/* Visual Anchor Background */}
-          <div className="absolute top-0 right-0 w-[45%] h-[60vh] opacity-30 pointer-events-none mask-image-left z-[-1] mix-blend-screen">
+          <div className="absolute top-0 right-0 w-[45%] h-[60vh] opacity-20 pointer-events-none mask-image-left z-[-1] mix-blend-screen">
              <FloatingVisual 
                 src="/visuals/study-visual.jpg" 
                 alt="Learning Intelligence"
@@ -132,36 +150,72 @@ const StudyAgent = () => {
                 {/* Upload Card */}
                 <CinematicReveal delay={0.2}>
                   <div className="semantic-card p-8 group overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--cinematic-gold)]/10 blur-[40px] -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--cinematic-gold)]/10 blur-[40px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                     
                     <h2 className="text-lg font-bold font-['Outfit'] mb-6 flex items-center gap-2 relative z-10">
                       <Upload className="w-5 h-5 text-[var(--cinematic-gold)]" />
                       Knowledge Ingestion
                     </h2>
-                    
+
+                    {/* Title field */}
+                    <div className="mb-4 relative z-10">
+                      <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Subject / Course title (optional)"
+                        className="w-full bg-[var(--surface-elevated)] border border-[var(--border-strong)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/50 focus:border-[var(--cinematic-gold)] outline-none transition-colors"
+                      />
+                    </div>
+
+                    {/* Syllabus upload */}
                     <div 
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all relative z-10 ${
-                        file ? 'border-[var(--cinematic-gold)] bg-[var(--cinematic-gold)]/5' : 'border-[var(--border-strong)] bg-[var(--surface-elevated)] hover:border-[var(--text-primary)]'
+                      onClick={() => syllabusInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all relative z-10 mb-3 ${
+                        syllabusFile ? 'border-[var(--cinematic-gold)] bg-[var(--cinematic-gold)]/5' : 'border-[var(--border-strong)] bg-[var(--surface-elevated)] hover:border-[var(--text-primary)]'
                       }`}
                     >
                       <input 
                         type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleFileSelect} 
+                        ref={syllabusInputRef} 
+                        onChange={(e) => setSyllabusFile(e.target.files[0] || null)} 
                         className="hidden" 
                         accept=".pdf,.doc,.docx,.txt"
                       />
-                      <FileText className={`w-10 h-10 mx-auto mb-4 ${file ? 'text-[var(--cinematic-gold)]' : 'text-[var(--text-secondary)]'}`} />
-                      <p className="text-sm font-bold mb-1">{file ? file.name : 'Select Study Material'}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">PDF, DOCX, TXT up to 10MB</p>
+                      <FileText className={`w-8 h-8 mx-auto mb-3 ${syllabusFile ? 'text-[var(--cinematic-gold)]' : 'text-[var(--text-secondary)]'}`} />
+                      <p className="text-sm font-bold mb-0.5">{syllabusFile ? syllabusFile.name : 'Upload Syllabus *'}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">PDF, DOCX, TXT · Required</p>
                     </div>
+
+                    {/* Notes upload (optional) */}
+                    <div 
+                      onClick={() => notesInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all relative z-10 mb-5 ${
+                        notesFile ? 'border-[var(--cinematic-gold)]/50 bg-[var(--cinematic-gold)]/5' : 'border-[var(--border-strong)]/50 bg-[var(--surface-elevated)] hover:border-[var(--border-strong)]'
+                      }`}
+                    >
+                      <input 
+                        type="file" 
+                        ref={notesInputRef} 
+                        onChange={(e) => setNotesFile(e.target.files[0] || null)} 
+                        className="hidden" 
+                        accept=".pdf,.doc,.docx,.txt"
+                      />
+                      <p className="text-xs font-bold text-[var(--text-secondary)]">{notesFile ? notesFile.name : '+ Add Notes (optional)'}</p>
+                    </div>
+
+                    {uploadError && (
+                      <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-2 relative z-10">
+                        <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-400">{uploadError}</p>
+                      </div>
+                    )}
 
                     <button
                       onClick={handleUpload}
-                      disabled={!file || isUploading}
-                      className="w-full mt-6 semantic-btn py-3 flex items-center justify-center gap-2 disabled:opacity-50 relative z-10 shadow-[0_0_15px_rgba(242,198,109,0.2)]"
-                      style={{ backgroundColor: file && !isUploading ? 'var(--cinematic-gold)' : undefined, color: file && !isUploading ? '#000' : undefined }}
+                      disabled={!syllabusFile || isUploading}
+                      className="w-full semantic-btn py-3 flex items-center justify-center gap-2 disabled:opacity-50 relative z-10 shadow-[0_0_15px_rgba(242,198,109,0.2)] transition-all"
+                      style={{ backgroundColor: syllabusFile && !isUploading ? 'var(--cinematic-gold)' : undefined, color: syllabusFile && !isUploading ? '#000' : undefined }}
                     >
                       {isUploading ? (
                         <><Loader2 className="w-4 h-4 animate-spin" /> Processing Neural Data...</>
@@ -176,22 +230,77 @@ const StudyAgent = () => {
                 <AnimatePresence>
                   {uploadResult && (
                     <CinematicReveal delay={0.1}>
-                      <div className="semantic-card p-8 bg-[var(--surface-elevated)] border-[var(--cinematic-gold)]/30">
-                        <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--cinematic-gold)] mb-6 flex items-center gap-2">
+                      <div className="semantic-card p-6 space-y-5">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--cinematic-gold)] flex items-center gap-2">
                           <Sparkles className="w-4 h-4" />
-                          Extracted Concepts
+                          {uploadResult.subject || 'Study Plan'}
                         </h3>
-                        
-                        <div className="space-y-4">
-                          {uploadResult.keyConcepts?.map((concept, idx) => (
-                            <div key={idx} className="flex gap-4">
-                              <div className="w-6 h-6 rounded-full bg-[var(--cinematic-gold)]/20 text-[var(--cinematic-gold)] flex items-center justify-center text-xs font-bold shrink-0">
-                                {idx + 1}
-                              </div>
-                              <p className="text-sm text-[var(--text-primary)] leading-relaxed">{concept}</p>
+
+                        {/* Summary */}
+                        {uploadResult.syllabus_summary && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-2">Summary</p>
+                            <p className="text-sm text-[var(--text-primary)] leading-relaxed">{uploadResult.syllabus_summary}</p>
+                          </div>
+                        )}
+
+                        {/* Key Topics */}
+                        {uploadResult.repeated_topics?.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-3 flex items-center gap-2">
+                              <Target className="w-3.5 h-3.5" /> High-Priority Topics
+                            </p>
+                            <div className="space-y-2">
+                              {uploadResult.repeated_topics.slice(0, 5).map((topic, idx) => (
+                                <div key={idx} className="flex gap-3 items-start">
+                                  <div className="w-5 h-5 rounded-full bg-[var(--cinematic-gold)]/20 text-[var(--cinematic-gold)] flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                                    {idx + 1}
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-bold text-[var(--text-primary)]">{topic.topic}</p>
+                                    {topic.reason && <p className="text-xs text-[var(--text-secondary)]">{topic.reason}</p>}
+                                  </div>
+                                  {topic.weight && (
+                                    <span className={`ml-auto text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                                      topic.weight === 'High' ? 'bg-red-500/10 text-red-400' :
+                                      topic.weight === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' :
+                                      'bg-[var(--cinematic-gold)]/10 text-[var(--cinematic-gold)]'
+                                    }`}>{topic.weight}</span>
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
+                          </div>
+                        )}
+
+                        {/* Weekly Plan */}
+                        {uploadResult.weekly_plan?.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-3 flex items-center gap-2">
+                              <Calendar className="w-3.5 h-3.5" /> Weekly Roadmap
+                            </p>
+                            <div className="space-y-3">
+                              {uploadResult.weekly_plan.map((week, idx) => (
+                                <div key={idx} className="p-3 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)]">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-black text-[var(--cinematic-gold)] uppercase tracking-widest">Week {week.week}</span>
+                                    <span className="text-xs text-[var(--text-secondary)]">{week.focus}</span>
+                                  </div>
+                                  {week.tasks?.length > 0 && (
+                                    <ul className="space-y-1">
+                                      {week.tasks.slice(0, 3).map((task, ti) => (
+                                        <li key={ti} className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
+                                          <div className="w-1 h-1 rounded-full bg-[var(--cinematic-gold)]" />
+                                          {task}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </CinematicReveal>
                   )}
@@ -206,6 +315,9 @@ const StudyAgent = () => {
                   <div className="p-5 border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)] relative z-10 flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-[var(--cinematic-gold)] animate-pulse" />
                     <h2 className="font-bold text-sm uppercase tracking-widest font-['Outfit']">Neural Mentor</h2>
+                    <span className="ml-auto text-[10px] text-[var(--text-secondary)] font-mono">
+                      {uploadResult ? 'Knowledge base loaded' : 'Upload material to enable RAG'}
+                    </span>
                   </div>
 
                   {/* Chat Area */}
@@ -251,7 +363,7 @@ const StudyAgent = () => {
                         type="text"
                         value={chatMsg}
                         onChange={(e) => setChatMsg(e.target.value)}
-                        placeholder="Query the knowledge base..."
+                        placeholder={uploadResult ? "Ask about your study material..." : "Upload a syllabus first, then ask questions..."}
                         className="w-full bg-[var(--surface-elevated)] border border-[var(--border-strong)] rounded-xl pl-5 pr-14 py-4 text-sm focus:border-[var(--cinematic-gold)] outline-none transition-colors"
                       />
                       <button 

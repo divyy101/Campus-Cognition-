@@ -11,7 +11,10 @@ import {
   AlertCircle,
   FileCode2,
   Bug,
-  Sparkles
+  Sparkles,
+  Zap,
+  Clock,
+  MemoryStick
 } from 'lucide-react';
 import { CinematicReveal, FloatingVisual, AgentStatusIndicator } from '../components/cinematic/CinematicComponents';
 
@@ -20,28 +23,50 @@ const CodeLab = () => {
   const [language, setLanguage] = useState('javascript');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
+  const [error, setError] = useState(null);
   const textareaRef = useRef(null);
 
   const handleAnalyze = async () => {
     if (!code.trim()) return;
     setIsAnalyzing(true);
     setResults(null);
+    setError(null);
 
     try {
       const res = await api.post('/code/analyze', { code, language });
       if (res.data.success) {
-        setResults(res.data.data.analysis);
+        // Backend returns: { success, data: { bugs, warnings, explanation, timeComplexity, spaceComplexity, optimization, alternative, improvedCode } }
+        setResults(res.data.data);
+      } else {
+        setError(res.data.message || 'Analysis failed.');
       }
     } catch (err) {
       console.error('Analysis failed:', err);
-      setResults({
-        summary: "Analysis failed due to server error.",
-        issues: [{ type: "error", message: "Connection lost to intelligence core.", line: 0 }]
-      });
+      const msg = err.response?.data?.message || 'Connection lost to intelligence core.';
+      setError(msg);
     } finally {
       setIsAnalyzing(false);
     }
   };
+
+  const handleKeyDown = (e) => {
+    // Tab support in textarea
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      const newCode = code.substring(0, start) + '  ' + code.substring(end);
+      setCode(newCode);
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = start + 2;
+          textareaRef.current.selectionEnd = start + 2;
+        }
+      }, 0);
+    }
+  };
+
+  const totalIssues = results ? ((results.bugs?.length || 0) + (results.warnings?.length || 0)) : 0;
 
   return (
     <motion.div 
@@ -53,17 +78,18 @@ const CodeLab = () => {
     >
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 relative z-10 h-screen overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col min-w-0 relative z-10 h-screen overflow-y-auto overflow-x-hidden custom-scrollbar">
         <Navbar title="" />
 
         <main className="flex-1 px-6 md:px-12 py-8 max-w-[1800px] mx-auto w-full relative">
           
           {/* Visual Anchor Background (CodeLab) */}
-          <div className="absolute top-0 right-0 w-[40%] h-[70vh] opacity-20 pointer-events-none mask-image-left z-0 mix-blend-screen">
+          <div className="absolute top-0 right-0 w-[40%] h-[70vh] opacity-20 pointer-events-none mask-image-left z-[-1] mix-blend-screen">
              <FloatingVisual 
                 src="/visuals/code-visual.jpg" 
                 alt="Code Intelligence"
                 speed="slow"
+                className="w-full h-full object-cover object-center"
              />
           </div>
 
@@ -117,12 +143,11 @@ const CodeLab = () => {
                     ref={textareaRef}
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     spellCheck="false"
                     className="absolute inset-0 w-full h-full bg-transparent text-[var(--text-primary)] p-6 resize-none outline-none leading-relaxed"
                     placeholder="// Paste your code here for intelligence review..."
                   />
-                  {/* Subtle Grid overlay for editor */}
-                  <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMSkiLz48L3N2Zz4=')] bg-[length:40px_40px]" />
                 </div>
 
                 {/* Editor Footer */}
@@ -157,14 +182,16 @@ const CodeLab = () => {
 
               <div className="flex-1 semantic-card p-6 overflow-y-auto custom-scrollbar">
                 <AnimatePresence mode="wait">
-                  {!results && !isAnalyzing ? (
+                  {!results && !isAnalyzing && !error ? (
                     <motion.div 
+                      key="idle"
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                       className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50"
                     >
                       <Terminal className="w-12 h-12 text-[var(--text-secondary)]" />
                       <p className="text-sm font-mono uppercase tracking-widest text-[var(--text-secondary)]">Awaiting code input...</p>
                     </motion.div>
+
                   ) : isAnalyzing ? (
                     <motion.div 
                       key="analyzing"
@@ -178,65 +205,126 @@ const CodeLab = () => {
                       </div>
                       <p className="text-xs font-mono uppercase tracking-widest text-[var(--cinematic-cyan)] animate-pulse">Running Neural Review</p>
                     </motion.div>
-                  ) : (
+
+                  ) : error ? (
+                    <motion.div
+                      key="error"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="h-full flex flex-col items-center justify-center space-y-4"
+                    >
+                      <AlertCircle className="w-12 h-12 text-red-500 opacity-60" />
+                      <p className="text-sm text-red-400 text-center max-w-xs">{error}</p>
+                      <button onClick={() => setError(null)} className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)] underline">Dismiss</button>
+                    </motion.div>
+
+                  ) : results ? (
                     <motion.div 
                       key="results"
                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                      className="space-y-6"
+                      className="space-y-5"
                     >
-                      {/* Summary */}
-                      <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--cinematic-cyan)]/30 shadow-[0_0_15px_rgba(53,214,232,0.1)]">
-                        <div className="flex items-center gap-2 text-[var(--cinematic-cyan)] mb-2">
-                          <Sparkles className="w-4 h-4" />
-                          <h3 className="text-xs font-bold uppercase tracking-widest">Intelligence Summary</h3>
+                      {/* Complexity Metrics */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+                            <Clock className="w-3 h-3" /> Time
+                          </div>
+                          <div className="text-lg font-black font-['Outfit'] text-[var(--cinematic-cyan)]">{results.timeComplexity || 'N/A'}</div>
                         </div>
-                        <p className="text-sm leading-relaxed">{results.summary}</p>
+                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+                            <MemoryStick className="w-3 h-3" /> Space
+                          </div>
+                          <div className="text-lg font-black font-['Outfit'] text-[var(--cinematic-cyan)]">{results.spaceComplexity || 'N/A'}</div>
+                        </div>
+                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Bugs</div>
+                          <div className={`text-3xl font-black font-['Outfit'] ${results.bugs?.length > 0 ? 'text-red-400' : 'text-green-400'}`}>{results.bugs?.length || 0}</div>
+                        </div>
+                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Warnings</div>
+                          <div className={`text-3xl font-black font-['Outfit'] ${results.warnings?.length > 0 ? 'text-yellow-400' : 'text-[var(--text-primary)]'}`}>{results.warnings?.length || 0}</div>
+                        </div>
                       </div>
 
-                      {/* Metrics/Score (Mocked for visual) */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)]">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Quality Score</div>
-                          <div className="text-3xl font-black font-['Outfit'] text-[var(--success)]">92<span className="text-sm text-[var(--text-secondary)]">/100</span></div>
+                      {/* Explanation */}
+                      {results.explanation && (
+                        <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--cinematic-cyan)]/30 shadow-[0_0_15px_rgba(53,214,232,0.05)]">
+                          <div className="flex items-center gap-2 text-[var(--cinematic-cyan)] mb-3">
+                            <Sparkles className="w-4 h-4" />
+                            <h3 className="text-xs font-bold uppercase tracking-widest">Intelligence Summary</h3>
+                          </div>
+                          <p className="text-sm leading-relaxed text-[var(--text-primary)]">{results.explanation}</p>
                         </div>
-                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)]">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Issues Found</div>
-                          <div className="text-3xl font-black font-['Outfit']">{results.issues?.length || 0}</div>
-                        </div>
-                      </div>
+                      )}
 
-                      {/* Issues List */}
-                      {results.issues && results.issues.length > 0 && (
-                        <div className="space-y-3">
-                          <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-4">Detailed Findings</h3>
-                          {results.issues.map((issue, idx) => (
-                            <div key={idx} className={`p-4 rounded-xl border flex gap-4 ${
-                              issue.type === 'error' ? 'bg-red-500/5 border-red-500/20' :
-                              issue.type === 'warning' ? 'bg-yellow-500/5 border-yellow-500/20' :
-                              'bg-[var(--cinematic-cyan)]/5 border-[var(--cinematic-cyan)]/20'
-                            }`}>
-                              <div className="mt-0.5">
-                                {issue.type === 'error' ? <AlertCircle className="w-4 h-4 text-red-500" /> :
-                                 issue.type === 'warning' ? <Bug className="w-4 h-4 text-yellow-500" /> :
-                                 <CheckCircle2 className="w-4 h-4 text-[var(--cinematic-cyan)]" />}
-                              </div>
+                      {/* Bugs */}
+                      {results.bugs && results.bugs.length > 0 && (
+                        <div className="space-y-2">
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-red-400 flex items-center gap-2">
+                            <Bug className="w-3.5 h-3.5" /> Bugs Detected
+                          </h3>
+                          {results.bugs.map((bug, idx) => (
+                            <div key={idx} className="p-3 rounded-xl border border-red-500/20 bg-red-500/5 flex gap-3">
+                              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                               <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                                    issue.type === 'error' ? 'text-red-500' :
-                                    issue.type === 'warning' ? 'text-yellow-500' :
-                                    'text-[var(--cinematic-cyan)]'
-                                  }`}>{issue.type}</span>
-                                  <span className="text-[10px] text-[var(--text-secondary)] font-mono">Line {issue.line}</span>
-                                </div>
-                                <p className="text-sm">{issue.message}</p>
+                                {bug.line && <span className="text-[10px] font-mono text-[var(--text-secondary)] block mb-0.5">Line {bug.line} · {bug.type || 'Error'}</span>}
+                                <p className="text-sm text-[var(--text-primary)]">{bug.message}</p>
                               </div>
                             </div>
                           ))}
                         </div>
                       )}
+
+                      {/* Warnings */}
+                      {results.warnings && results.warnings.length > 0 && (
+                        <div className="space-y-2">
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-yellow-400 flex items-center gap-2">
+                            <AlertCircle className="w-3.5 h-3.5" /> Warnings
+                          </h3>
+                          {results.warnings.map((warn, idx) => (
+                            <div key={idx} className="p-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 flex gap-3">
+                              <Bug className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                              <div>
+                                {warn.line && <span className="text-[10px] font-mono text-[var(--text-secondary)] block mb-0.5">Line {warn.line}</span>}
+                                <p className="text-sm text-[var(--text-primary)]">{warn.message}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Optimization */}
+                      {results.optimization && (
+                        <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)]">
+                          <div className="flex items-center gap-2 text-[var(--text-secondary)] mb-2">
+                            <Zap className="w-3.5 h-3.5 text-[var(--cinematic-cyan)]" />
+                            <h3 className="text-xs font-bold uppercase tracking-widest">Optimization</h3>
+                          </div>
+                          <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{results.optimization}</p>
+                        </div>
+                      )}
+
+                      {/* Improved Code */}
+                      {results.improvedCode && results.improvedCode !== code && (
+                        <div className="p-4 rounded-xl bg-[var(--bg-main)] border border-[var(--cinematic-cyan)]/20">
+                          <div className="flex items-center gap-2 text-[var(--cinematic-cyan)] mb-3">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <h3 className="text-xs font-bold uppercase tracking-widest">Optimized Code</h3>
+                          </div>
+                          <pre className="text-xs font-mono text-[var(--text-primary)] whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-48 overflow-y-auto custom-scrollbar">
+                            {results.improvedCode}
+                          </pre>
+                          <button
+                            onClick={() => setCode(results.improvedCode)}
+                            className="mt-3 text-xs font-bold text-[var(--cinematic-cyan)] uppercase tracking-widest hover:opacity-80 transition-opacity"
+                          >
+                            Apply to Editor →
+                          </button>
+                        </div>
+                      )}
                     </motion.div>
-                  )}
+                  ) : null}
                 </AnimatePresence>
               </div>
             </CinematicReveal>
