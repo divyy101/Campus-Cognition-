@@ -10,16 +10,11 @@ const AuthLayout = ({ children, title, subtitle }) => {
   const isLogin = location.pathname === '/login';
 
   return (
-    <div className="min-h-screen flex w-full bg-transparent transition-colors duration-500 overflow-hidden text-[var(--text-primary)]">
+    <div className="min-h-[100dvh] flex w-full bg-[var(--bg)] text-[var(--text-primary)]">
       
       {/* Left Panel: Authentication (40% Desktop, 100% Mobile) */}
       <div className="w-full lg:w-[40%] flex flex-col items-center justify-center relative z-10 px-6 sm:px-12 py-10 overflow-y-auto custom-scrollbar">
         
-        {/* Subtle Ambient Glow for Auth Panel (Mobile only) */}
-        <div className="absolute inset-0 pointer-events-none lg:hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent)]/10 blur-[80px] rounded-full" />
-        </div>
-
         <div className="w-full max-w-[420px] relative z-10 flex flex-col gap-8">
           
           {/* Logo & Header */}
@@ -28,7 +23,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="w-12 h-12 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center shadow-lg border border-[var(--accent)]/30"
+              className="w-12 h-12 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center border border-[var(--border)]"
             >
               <Sparkles className="w-6 h-6 text-[var(--accent)]" />
             </motion.div>
@@ -38,16 +33,16 @@ const AuthLayout = ({ children, title, subtitle }) => {
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-2xl sm:text-3xl font-light tracking-tight leading-snug"
+                className="cc-h1 mb-2"
               >
                 Welcome back,<br/>
-                <span className="font-bold">Creative.</span>
+                <span className="font-bold text-[var(--accent)]">Creative.</span>
               </motion.h1>
               <motion.p 
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-sm text-[var(--text-secondary)] mt-2 font-medium"
+                className="cc-body text-[var(--text-secondary)]"
               >
                 Continue your journey with Campus Cognition.
               </motion.p>
@@ -59,7 +54,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex p-1 rounded-xl bg-[var(--surface)] border border-[var(--border)] w-full"
+            className="flex p-1 rounded-xl bg-[var(--surface-sunken)] border border-[var(--border)] w-full"
           >
             <button
               onClick={() => navigate('/login')}
@@ -68,7 +63,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
               {isLogin && (
                 <motion.div 
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-[var(--surface-elevated)] rounded-lg shadow-sm border border-[var(--border)]"
+                  className="absolute inset-0 bg-[var(--surface)] rounded-lg shadow-sm border border-[var(--border)]"
                 />
               )}
               <span className="relative z-10">Sign In</span>
@@ -80,7 +75,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
               {!isLogin && (
                 <motion.div 
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-[var(--surface-elevated)] rounded-lg shadow-sm border border-[var(--border)]"
+                  className="absolute inset-0 bg-[var(--surface)] rounded-lg shadow-sm border border-[var(--border)]"
                 />
               )}
               <span className="relative z-10">Sign Up</span>

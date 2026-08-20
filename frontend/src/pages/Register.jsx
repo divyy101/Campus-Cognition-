@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, User, Mail } from 'lucide-react';
 import AuthLayout from '../components/auth/AuthLayout';
 
 const Register = () => {
@@ -26,9 +26,9 @@ const Register = () => {
   const getPasswordStrength = () => {
     const p = formData.password;
     if (!p) return { score: 0, text: 'Empty', color: 'bg-[var(--border-strong)]' };
-    if (p.length < 6) return { score: 1, text: 'Weak', color: 'bg-red-500' };
-    if (p.length < 10) return { score: 2, text: 'Medium', color: 'bg-amber-500' };
-    return { score: 3, text: 'Strong', color: 'bg-green-500' };
+    if (p.length < 6) return { score: 1, text: 'Weak', color: 'bg-[var(--danger)]' };
+    if (p.length < 10) return { score: 2, text: 'Medium', color: 'bg-[var(--warning)]' };
+    return { score: 3, text: 'Strong', color: 'bg-[var(--success)]' };
   };
 
   const strength = getPasswordStrength();
@@ -69,17 +69,17 @@ const Register = () => {
     <AuthLayout>
       
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+        <div className="mb-6 p-4 rounded-xl bg-[var(--danger-soft)] border border-[var(--danger)]/30 text-[var(--danger)] text-sm font-semibold flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-[var(--danger)] shrink-0" />
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4">
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[var(--text-secondary)]">First Name</label>
+            <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">First Name</label>
             <div className="relative group">
               <input
                 type="text"
@@ -87,13 +87,13 @@ const Register = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="John"
-                className="semantic-input w-full h-14 px-4 shadow-inner"
+                className="cc-input w-full h-12 px-4"
                 required
               />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[var(--text-secondary)]">Last Name</label>
+            <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Last Name</label>
             <div className="relative group">
               <input
                 type="text"
@@ -101,7 +101,7 @@ const Register = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Doe"
-                className="semantic-input w-full h-14 px-4 shadow-inner"
+                className="cc-input w-full h-12 px-4"
                 required
               />
             </div>
@@ -109,7 +109,7 @@ const Register = () => {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[var(--text-secondary)]">Username</label>
+          <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Username</label>
           <div className="relative group">
             <input
               type="text"
@@ -117,15 +117,15 @@ const Register = () => {
               value={formData.username}
               onChange={handleChange}
               placeholder="johndoe2026"
-              className="semantic-input w-full h-14 pl-4 pr-10 shadow-inner"
+              className="cc-input w-full h-12 pl-4 pr-10"
               required
             />
-            <User className="w-5 h-5 text-[var(--text-secondary)] absolute right-4 top-4.5 group-focus-within:text-[var(--accent)] transition-colors" style={{ top: '18px' }} />
+            <User className="w-5 h-5 text-[var(--text-muted)] absolute right-4 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--accent)] transition-colors" />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[var(--text-secondary)]">Email Address</label>
+          <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Email Address</label>
           <div className="relative group">
             <input
               type="email"
@@ -133,15 +133,15 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="john@university.edu"
-              className="semantic-input w-full h-14 pl-4 pr-10 shadow-inner"
+              className="cc-input w-full h-12 pl-4 pr-10"
               required
             />
-            <Mail className="w-5 h-5 text-[var(--text-secondary)] absolute right-4 top-4.5 group-focus-within:text-[var(--accent)] transition-colors" style={{ top: '18px' }} />
+            <Mail className="w-5 h-5 text-[var(--text-muted)] absolute right-4 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--accent)] transition-colors" />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[var(--text-secondary)]">Password</label>
+          <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Password</label>
           <div className="relative group">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -149,14 +149,13 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="semantic-input w-full h-14 pl-4 pr-12 shadow-inner"
+              className="cc-input w-full h-12 pl-4 pr-12"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus:outline-none"
-              style={{ top: '18px' }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors focus:outline-none"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
@@ -164,8 +163,8 @@ const Register = () => {
 
           {/* Password Strength Indicator */}
           {formData.password && (
-            <div className="mt-3 flex items-center gap-2 px-1">
-              <div className="flex-1 h-1.5 bg-[var(--surface-elevated)] rounded-full overflow-hidden flex gap-1">
+            <div className="mt-2 flex items-center gap-2 px-1">
+              <div className="flex-1 h-1 bg-[var(--surface-sunken)] rounded-full overflow-hidden flex gap-1">
                 <div className={`h-full ${strength.score >= 1 ? strength.color : 'transparent'} flex-1 transition-colors`} />
                 <div className={`h-full ${strength.score >= 2 ? strength.color : 'transparent'} flex-1 transition-colors`} />
                 <div className={`h-full ${strength.score >= 3 ? strength.color : 'transparent'} flex-1 transition-colors`} />
@@ -178,20 +177,20 @@ const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-14 rounded-xl font-bold flex justify-center items-center gap-2 mt-6 bg-[var(--text-primary)] hover:bg-[var(--text-secondary)] text-[var(--bg-main)] transition-colors disabled:opacity-50"
+          className="cc-btn w-full h-12 flex justify-center items-center gap-2 mt-6"
         >
           {loading ? (
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce [animation-delay:0.2s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--bg-main)] animate-bounce [animation-delay:0.4s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.2s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.4s]" />
             </div>
           ) : 'Initialize Account'}
         </button>
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-xs text-[var(--text-secondary)] font-medium">
+        <p className="text-xs text-[var(--text-secondary)] font-semibold">
           By signing up, you agree to our{' '}
           <Link to="/terms" className="text-[var(--text-primary)] hover:underline transition-colors">Terms of Service</Link>
           {' '}and{' '}

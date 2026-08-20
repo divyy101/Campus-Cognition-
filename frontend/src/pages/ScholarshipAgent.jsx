@@ -12,7 +12,7 @@ import {
   Target,
   Award
 } from 'lucide-react';
-import { CinematicReveal, FloatingVisual, AgentStatusIndicator, ScrollSection } from '../components/cinematic/CinematicComponents';
+import { AgentStatusIndicator, PageHeader } from '../components/cinematic/CinematicComponents';
 
 const ScholarshipAgent = () => {
   const [query, setQuery] = useState('');
@@ -22,8 +22,6 @@ const ScholarshipAgent = () => {
 
   const TAGS = ['Merit Based', 'Need Based', 'STEM', 'Women in Tech', 'International', 'Research', 'Undergraduate', 'Postgraduate'];
 
-  // GET /api/scholarships/search?q=<query>
-  // Response: { success, data: { results, total, page, limit, has_next } }
   const fetchScholarships = async (searchQuery = '') => {
     setLoading(true);
     try {
@@ -54,169 +52,125 @@ const ScholarshipAgent = () => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.3 } }}
-      transition={{ duration: 0.8 }}
-      className="flex min-h-screen bg-transparent font-sans text-[var(--text-primary)] relative overflow-hidden z-10"
-    >
+    <div className="flex min-h-[100dvh] bg-[var(--bg)]">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 z-10 h-screen overflow-y-auto overflow-x-hidden custom-scrollbar">
-        <Navbar title="" />
+      <div className="flex-1 flex flex-col min-w-0 h-[100dvh] overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <Navbar title="Scholarship Agent" />
 
-        <main className="flex-1 pb-24 relative">
+        <main className="flex-1 px-4 sm:px-8 py-8 max-w-7xl mx-auto w-full space-y-12 pb-24">
           
-          {/* Visual Anchor Hero Section */}
-          <ScrollSection className="w-full relative min-h-[50vh] flex flex-col justify-center px-6 md:px-12 pt-12 pb-16 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
-            
-            {/* Cinematic Full-Screen Background */}
-            <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
-              <FloatingVisual 
-                src="/visuals/opportunity-visual.jpg" 
-                videoSrc="/visuals/opportunity-visual-motion.mp4"
-                alt="Scholarship Network"
-                speed="medium"
-                className="absolute inset-0 w-full h-full object-cover object-center"
-              />
-            </div>
-            
-            <div className="relative z-20 max-w-3xl">
-              <CinematicReveal delay={0.1} direction="up" className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center shadow-[0_0_15px_var(--cinematic-coral)]">
-                  <GraduationCap className="w-5 h-5 text-[var(--cinematic-coral)]" />
-                </div>
-                <div className="flex flex-col">
-                  <h1 className="text-3xl font-extrabold font-['Outfit']">Scholarship Agent</h1>
-                  <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest flex items-center gap-2">
-                     Funding Intelligence 
-                     <AgentStatusIndicator status={loading ? 'searching' : 'active'} type="opportunity" />
-                  </p>
-                </div>
-              </CinematicReveal>
-              
-              <CinematicReveal delay={0.2} direction="up">
-                <h2 className="text-5xl font-extrabold tracking-tight leading-[1.1] mb-6 font-['Outfit']">
-                  Discover funding that fits <br/>
-                  <span className="text-[var(--cinematic-coral)]">your academic profile.</span>
-                </h2>
-              </CinematicReveal>
+          <PageHeader
+            icon={GraduationCap}
+            eyebrow="Funding Intelligence"
+            title="Scholarship Agent"
+            description="Discover funding that fits your academic profile."
+            actions={<AgentStatusIndicator status={loading ? 'searching' : 'active'} type="opportunity" />}
+          />
 
-              <CinematicReveal delay={0.3} direction="up">
-                <form onSubmit={handleSearch} className="w-full max-w-2xl flex flex-col sm:flex-row gap-3">
-                  <div className="relative flex-1">
-                    <Search className="w-5 h-5 text-[var(--text-secondary)] absolute left-5 top-1/2 -translate-y-1/2 z-10" />
-                    <input
-                      type="text"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search scholarship, provider, or criteria..."
-                      className="w-full bg-[var(--surface-elevated)]/80 backdrop-blur-md rounded-2xl pl-14 pr-6 py-4 text-sm font-bold border border-[var(--border-strong)] focus:border-[var(--cinematic-coral)] shadow-glow outline-none transition-all placeholder:text-[var(--text-secondary)]/50"
-                    />
-                  </div>
-                  <button 
-                    type="submit" 
-                    className="px-10 py-4 rounded-2xl bg-[var(--cinematic-coral)] text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 shadow-[0_0_15px_rgba(240,138,138,0.4)] transition-all shrink-0"
-                  >
-                    Find Funding
-                  </button>
-                </form>
-              </CinematicReveal>
-
-              <CinematicReveal delay={0.4} direction="up" className="mt-8 flex flex-wrap gap-2">
-                {TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => handleTagClick(tag)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                      selectedTag === tag
-                        ? 'bg-[var(--cinematic-coral)] border-[var(--cinematic-coral)] text-black'
-                        : 'bg-[var(--surface-elevated)]/50 border-[var(--border-strong)] text-[var(--text-secondary)] hover:border-[var(--cinematic-coral)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </CinematicReveal>
-            </div>
-          </ScrollSection>
-
-          {/* Results Section */}
-          <div className="px-6 md:px-12 pt-12 max-w-[1800px] mx-auto w-full relative z-20">
-            <CinematicReveal delay={0.5}>
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xl font-bold font-['Outfit'] flex items-center gap-3">
-                  <Target className="w-6 h-6 text-[var(--cinematic-coral)]" />
-                  {scholarships.length > 0 ? `${scholarships.length} Funding Matches` : 'Awaiting Scan'}
-                </h3>
-                <span className="text-[10px] font-bold text-[var(--cinematic-coral)] uppercase tracking-widest bg-[var(--cinematic-coral)]/10 px-3 py-1.5 rounded-lg border border-[var(--cinematic-coral)]/20">Ranked by Match Score</span>
+          <section>
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search scholarship, provider, or criteria..."
+                  className="cc-input w-full pl-12 pr-4 py-3"
+                />
               </div>
-            </CinematicReveal>
+              <button type="submit" className="cc-btn px-8 py-3">
+                Find Funding
+              </button>
+            </form>
+
+            <div className="flex flex-wrap gap-2">
+              {TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => handleTagClick(tag)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors border ${
+                    selectedTag === tag
+                      ? 'bg-[var(--accent)] text-[var(--text-on-accent)] border-[var(--accent)]'
+                      : 'bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="cc-h3 flex items-center gap-2">
+                <Target className="w-5 h-5 text-[var(--accent)]" />
+                {scholarships.length > 0 ? `${scholarships.length} Funding Matches` : 'Awaiting Scan'}
+              </h3>
+              <span className="cc-badge">Ranked by Match Score</span>
+            </div>
 
             <AnimatePresence mode="wait">
               {loading ? (
                 <motion.div 
                   key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="py-32 flex flex-col items-center justify-center text-center space-y-6 bg-[var(--surface)]/50 border border-[var(--border-subtle)] rounded-3xl backdrop-blur-sm"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="py-24 flex flex-col items-center justify-center space-y-4"
                 >
-                  <div className="w-16 h-16 border-2 border-[var(--border-strong)] border-t-[var(--cinematic-coral)] rounded-full animate-spin" />
-                  <p className="text-xs font-mono uppercase tracking-widest text-[var(--cinematic-coral)] animate-pulse">Scanning Scholarship Database</p>
+                  <div className="w-8 h-8 border-2 border-[var(--border-strong)] border-t-[var(--accent)] rounded-full animate-spin" />
+                  <p className="cc-caption text-[var(--accent)] animate-pulse">Scanning Scholarship Database</p>
                 </motion.div>
               ) : scholarships.length > 0 ? (
                 <motion.div 
                   key="results"
-                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                   {scholarships.map((item, idx) => (
                     <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.05, duration: 0.5 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
                       key={item.id || idx}
-                      className="glass-panel p-8 hover:border-[var(--cinematic-coral)] transition-colors flex flex-col h-full group rounded-3xl"
+                      className="cc-card p-6 flex flex-col h-full hover:border-[var(--accent)] transition-colors"
                     >
-                      <div className="flex justify-between items-start mb-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl flex items-center justify-center border transition-colors bg-[var(--surface-elevated)] border-[var(--border-strong)] text-[var(--cinematic-coral)]">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--accent-soft)] text-[var(--accent)]">
                             <Award className="w-5 h-5" />
                           </div>
                           <div>
-                            <div className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">{item.company || item.provider}</div>
-                            <h4 className="font-bold text-lg line-clamp-1 group-hover:text-[var(--cinematic-coral)] transition-colors font-['Outfit']">
+                            <div className="cc-eyebrow mb-1">{item.company || item.provider}</div>
+                            <h4 className="text-base font-bold text-[var(--text-primary)] line-clamp-1">
                               {item.title}
                             </h4>
                           </div>
                         </div>
-                        <button className="w-8 h-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--cinematic-coral)] transition-colors shrink-0">
-                          <Bookmark className="w-4 h-4" />
+                        <button className="text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
+                          <Bookmark className="w-5 h-5" />
                         </button>
                       </div>
 
-                      <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mb-6 leading-relaxed flex-1">
+                      <p className="cc-body text-[var(--text-secondary)] line-clamp-2 mb-6 flex-1">
                         {item.description}
                       </p>
 
-                      <div className="space-y-4 mb-8">
+                      <div className="space-y-3 mb-6">
                         {item.amount && (
-                          <div className="flex items-center gap-2 text-xs font-bold text-[var(--cinematic-coral)] bg-[var(--cinematic-coral)]/10 px-3 py-2 rounded-lg border border-[var(--cinematic-coral)]/20 w-fit">
+                          <div className="flex items-center gap-2 text-xs font-semibold text-[var(--success)] bg-[var(--success-soft)] px-3 py-1.5 rounded-lg border border-[var(--success)]/20 w-fit">
                             <Award className="w-3.5 h-3.5" />
                             <span>{item.amount}</span>
                           </div>
                         )}
                         <div className="flex flex-wrap gap-2">
                            {(item.requiredCriteria || item.skills || []).slice(0, 3).map((cr, i) => (
-                             <span key={i} className="px-2.5 py-1 bg-[var(--surface-elevated)] rounded-md text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">{cr}</span>
+                             <span key={i} className="px-2 py-1 bg-[var(--surface-sunken)] rounded text-xs font-semibold text-[var(--text-secondary)] border border-[var(--border)]">{cr}</span>
                            ))}
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-5 border-t border-[var(--border-subtle)] mt-auto">
-                        <div className="flex items-center gap-1.5 text-xs font-black text-[var(--cinematic-coral)] font-['Outfit']">
+                      <div className="flex items-center justify-between pt-4 border-t border-[var(--border)] mt-auto">
+                        <div className="flex items-center gap-1.5 text-sm font-bold text-[var(--accent)]">
                           <Sparkles className="w-4 h-4" />
                           {item.matchScore}% Match
                         </div>
@@ -224,7 +178,7 @@ const ScholarshipAgent = () => {
                           href={item.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-bold text-black bg-[var(--text-secondary)] group-hover:bg-[var(--cinematic-coral)] flex items-center gap-1.5 px-4 py-2 rounded-xl transition-colors"
+                          className="cc-btn-secondary px-4 py-2 text-xs"
                         >
                           Apply <ExternalLink className="w-3.5 h-3.5" />
                         </a>
@@ -235,20 +189,19 @@ const ScholarshipAgent = () => {
               ) : (
                 <motion.div 
                   key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="py-32 flex flex-col items-center justify-center text-center space-y-4 bg-[var(--surface)]/50 border border-[var(--border-subtle)] rounded-3xl backdrop-blur-sm"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="py-24 flex flex-col items-center justify-center text-center space-y-3"
                 >
-                  <Search className="w-12 h-12 text-[var(--text-secondary)] mb-2 opacity-50" />
-                  <h3 className="text-xl font-bold font-['Outfit']">No scholarships found</h3>
-                  <p className="text-xs text-[var(--text-secondary)] max-w-sm font-mono uppercase tracking-widest">Adjust search criteria to find funding.</p>
+                  <Search className="w-10 h-10 text-[var(--text-muted)]" />
+                  <h3 className="cc-h3 text-[var(--text-primary)]">No scholarships found</h3>
+                  <p className="cc-caption">Adjust search criteria to find funding.</p>
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </section>
         </main>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

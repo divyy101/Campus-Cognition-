@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import api from '../api/axios';
-import { Lock, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Lock, CheckCircle2 } from 'lucide-react';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -44,54 +44,54 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] flex items-center justify-center p-4 bg-[var(--bg)] text-[var(--text-primary)]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl"
+        className="w-full max-w-md bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 shadow-sm"
       >
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30 mb-4">
+          <div className="w-12 h-12 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center mb-4">
             <Lock className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">Set New Password</h1>
-          <p className="text-sm text-slate-400 mt-1">Enter your new secure password below</p>
+          <h1 className="cc-h2 mb-1">Set New Password</h1>
+          <p className="cc-body text-[var(--text-secondary)]">Enter your new secure password below</p>
         </div>
 
         {message && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2">
+          <div className="mb-6 p-4 rounded-xl bg-[var(--success-soft)] border border-[var(--success)]/30 text-[var(--success)] text-xs font-semibold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             {message}
           </div>
         )}
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold">
+          <div className="mb-6 p-4 rounded-xl bg-[var(--danger-soft)] border border-[var(--danger)]/30 text-[var(--danger)] text-xs font-semibold">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">New Password</label>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">New Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-all"
+              className="cc-input w-full px-4 py-3"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Confirm New Password</label>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Confirm New Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-all"
+              className="cc-input w-full px-4 py-3"
               required
             />
           </div>
@@ -99,7 +99,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all"
+            className="cc-btn w-full py-3.5 mt-4"
           >
             {loading ? 'Updating Password...' : 'Save New Password'}
           </button>

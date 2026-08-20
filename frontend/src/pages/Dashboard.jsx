@@ -10,18 +10,12 @@ import {
   Clock, 
   ExternalLink,
   Target,
-  Sparkles,
   Zap,
   Activity as ActivityIcon
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  CinematicReveal, 
-  FloatingVisual, 
-  ScrollSection, 
-  AgentStatusIndicator 
-} from '../components/cinematic/CinematicComponents';
+import { StatusDot } from '../components/cinematic/CinematicComponents';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -48,238 +42,186 @@ const Dashboard = () => {
   const nextAction = data?.nextBestAction;
   const activities = data?.activities || [];
   const recommendedOpps = data?.recommendedOpportunities || [];
-  const codeHistory = data?.recentCodeHistory || [];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.3 } }}
-      transition={{ duration: 0.8 }}
-      className="flex min-h-screen bg-transparent font-sans text-[var(--text-primary)] relative z-10"
-    >
+    <div className="flex min-h-screen bg-transparent">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 relative z-10 h-screen overflow-y-auto overflow-x-hidden custom-scrollbar">
-        <Navbar title="" />
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <Navbar title="Dashboard" />
 
-        <main className="flex-1 flex flex-col pb-24 relative">
+        <main className="flex-1 px-4 sm:px-8 py-8 max-w-7xl mx-auto w-full space-y-12 pb-24">
           
-          {/* --- CINEMATIC HERO SECTION --- */}
-          <ScrollSection className="w-full relative min-h-[70vh] flex flex-col justify-center px-6 md:px-12 pt-16 pb-12 max-w-[1800px] mx-auto border-b border-[var(--border-subtle)]">
-            
-            {/* Cinematic Full-Screen Background */}
-            <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
-              <FloatingVisual 
-                src="/visuals/dashboard-atmosphere.jpg" 
-                videoSrc="/visuals/dashboard-atmosphere-motion.mp4"
-                alt="Neural Network Intelligence"
-                speed="slow"
-                className="absolute inset-0 w-full h-full object-cover object-center"
-              />
-            </div>
-            
-            <div className="relative z-20 max-w-3xl">
-              <CinematicReveal delay={0.2} direction="up" className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center shadow-glow">
-                  <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-                </div>
-                <span className="text-xs font-bold tracking-[0.2em] text-[var(--accent)] uppercase font-['Outfit']">System Online</span>
-              </CinematicReveal>
+          {/* --- HERO SECTION --- */}
+          <section className="flex flex-col-reverse lg:flex-row items-center gap-8 justify-between mt-4 bg-[var(--surface)] p-6 sm:p-8 lg:p-10 rounded-3xl border border-[var(--border)] shadow-sm dark:bg-[#050b14] dark:border-[var(--accent)]/20">
+            <div className="max-w-xl flex-1">
+              <span className="cc-eyebrow text-[var(--success)] flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+                SYSTEM ONLINE
+              </span>
+              <h1 className="cc-display mb-4">
+                Your academic intelligence, connected.
+              </h1>
+              <p className="cc-body text-[var(--text-secondary)] mb-8 text-lg">
+                Campus Cognition is monitoring your study momentum, analyzing code repositories, and scanning the global network for career opportunities.
+              </p>
               
-              <CinematicReveal delay={0.4} direction="up">
-                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 font-['Outfit']">
-                  Your academic <br className="hidden md:block"/>
-                  <span className="text-glow bg-clip-text text-transparent bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)]">
-                    intelligence.
-                  </span>
-                </h1>
-              </CinematicReveal>
-
-              <CinematicReveal delay={0.6} direction="up">
-                <p className="text-lg md:text-xl text-[var(--text-secondary)] max-w-xl font-light mb-10 leading-relaxed">
-                  Campus Cognition is monitoring your study momentum, analyzing code repositories, and scanning the global network for career opportunities.
-                </p>
-              </CinematicReveal>
-              
-              <CinematicReveal delay={0.8} direction="up" className="flex flex-col sm:flex-row items-center gap-4">
-                {nextAction ? (
-                  <Link
-                    to={nextAction.target || '/study'}
-                    className="semantic-btn px-8 py-4 w-full sm:w-auto flex items-center justify-center gap-3 shadow-glow group"
-                  >
-                    <Zap className="w-5 h-5 text-[var(--bg-main)] group-hover:scale-110 transition-transform" />
-                    <span>{nextAction.title}</span>
-                  </Link>
-                ) : (
-                  <Link to="/study" className="semantic-btn px-8 py-4 w-full sm:w-auto flex items-center justify-center gap-3 shadow-glow group">
-                    <BookOpen className="w-5 h-5 text-[var(--bg-main)]" />
-                    <span>Initialize Study Session</span>
-                  </Link>
-                )}
-              </CinematicReveal>
-            </div>
-          </ScrollSection>
-
-          {/* --- DASHBOARD CORE (AI COMMAND CENTER) --- */}
-          <div className="px-6 md:px-12 relative z-20 space-y-12 max-w-[1800px] mx-auto w-full pt-16">
-            
-            {/* Momentum & Agents Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* Massive Momentum Metric */}
-              <CinematicReveal delay={0.1} className="lg:col-span-5 semantic-card p-10 flex flex-col justify-between min-h-[300px]">
-                <div className="flex items-center justify-between">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] flex items-center gap-2">
-                    <ActivityIcon className="w-4 h-4 text-[var(--accent)]" /> 
-                    Momentum Engine
-                  </div>
-                </div>
-                
-                <div className="my-8">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-8xl md:text-9xl font-black tracking-tighter text-[var(--accent)] drop-shadow-lg font-['Outfit']">{stats.studyStreak}</span>
-                    <span className="text-2xl font-bold text-[var(--text-secondary)] uppercase tracking-widest">Day<br/>Streak</span>
-                  </div>
-                </div>
-                
-                <p className="text-sm text-[var(--text-secondary)] font-medium max-w-sm">
-                  Your cognitive momentum is building. Neural networks optimized for maximum retention.
-                </p>
-              </CinematicReveal>
-
-              {/* Agent Status Panel */}
-              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                
-                {/* Code Agent Status */}
-                <CinematicReveal delay={0.2} className="semantic-card p-8 group flex flex-col justify-between min-h-[300px] relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--cinematic-cyan)]/10 blur-[50px] -translate-y-1/2 translate-x-1/3" />
-                  <div>
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)]">
-                          <Code2 className="w-5 h-5 text-[var(--cinematic-cyan)]" />
-                        </div>
-                        <h3 className="text-base font-bold font-['Outfit'] tracking-wide">Code Lab</h3>
-                      </div>
-                      <AgentStatusIndicator status="analyzing" type="code" />
-                    </div>
-                    
-                    <div className="space-y-1 relative z-10">
-                      <div className="text-5xl font-black tracking-tighter text-[var(--text-primary)] font-['Outfit']">{stats.codeReviewCount}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Files Analyzed</div>
-                    </div>
-                  </div>
-                  
-                  <Link to="/code-lab" className="mt-8 flex items-center justify-between group-hover:text-[var(--cinematic-cyan)] transition-colors relative z-10">
-                    <span className="text-xs font-bold uppercase tracking-widest">Open Terminal</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </CinematicReveal>
-
-                {/* Opportunity Agent Status */}
-                <CinematicReveal delay={0.3} className="semantic-card p-8 group flex flex-col justify-between min-h-[300px] relative overflow-hidden">
-                  <div className="absolute bottom-0 right-0 w-48 h-48 bg-[var(--cinematic-coral)]/10 blur-[50px] translate-y-1/3 translate-x-1/3" />
-                  <div>
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)]">
-                          <Target className="w-5 h-5 text-[var(--cinematic-coral)]" />
-                        </div>
-                        <h3 className="text-base font-bold font-['Outfit'] tracking-wide">Career Net</h3>
-                      </div>
-                      <AgentStatusIndicator status="searching" type="opportunity" />
-                    </div>
-                    
-                    <div className="space-y-1 relative z-10">
-                      <div className="text-5xl font-black tracking-tighter text-[var(--text-primary)] font-['Outfit']">{stats.appliedOpportunities}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Active Paths</div>
-                    </div>
-                  </div>
-                  
-                  <Link to="/internships" className="mt-8 flex items-center justify-between group-hover:text-[var(--cinematic-coral)] transition-colors relative z-10">
-                    <span className="text-xs font-bold uppercase tracking-widest">View Network</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </CinematicReveal>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <Link to={nextAction?.target || '/study'} className="cc-btn w-full sm:w-auto px-6 py-3">
+                  <BookOpen className="w-4 h-4" />
+                  Upload Exam Syllabus
+                </Link>
+                <Link to="/internships" className="cc-btn-secondary w-full sm:w-auto px-6 py-3">
+                  Explore Intelligence
+                </Link>
               </div>
             </div>
+            <div className="w-full lg:w-[45%] xl:w-[40%] relative rounded-2xl overflow-hidden border border-[var(--border-strong)] shadow-md dark:shadow-[0_0_40px_-15px_var(--accent)] shrink-0">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10 pointer-events-none" />
+              <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] z-10 pointer-events-none" />
+              <img 
+                src="https://static.vecteezy.com/system/resources/thumbnails/009/435/573/small_2x/abstract-dark-sci-fi-tunnel-with-green-light-seamless-loop-4k-3d-animation-background-free-video.jpg" 
+                alt="Neural Tunnel Intelligence Visualization" 
+                className="w-full h-[220px] lg:h-[340px] object-cover"
+              />
+            </div>
+          </section>
 
-            {/* Editorial Feed & Timeline */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8">
+          {/* --- INTELLIGENCE OVERVIEW --- */}
+          <section>
+            <h2 className="cc-h3 mb-6">Intelligence Overview</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
-              {/* Timeline */}
-              <CinematicReveal delay={0.4} className="lg:col-span-5">
-                <div className="flex items-center gap-3 mb-8">
-                  <Clock className="w-5 h-5 text-[var(--text-secondary)]" />
-                  <h2 className="text-xl font-bold font-['Outfit']">System Log</h2>
-                </div>
-                
-                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[5px] before:-translate-x-px before:h-full before:w-px before:bg-[var(--border-strong)]">
-                  {activities.slice(0, 5).map((act, idx) => (
-                    <motion.div 
-                      key={idx}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1, duration: 0.5 }}
-                      className="relative pl-6"
-                    >
-                      <div className="absolute left-0 w-3 h-3 rounded-full bg-[var(--surface-elevated)] border-2 border-[var(--accent)] shadow-glow mt-1.5" />
-                      <p className="text-sm font-medium leading-relaxed text-[var(--text-primary)]">{act.description}</p>
-                      <p className="text-[10px] text-[var(--text-secondary)] mt-1.5 font-mono uppercase tracking-widest">
-                        {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
-              </CinematicReveal>
-
-              {/* Featured Opportunities */}
-              <CinematicReveal delay={0.5} className="lg:col-span-7">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-3">
-                    <Target className="w-5 h-5 text-[var(--text-secondary)]" />
-                    <h2 className="text-xl font-bold font-['Outfit']">Top Matches</h2>
+              <div className="cc-card p-6 flex flex-col">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+                    <ActivityIcon className="w-5 h-5 text-[var(--accent)]" />
                   </div>
-                  <Link to="/internships" className="text-xs font-bold uppercase tracking-widest text-[var(--accent)] hover:text-white transition-colors">
-                    Explore All
-                  </Link>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Study Momentum</h3>
+                    <StatusDot status="active" label="Tracking" className="mt-0.5" />
+                  </div>
                 </div>
-                
-                <div className="flex flex-col gap-4">
-                  {recommendedOpps.slice(0, 3).map((opp, idx) => (
-                    <div key={idx} className="glass-panel p-6 rounded-2xl group hover:border-[var(--border-strong)] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <div className="text-[10px] font-black text-[var(--cinematic-coral)] uppercase tracking-widest mb-2">{opp.company}</div>
-                        <h4 className="text-lg font-bold font-['Outfit'] group-hover:text-[var(--cinematic-coral)] transition-colors">{opp.title}</h4>
-                        <div className="text-xs text-[var(--text-secondary)] font-mono mt-2">{opp.deadline}</div>
-                      </div>
-                      
-                      <div className="flex items-center gap-6">
-                        <div className="flex flex-col items-end">
-                          <span className="text-xl font-black text-[var(--text-primary)] font-['Outfit']">{opp.matchScore}%</span>
-                          <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Match</span>
-                        </div>
-                        <a href={opp.url} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-xl bg-[var(--surface-elevated)] flex items-center justify-center border border-[var(--border-strong)] group-hover:bg-[var(--cinematic-coral)] group-hover:text-black transition-colors">
-                          <ExternalLink className="w-5 h-5" />
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                  {recommendedOpps.length === 0 && (
-                    <div className="glass-panel p-12 text-center text-sm text-[var(--text-secondary)] font-mono rounded-2xl">
-                      Scanning global networks for matches...
-                    </div>
-                  )}
+                <div className="mt-auto">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold tracking-tighter text-[var(--text-primary)]">{stats.studyStreak}</span>
+                    <span className="cc-small uppercase tracking-wide">Day Streak</span>
+                  </div>
                 </div>
-              </CinematicReveal>
+              </div>
+
+              <div className="cc-card p-6 flex flex-col">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--warning-soft)] flex items-center justify-center">
+                    <Code2 className="w-5 h-5 text-[var(--warning)]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Code Intelligence</h3>
+                    <StatusDot status="analyzing" label="Ready" className="mt-0.5" />
+                  </div>
+                </div>
+                <div className="mt-auto">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold tracking-tighter text-[var(--text-primary)]">{stats.codeReviewCount}</span>
+                    <span className="cc-small uppercase tracking-wide">Files Analyzed</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="cc-card p-6 flex flex-col">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--success-soft)] flex items-center justify-center">
+                    <Target className="w-5 h-5 text-[var(--success)]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Opportunity Radar</h3>
+                    <StatusDot status="searching" label="Scanning" className="mt-0.5" />
+                  </div>
+                </div>
+                <div className="mt-auto">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold tracking-tighter text-[var(--text-primary)]">{stats.appliedOpportunities}</span>
+                    <span className="cc-small uppercase tracking-wide">Active Paths</span>
+                  </div>
+                </div>
+              </div>
 
             </div>
+          </section>
+
+          {/* --- FEED & TIMELINE --- */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Timeline */}
+            <section className="lg:col-span-5">
+              <div className="flex items-center gap-2 mb-6">
+                <Clock className="w-5 h-5 text-[var(--text-muted)]" />
+                <h2 className="cc-h3">System Log</h2>
+              </div>
+              
+              <div className="cc-card p-6">
+                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[5px] before:-translate-x-px before:h-full before:w-px before:bg-[var(--border)]">
+                  {activities.slice(0, 5).map((act, idx) => (
+                    <div key={idx} className="relative pl-6">
+                      <div className="absolute left-0 w-2.5 h-2.5 rounded-full bg-[var(--surface)] border-2 border-[var(--accent)] mt-1.5" />
+                      <p className="text-sm text-[var(--text-primary)]">{act.description}</p>
+                      <p className="cc-metadata mt-1">
+                        {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  ))}
+                  {activities.length === 0 && (
+                    <p className="text-sm text-[var(--text-muted)]">No recent activity found.</p>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Featured Opportunities */}
+            <section className="lg:col-span-7">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-[var(--text-muted)]" />
+                  <h2 className="cc-h3">Top Matches</h2>
+                </div>
+                <Link to="/internships" className="cc-btn-ghost text-sm">
+                  Explore All <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+              
+              <div className="flex flex-col gap-4">
+                {recommendedOpps.slice(0, 3).map((opp, idx) => (
+                  <div key={idx} className="cc-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="cc-eyebrow mb-1">{opp.company}</div>
+                      <h4 className="text-base font-semibold text-[var(--text-primary)]">{opp.title}</h4>
+                      <div className="cc-metadata mt-1.5">{opp.deadline}</div>
+                    </div>
+                    
+                    <div className="flex items-center gap-5">
+                      <div className="flex flex-col items-end">
+                        <span className="text-lg font-bold text-[var(--text-primary)]">{opp.matchScore}%</span>
+                        <span className="cc-caption uppercase">Match</span>
+                      </div>
+                      <a href={opp.url} target="_blank" rel="noopener noreferrer" className="cc-btn-secondary p-2.5" aria-label="Open Opportunity">
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+                {recommendedOpps.length === 0 && (
+                  <div className="cc-card p-10 text-center flex flex-col items-center justify-center text-[var(--text-muted)]">
+                    <Target className="w-8 h-8 mb-3 opacity-20" />
+                    <p className="text-sm">Scanning global networks for matches...</p>
+                  </div>
+                )}
+              </div>
+            </section>
+
           </div>
         </main>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

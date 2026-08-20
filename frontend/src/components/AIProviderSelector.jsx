@@ -6,19 +6,19 @@ const AIProviderSelector = ({ className = '' }) => {
   const { aiEngine, setAiEngine } = useAuth();
 
   return (
-    <div className={`flex items-center gap-2 bg-[var(--surface-elevated)] p-1.5 rounded-xl border border-[var(--border)] ${className}`}>
-      <span className="text-xs font-semibold text-[var(--text-secondary)] px-2 flex items-center gap-1">
-        <Cpu className="w-3.5 h-3.5 text-[var(--accent)]" />
+    <div className={`flex items-center gap-1 bg-[var(--surface-sunken)] p-1 rounded-lg border border-[var(--border)] ${className}`}>
+      <span className="text-[11px] font-semibold text-[var(--text-muted)] px-2 uppercase tracking-wide flex items-center gap-1">
+        <Cpu className="w-3 h-3 text-[var(--accent)]" />
         Neural Engine:
       </span>
 
       <button
         type="button"
         onClick={() => setAiEngine('campus_ai')}
-        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
           aiEngine === 'campus_ai'
-            ? 'bg-[var(--accent)] text-[var(--bg-main)] shadow-glow'
-            : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
+            ? 'bg-[var(--surface)] text-[var(--text-primary)] shadow-[var(--shadow-sm)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Sparkles className="w-3.5 h-3.5" />
@@ -28,10 +28,10 @@ const AIProviderSelector = ({ className = '' }) => {
       <button
         type="button"
         onClick={() => setAiEngine('gemini')}
-        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
           aiEngine === 'gemini'
-            ? 'bg-[var(--accent)] text-[var(--bg-main)] shadow-glow'
-            : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
+            ? 'bg-[var(--surface)] text-[var(--text-primary)] shadow-[var(--shadow-sm)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Cpu className="w-3.5 h-3.5" />
@@ -41,10 +41,10 @@ const AIProviderSelector = ({ className = '' }) => {
       <button
         type="button"
         onClick={() => setAiEngine('openai')}
-        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
           aiEngine === 'openai'
-            ? 'bg-[var(--accent)] text-[var(--bg-main)] shadow-glow'
-            : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
+            ? 'bg-[var(--surface)] text-[var(--text-primary)] shadow-[var(--shadow-sm)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Sparkles className="w-3.5 h-3.5" />

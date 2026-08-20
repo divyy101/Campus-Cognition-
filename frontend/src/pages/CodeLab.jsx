@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import Navbar from '../components/Navbar';
@@ -16,7 +16,7 @@ import {
   Clock,
   MemoryStick
 } from 'lucide-react';
-import { CinematicReveal, FloatingVisual, AgentStatusIndicator } from '../components/cinematic/CinematicComponents';
+import { StatusDot } from '../components/cinematic/CinematicComponents';
 
 const CodeLab = () => {
   const [code, setCode] = useState('// Initialize your cognitive code session\n\nfunction analyzePattern(data) {\n  // Agent is ready to review...\n  return data;\n}');
@@ -35,7 +35,6 @@ const CodeLab = () => {
     try {
       const res = await api.post('/code/analyze', { code, language });
       if (res.data.success) {
-        // Backend returns: { success, data: { bugs, warnings, explanation, timeComplexity, spaceComplexity, optimization, alternative, improvedCode } }
         setResults(res.data.data);
       } else {
         setError(res.data.message || 'Analysis failed.');
@@ -50,7 +49,6 @@ const CodeLab = () => {
   };
 
   const handleKeyDown = (e) => {
-    // Tab support in textarea
     if (e.key === 'Tab') {
       e.preventDefault();
       const start = e.target.selectionStart;
@@ -66,56 +64,38 @@ const CodeLab = () => {
     }
   };
 
-  const totalIssues = results ? ((results.bugs?.length || 0) + (results.warnings?.length || 0)) : 0;
-
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.3 } }}
-      transition={{ duration: 0.8 }}
-      className="flex min-h-screen bg-transparent font-sans text-[var(--text-primary)] relative z-10"
-    >
+    <div className="flex min-h-[100dvh] bg-[var(--bg)]">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 relative z-10 h-screen overflow-y-auto overflow-x-hidden custom-scrollbar">
-        <Navbar title="" />
+      <div className="flex-1 flex flex-col min-w-0 h-[100dvh] overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <Navbar title="Code Lab" />
 
-        <main className="flex-1 px-6 md:px-12 py-8 max-w-[1800px] mx-auto w-full relative">
+        <main className="flex-1 px-4 sm:px-8 py-8 max-w-[1800px] mx-auto w-full">
           
-          {/* Cinematic Full-Screen Background */}
-          <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden mix-blend-screen opacity-20">
-             <FloatingVisual 
-                src="/visuals/code-visual.jpg" 
-                videoSrc="/visuals/code-visual-motion.mp4"
-                alt="Code Intelligence"
-                speed="slow"
-                className="absolute inset-0 w-full h-full object-cover object-center"
-             />
-          </div>
-
-          <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
             
             {/* Left: Code Editor (7 cols) */}
-            <CinematicReveal delay={0.1} className="xl:col-span-7 flex flex-col h-[calc(100vh-160px)]">
+            <div className="xl:col-span-7 flex flex-col h-[calc(100dvh-140px)] min-h-[600px]">
+              
               <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] flex items-center justify-center shadow-[0_0_15px_var(--cinematic-cyan)]">
-                    <Code2 className="w-5 h-5 text-[var(--cinematic-cyan)]" />
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-[var(--warning-soft)] flex items-center justify-center">
+                    <Code2 className="w-6 h-6 text-[var(--warning)]" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold font-['Outfit']">Engineering Core</h1>
-                    <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest mt-1 flex items-center gap-2">
-                       IDE Active
-                       <AgentStatusIndicator status={isAnalyzing ? 'analyzing' : 'active'} type="code" />
-                    </p>
+                    <h1 className="cc-h2">Engineering Core</h1>
+                    <div className="flex items-center gap-2 mt-1">
+                       <StatusDot status={isAnalyzing ? 'analyzing' : 'active'} />
+                       <span className="cc-caption uppercase tracking-wide">IDE Active</span>
+                    </div>
                   </div>
                 </div>
                 
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="bg-[var(--surface-elevated)] border border-[var(--border-strong)] rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] focus:border-[var(--cinematic-cyan)] outline-none transition-colors"
+                  className="cc-input py-2 px-3 text-sm font-semibold uppercase tracking-wider"
                 >
                   <option value="javascript">JavaScript</option>
                   <option value="python">Python</option>
@@ -124,15 +104,16 @@ const CodeLab = () => {
                 </select>
               </div>
 
-              <div className="flex-1 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-strong)] overflow-hidden flex flex-col relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+              <div className="flex-1 cc-card overflow-hidden flex flex-col relative shadow-sm">
+                
                 {/* Editor Header */}
-                <div className="px-4 py-3 bg-[var(--surface)] border-b border-[var(--border-subtle)] flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                <div className="px-4 py-3 bg-[var(--surface-sunken)] border-b border-[var(--border)] flex items-center gap-3">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
                   </div>
-                  <div className="ml-4 flex items-center gap-2 text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-main)] px-3 py-1 rounded-md">
+                  <div className="ml-4 flex items-center gap-2 text-xs font-mono font-medium text-[var(--text-secondary)] bg-[var(--surface)] border border-[var(--border)] px-3 py-1.5 rounded-md">
                     <FileCode2 className="w-3.5 h-3.5" />
                     main.{language === 'javascript' ? 'js' : language === 'python' ? 'py' : language === 'java' ? 'java' : 'cpp'}
                   </div>
@@ -146,51 +127,51 @@ const CodeLab = () => {
                     onChange={(e) => setCode(e.target.value)}
                     onKeyDown={handleKeyDown}
                     spellCheck="false"
-                    className="absolute inset-0 w-full h-full bg-transparent text-[var(--text-primary)] p-6 resize-none outline-none leading-relaxed"
+                    className="absolute inset-0 w-full h-full bg-[var(--surface)] text-[var(--text-primary)] p-6 resize-none outline-none leading-relaxed"
                     placeholder="// Paste your code here for intelligence review..."
                   />
                 </div>
 
                 {/* Editor Footer */}
-                <div className="p-4 bg-[var(--surface)] border-t border-[var(--border-subtle)] flex justify-end">
+                <div className="p-4 bg-[var(--surface-sunken)] border-t border-[var(--border)] flex justify-end">
                   <button
                     onClick={handleAnalyze}
                     disabled={isAnalyzing || !code.trim()}
-                    className="px-6 py-2.5 rounded-xl bg-[var(--cinematic-cyan)] text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 disabled:opacity-50 transition-all flex items-center gap-2 shadow-[0_0_15px_var(--cinematic-cyan)]"
+                    className="cc-btn px-6 py-2.5 bg-[var(--warning)] text-white hover:bg-[var(--warning)]/90 flex items-center gap-2 disabled:opacity-50"
                   >
                     {isAnalyzing ? (
                       <>
-                        <div className="w-3 h-3 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Analyzing...
                       </>
                     ) : (
                       <>
-                        <Play className="w-3.5 h-3.5" />
+                        <Play className="w-4 h-4" />
                         Run Intelligence
                       </>
                     )}
                   </button>
                 </div>
               </div>
-            </CinematicReveal>
+            </div>
 
             {/* Right: Analysis Results (5 cols) */}
-            <CinematicReveal delay={0.3} className="xl:col-span-5 h-[calc(100vh-160px)] flex flex-col">
-              <div className="flex items-center gap-3 mb-6">
-                <Terminal className="w-5 h-5 text-[var(--text-secondary)]" />
-                <h2 className="text-xl font-bold font-['Outfit']">Analysis Output</h2>
+            <div className="xl:col-span-5 h-[calc(100dvh-140px)] min-h-[600px] flex flex-col">
+              <div className="flex items-center gap-2 mb-6 h-12">
+                <Terminal className="w-5 h-5 text-[var(--text-muted)]" />
+                <h2 className="cc-h2">Analysis Output</h2>
               </div>
 
-              <div className="flex-1 semantic-card p-6 overflow-y-auto custom-scrollbar">
+              <div className="flex-1 cc-card p-6 overflow-y-auto custom-scrollbar bg-[var(--surface-sunken)]">
                 <AnimatePresence mode="wait">
                   {!results && !isAnalyzing && !error ? (
                     <motion.div 
                       key="idle"
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50"
+                      className="h-full flex flex-col items-center justify-center text-center space-y-4 text-[var(--text-muted)]"
                     >
-                      <Terminal className="w-12 h-12 text-[var(--text-secondary)]" />
-                      <p className="text-sm font-mono uppercase tracking-widest text-[var(--text-secondary)]">Awaiting code input...</p>
+                      <Terminal className="w-12 h-12 opacity-50" />
+                      <p className="text-sm font-mono uppercase tracking-widest">Awaiting code input...</p>
                     </motion.div>
 
                   ) : isAnalyzing ? (
@@ -201,10 +182,10 @@ const CodeLab = () => {
                     >
                       <div className="relative">
                         <div className="w-16 h-16 border-2 border-[var(--border-strong)] rounded-full" />
-                        <div className="absolute inset-0 border-t-2 border-[var(--cinematic-cyan)] rounded-full animate-spin" />
-                        <Code2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[var(--cinematic-cyan)] animate-pulse" />
+                        <div className="absolute inset-0 border-t-2 border-[var(--warning)] rounded-full animate-spin" />
+                        <Code2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[var(--warning)] animate-pulse" />
                       </div>
-                      <p className="text-xs font-mono uppercase tracking-widest text-[var(--cinematic-cyan)] animate-pulse">Running Neural Review</p>
+                      <p className="text-xs font-mono uppercase tracking-widest text-[var(--warning)] animate-pulse">Running Neural Review</p>
                     </motion.div>
 
                   ) : error ? (
@@ -213,64 +194,64 @@ const CodeLab = () => {
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                       className="h-full flex flex-col items-center justify-center space-y-4"
                     >
-                      <AlertCircle className="w-12 h-12 text-red-500 opacity-60" />
-                      <p className="text-sm text-red-400 text-center max-w-xs">{error}</p>
-                      <button onClick={() => setError(null)} className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)] underline">Dismiss</button>
+                      <AlertCircle className="w-12 h-12 text-[var(--danger)] opacity-80" />
+                      <p className="text-sm text-[var(--danger)] text-center max-w-xs">{error}</p>
+                      <button onClick={() => setError(null)} className="cc-btn-ghost text-xs">Dismiss</button>
                     </motion.div>
 
                   ) : results ? (
                     <motion.div 
                       key="results"
                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                      className="space-y-5"
+                      className="space-y-6"
                     >
                       {/* Complexity Metrics */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
-                          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
-                            <Clock className="w-3 h-3" /> Time
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="cc-card p-4 flex flex-col gap-1.5 shadow-sm">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                            <Clock className="w-3.5 h-3.5" /> Time
                           </div>
-                          <div className="text-lg font-black font-['Outfit'] text-[var(--cinematic-cyan)]">{results.timeComplexity || 'N/A'}</div>
+                          <div className="text-xl font-bold font-mono text-[var(--warning)]">{results.timeComplexity || 'N/A'}</div>
                         </div>
-                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
-                          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
-                            <MemoryStick className="w-3 h-3" /> Space
+                        <div className="cc-card p-4 flex flex-col gap-1.5 shadow-sm">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                            <MemoryStick className="w-3.5 h-3.5" /> Space
                           </div>
-                          <div className="text-lg font-black font-['Outfit'] text-[var(--cinematic-cyan)]">{results.spaceComplexity || 'N/A'}</div>
+                          <div className="text-xl font-bold font-mono text-[var(--warning)]">{results.spaceComplexity || 'N/A'}</div>
                         </div>
-                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Bugs</div>
-                          <div className={`text-3xl font-black font-['Outfit'] ${results.bugs?.length > 0 ? 'text-red-400' : 'text-green-400'}`}>{results.bugs?.length || 0}</div>
+                        <div className="cc-card p-4 flex flex-col gap-1.5 shadow-sm">
+                          <div className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Bugs</div>
+                          <div className={`text-2xl font-bold ${results.bugs?.length > 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'}`}>{results.bugs?.length || 0}</div>
                         </div>
-                        <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-main)] flex flex-col gap-1">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Warnings</div>
-                          <div className={`text-3xl font-black font-['Outfit'] ${results.warnings?.length > 0 ? 'text-yellow-400' : 'text-[var(--text-primary)]'}`}>{results.warnings?.length || 0}</div>
+                        <div className="cc-card p-4 flex flex-col gap-1.5 shadow-sm">
+                          <div className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Warnings</div>
+                          <div className={`text-2xl font-bold ${results.warnings?.length > 0 ? 'text-amber-500' : 'text-[var(--text-primary)]'}`}>{results.warnings?.length || 0}</div>
                         </div>
                       </div>
 
                       {/* Explanation */}
                       {results.explanation && (
-                        <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--cinematic-cyan)]/30 shadow-[0_0_15px_rgba(53,214,232,0.05)]">
-                          <div className="flex items-center gap-2 text-[var(--cinematic-cyan)] mb-3">
+                        <div className="p-5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-sm">
+                          <div className="flex items-center gap-2 text-[var(--warning)] mb-3">
                             <Sparkles className="w-4 h-4" />
-                            <h3 className="text-xs font-bold uppercase tracking-widest">Intelligence Summary</h3>
+                            <h3 className="text-sm font-bold uppercase tracking-wider">Intelligence Summary</h3>
                           </div>
-                          <p className="text-sm leading-relaxed text-[var(--text-primary)]">{results.explanation}</p>
+                          <p className="cc-body">{results.explanation}</p>
                         </div>
                       )}
 
                       {/* Bugs */}
                       {results.bugs && results.bugs.length > 0 && (
-                        <div className="space-y-2">
-                          <h3 className="text-xs font-bold uppercase tracking-widest text-red-400 flex items-center gap-2">
-                            <Bug className="w-3.5 h-3.5" /> Bugs Detected
+                        <div className="space-y-3">
+                          <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--danger)] flex items-center gap-2">
+                            <Bug className="w-4 h-4" /> Bugs Detected
                           </h3>
                           {results.bugs.map((bug, idx) => (
-                            <div key={idx} className="p-3 rounded-xl border border-red-500/20 bg-red-500/5 flex gap-3">
-                              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                            <div key={idx} className="p-4 rounded-xl border border-[var(--danger)]/30 bg-[var(--danger-soft)] flex gap-3">
+                              <AlertCircle className="w-5 h-5 text-[var(--danger)] shrink-0 mt-0.5" />
                               <div>
-                                {bug.line && <span className="text-[10px] font-mono text-[var(--text-secondary)] block mb-0.5">Line {bug.line} · {bug.type || 'Error'}</span>}
-                                <p className="text-sm text-[var(--text-primary)]">{bug.message}</p>
+                                {bug.line && <span className="text-xs font-mono text-[var(--danger)] block mb-1 font-semibold">Line {bug.line} · {bug.type || 'Error'}</span>}
+                                <p className="text-sm text-[var(--danger)]">{bug.message}</p>
                               </div>
                             </div>
                           ))}
@@ -279,16 +260,16 @@ const CodeLab = () => {
 
                       {/* Warnings */}
                       {results.warnings && results.warnings.length > 0 && (
-                        <div className="space-y-2">
-                          <h3 className="text-xs font-bold uppercase tracking-widest text-yellow-400 flex items-center gap-2">
-                            <AlertCircle className="w-3.5 h-3.5" /> Warnings
+                        <div className="space-y-3">
+                          <h3 className="text-sm font-bold uppercase tracking-wider text-amber-500 flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4" /> Warnings
                           </h3>
                           {results.warnings.map((warn, idx) => (
-                            <div key={idx} className="p-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 flex gap-3">
-                              <Bug className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                            <div key={idx} className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 flex gap-3">
+                              <Bug className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                               <div>
-                                {warn.line && <span className="text-[10px] font-mono text-[var(--text-secondary)] block mb-0.5">Line {warn.line}</span>}
-                                <p className="text-sm text-[var(--text-primary)]">{warn.message}</p>
+                                {warn.line && <span className="text-xs font-mono text-amber-600 dark:text-amber-400 block mb-1 font-semibold">Line {warn.line}</span>}
+                                <p className="text-sm text-amber-700 dark:text-amber-300">{warn.message}</p>
                               </div>
                             </div>
                           ))}
@@ -297,30 +278,30 @@ const CodeLab = () => {
 
                       {/* Optimization */}
                       {results.optimization && (
-                        <div className="p-4 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-strong)]">
-                          <div className="flex items-center gap-2 text-[var(--text-secondary)] mb-2">
-                            <Zap className="w-3.5 h-3.5 text-[var(--cinematic-cyan)]" />
-                            <h3 className="text-xs font-bold uppercase tracking-widest">Optimization</h3>
+                        <div className="p-5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-sm">
+                          <div className="flex items-center gap-2 text-[var(--warning)] mb-3">
+                            <Zap className="w-4 h-4" />
+                            <h3 className="text-sm font-bold uppercase tracking-wider">Optimization</h3>
                           </div>
-                          <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{results.optimization}</p>
+                          <p className="cc-body">{results.optimization}</p>
                         </div>
                       )}
 
                       {/* Improved Code */}
                       {results.improvedCode && results.improvedCode !== code && (
-                        <div className="p-4 rounded-xl bg-[var(--bg-main)] border border-[var(--cinematic-cyan)]/20">
-                          <div className="flex items-center gap-2 text-[var(--cinematic-cyan)] mb-3">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <h3 className="text-xs font-bold uppercase tracking-widest">Optimized Code</h3>
+                        <div className="p-5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-sm">
+                          <div className="flex items-center gap-2 text-[var(--success)] mb-4">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <h3 className="text-sm font-bold uppercase tracking-wider">Optimized Code</h3>
                           </div>
-                          <pre className="text-xs font-mono text-[var(--text-primary)] whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar">
+                          <pre className="text-sm font-mono text-[var(--text-primary)] whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar bg-[var(--surface-sunken)] p-4 rounded-lg border border-[var(--border)]">
                             {results.improvedCode}
                           </pre>
                           <button
                             onClick={() => setCode(results.improvedCode)}
-                            className="mt-3 text-xs font-bold text-[var(--cinematic-cyan)] uppercase tracking-widest hover:opacity-80 transition-opacity"
+                            className="mt-4 text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors flex items-center gap-1"
                           >
-                            Apply to Editor →
+                            Apply to Editor <Play className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       )}
@@ -328,12 +309,12 @@ const CodeLab = () => {
                   ) : null}
                 </AnimatePresence>
               </div>
-            </CinematicReveal>
+            </div>
 
           </div>
         </main>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
