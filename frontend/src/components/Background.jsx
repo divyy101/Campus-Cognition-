@@ -16,11 +16,11 @@ const Background = () => {
     // Abstract neural/plexus video for Study Agent
     videoSrc = "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4";
   } else if (path.includes('code-lab') || path.includes('agent')) {
-    // Tech/Data stream for Code Lab and other generic agents
-    videoSrc = "https://videos.pexels.com/video-files/853889/853889-hd_1920_1080_25fps.mp4";
+    // Hacker / Code stream for Code Lab and other generic agents
+    videoSrc = "https://videos.pexels.com/video-files/5377684/5377684-hd_1920_1080_25fps.mp4";
   } else if (path.includes('internship') || path.includes('opportunit') || path.includes('scholarship')) {
-    // Network/Globe/City for Opportunity/Network scanners
-    videoSrc = "https://videos.pexels.com/video-files/3129957/3129957-hd_1920_1080_25fps.mp4";
+    // Working professional / Office for Opportunity/Network scanners
+    videoSrc = "https://videos.pexels.com/video-files/3129977/3129977-hd_1920_1080_30fps.mp4";
   }
 
   return (
