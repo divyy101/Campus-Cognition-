@@ -12,11 +12,11 @@
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --bg: #F8FAFC;
-  --bg-secondary: #F1F5F9;
-  --surface: #FFFFFF;
-  --surface-elevated: #FFFFFF;
-  --surface-sunken: #F1F5F9;
+  --bg: transparent;
+  --bg-secondary: rgba(241, 245, 249, 0.7);
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-elevated: rgba(255, 255, 255, 0.95);
+  --surface-sunken: rgba(241, 245, 249, 0.7);
 
   --text-primary: #101828;
   --text-secondary: #475467;
@@ -41,19 +41,19 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
 
-  --sidebar-bg: #FFFFFF;
-  --navbar-bg: #FFFFFF;
+  --sidebar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-bg: rgba(255, 255, 255, 0.85);
 }
 
 /* Dark mode */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #061016;
-  --bg-secondary: #0A171E;
-  --surface: #0F1A22;
-  --surface-elevated: #14232D;
-  --surface-sunken: #091318;
+  --bg: transparent;
+  --bg-secondary: rgba(10, 23, 30, 0.7);
+  --surface: rgba(15, 26, 34, 0.75);
+  --surface-elevated: rgba(20, 35, 45, 0.85);
+  --surface-sunken: rgba(9, 19, 24, 0.6);
 
   --text-primary: #F8FAFC;
   --text-secondary: #CBD5E1;
@@ -78,8 +78,8 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
 
-  --sidebar-bg: #0B1820;
-  --navbar-bg: #0F1A22;
+  --sidebar-bg: rgba(11, 24, 32, 0.75);
+  --navbar-bg: rgba(15, 26, 34, 0.75);
 }
 
 /* ─── Spacing Scale (8px based) ─── */
@@ -116,10 +116,12 @@
 /* Card — solid surface, subtle shadow, no blur */
 .cc-card {
   background: var(--surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.3s ease;
 }
 .cc-card:hover {
   box-shadow: var(--shadow-md);

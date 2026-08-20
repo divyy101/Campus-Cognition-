@@ -8,7 +8,7 @@ const Navbar = ({ title }) => {
   const [searchFocused, setSearchFocused] = useState(false);
 
   return (
-    <header className="h-16 bg-[var(--navbar-bg)] border-b border-[var(--border)] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 w-full md:pl-6 pl-16">
+    <header className="h-16 bg-[var(--navbar-bg)] backdrop-blur-xl border-b border-[var(--border)] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 w-full md:pl-6 pl-16">
       
       {/* Page Title */}
       <div className="flex-1 min-w-0">
