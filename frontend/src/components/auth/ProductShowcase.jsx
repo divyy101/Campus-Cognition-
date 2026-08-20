@@ -65,18 +65,12 @@ const AgentPreviewCard = ({
 
 const ProductShowcase = () => {
   return (
-    <div className="hidden lg:flex w-[60%] relative bg-[#F7F9FC] dark:bg-[#070B14] overflow-hidden items-center justify-center p-12 transition-colors duration-500">
+    <div className="hidden lg:flex w-[60%] relative overflow-hidden items-center justify-center p-12">
       
-      {/* Abstract Animated Atmospheric Background */}
+      {/* Abstract Animated Atmospheric Background (Handled Globally by Background.jsx) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 mask-image-left">
-        <img 
-          src="/visuals/hero-visual.jpg" 
-          alt="Campus Cognition Intelligence"
-          className="w-full h-full object-cover opacity-30 mix-blend-screen"
-        />
-        
-        {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTQ4LDE2MywxODQsMC4wNSkiLz48L3N2Zz4=')] bg-[length:32px_32px] opacity-20" />
+        {/* Subtle Grid Overlay for texture */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTQ4LDE2MywxODQsMC4wNSkiLz48L3N2Zz4=')] bg-[length:32px_32px] opacity-20 dark:opacity-10" />
       </div>
 
       {/* Main Composition */}

@@ -10,10 +10,10 @@ const AuthLayout = ({ children, title, subtitle }) => {
   const isLogin = location.pathname === '/login';
 
   return (
-    <div className="min-h-[100dvh] flex w-full bg-[var(--bg)] text-[var(--text-primary)]">
+    <div className="min-h-[100dvh] flex w-full bg-transparent text-[var(--text-primary)]">
       
       {/* Left Panel: Authentication (40% Desktop, 100% Mobile) */}
-      <div className="w-full lg:w-[40%] flex flex-col items-center justify-center relative z-10 px-6 sm:px-12 py-10 overflow-y-auto custom-scrollbar">
+      <div className="w-full lg:w-[40%] flex flex-col items-center justify-center relative z-10 px-6 sm:px-12 py-10 overflow-y-auto custom-scrollbar bg-[var(--surface-elevated)] backdrop-blur-2xl border-r border-[var(--border)]">
         
         <div className="w-full max-w-[420px] relative z-10 flex flex-col gap-8">
           

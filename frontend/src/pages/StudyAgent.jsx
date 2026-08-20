@@ -321,23 +321,29 @@ const StudyAgent = () => {
                   )}
                 </div>
 
-                {/* Chat Input */}
-                <div className="p-4 bg-[var(--surface)] border-t border-[var(--border)]">
-                  <form onSubmit={handleChat} className="relative flex items-center">
-                    <input
-                      type="text"
-                      value={chatMsg}
-                      onChange={(e) => setChatMsg(e.target.value)}
-                      placeholder={uploadResult ? "Ask about your study material..." : "Upload a syllabus first, then ask questions..."}
-                      className="cc-input w-full pl-4 pr-12 py-3"
-                    />
-                    <button 
-                      type="submit"
-                      disabled={!chatMsg.trim() || isChatting}
-                      className="absolute right-2 p-2 rounded-md bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
-                    >
-                      <Send className="w-4 h-4" />
-                    </button>
+                {/* Floating AI Composer */}
+                <div className="p-4 bg-[var(--surface-sunken)] border-t border-[var(--border)] mt-auto relative z-10">
+                  <form onSubmit={handleChat} className="relative flex items-center max-w-3xl mx-auto">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent)]/10 to-transparent rounded-2xl blur-xl" />
+                    <div className="relative flex items-center w-full bg-[var(--surface-elevated)] backdrop-blur-xl border border-[var(--border-strong)] rounded-2xl p-1.5 shadow-2xl transition-all focus-within:border-[var(--accent)] focus-within:shadow-[var(--accent)]/20">
+                      <div className="pl-4">
+                        <Sparkles className="w-5 h-5 text-[var(--accent)] animate-pulse" />
+                      </div>
+                      <input
+                        type="text"
+                        value={chatMsg}
+                        onChange={(e) => setChatMsg(e.target.value)}
+                        placeholder={uploadResult ? "Command Neural Mentor..." : "Upload knowledge base to enable RAG..."}
+                        className="w-full bg-transparent border-none text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-0 pl-3 pr-12 py-3 text-sm"
+                      />
+                      <button 
+                        type="submit"
+                        disabled={!chatMsg.trim() || isChatting}
+                        className="absolute right-2 p-2.5 rounded-xl bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-all hover:scale-105 active:scale-95 flex items-center justify-center shadow-lg"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
                   </form>
                 </div>
               </div>
