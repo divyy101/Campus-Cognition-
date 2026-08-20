@@ -17,10 +17,19 @@ import {
 const Profile = () => {
   const { user, setUser } = useAuth();
 
-  const [branch, setBranch] = useState(user?.branch || 'CSE');
-  const [cgpa, setCgpa] = useState(user?.cgpa || 8.0);
+  const [branch, setBranch] = useState(user?.branch || '');
+  const [cgpa, setCgpa] = useState(user?.cgpa || '');
   const [skills, setSkills] = useState((user?.skills || []).join(', '));
   const [targetCompanies, setTargetCompanies] = useState((user?.targetCompanies || []).join(', '));
+
+  React.useEffect(() => {
+    if (user) {
+      setBranch(user.branch || '');
+      setCgpa(user.cgpa || '');
+      setSkills((user.skills || []).join(', '));
+      setTargetCompanies((user.targetCompanies || []).join(', '));
+    }
+  }, [user]);
   
   // Password change state
   const [currentPassword, setCurrentPassword] = useState('');

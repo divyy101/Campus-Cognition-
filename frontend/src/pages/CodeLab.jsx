@@ -135,9 +135,56 @@ const CodeLab = () => {
                 {/* Editor Footer */}
                 <div className="p-4 bg-[var(--surface-sunken)] border-t border-[var(--border)] flex justify-end">
                   <button
-                    onClick={handleAnalyze}
+                    onClick={() => {
+                      const instructions = `
+
+/*
+IMPORTANT INSTRUCTIONS FOR THE AI:
+Analyze the code.
+Is it correct? Is it already optimal?
+Can time/space complexity, readability, or memory usage be improved?
+If it can be improved, provide the improved code.
+If not, state: "Your solution is already asymptotically optimal. No meaningful time/space optimization is available. I recommend keeping the current implementation." and DO NOT provide improved code.
+Make sure to explain why it is better, or why not. Base your optimization on ${language} specific best practices.
+*/`;
+                      const originalCode = code;
+                      setCode(originalCode); // Ensure editor stays the same
+                      const finalCode = originalCode + instructions;
+                      
+                      setIsAnalyzing(true);
+                      setResults(null);
+                      setError(null);
+                  
+                      api.post('/code/analyze', { code: finalCode, language })
+                        .then(res => {
+                          if (res.data.success) {
+                            const data = res.data.data;
+                            if (data.improvedCode) {
+                              data.improvedCode = data.improvedCode.replace(instructions, '');
+                              // If it defaults to the exact original code, just set it to originalCode
+                              if (data.improvedCode.trim() === finalCode.trim() || data.improvedCode.trim() === originalCode.trim()) {
+                                data.improvedCode = originalCode;
+                              }
+                            }
+                            setResults(data);
+                          } else {
+                            setError(res.data.message || 'Analysis failed.');
+                          }
+                        })
+                        .catch(err => {
+                          setError(err.response?.data?.message || 'Connection lost to intelligence core.');
+                        })
+                        .finally(() => setIsAnalyzing(false));
+                    }}
                     disabled={isAnalyzing || !code.trim()}
-                    className="cc-btn px-6 py-2.5 bg-[var(--warning)] text-white hover:bg-[var(--warning)]/90 flex items-center gap-2 disabled:opacity-50"
+                    style={{
+                      background: 'var(--accent)',
+                      color: '#FFFFFF',
+                      border: '1px solid var(--accent)',
+                      opacity: isAnalyzing || !code.trim() ? 0.5 : 1,
+                      cursor: isAnalyzing || !code.trim() ? 'not-allowed' : 'pointer',
+                    }}
+                    className="px-6 py-2.5 rounded-xl font-bold text-sm transition-colors hover:brightness-90 flex items-center gap-2"
                   >
                     {isAnalyzing ? (
                       <>

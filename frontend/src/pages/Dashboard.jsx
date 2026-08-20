@@ -38,10 +38,48 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
-  const stats = data?.stats || { studyStreak: 7, studyCount: 4, codeReviewCount: 12, appliedOpportunities: 3 };
+  const stats = data?.stats || { studyStreak: 0, studyCount: 0, codeReviewCount: 0, appliedOpportunities: 0 };
   const nextAction = data?.nextBestAction;
   const activities = data?.activities || [];
   const recommendedOpps = data?.recommendedOpportunities || [];
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[100dvh] bg-[var(--bg)]">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0 h-[100dvh]">
+          <Navbar title="Dashboard" />
+          <div className="flex-1 flex flex-col items-center justify-center text-[var(--text-secondary)]">
+            <div className="w-10 h-10 border-2 border-[var(--border-strong)] border-t-[var(--accent)] rounded-full animate-spin mb-4" />
+            <p className="cc-caption tracking-widest uppercase">Loading Dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex min-h-[100dvh] bg-[var(--bg)]">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0 h-[100dvh]">
+          <Navbar title="Dashboard" />
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="cc-card max-w-md w-full p-10 text-center">
+              <AlertCircle className="w-12 h-12 text-[var(--danger)] mx-auto mb-4 opacity-80" />
+              <h2 className="cc-h3 mb-2">Unable to load your dashboard.</h2>
+              <p className="cc-body text-[var(--text-secondary)] mb-6">
+                The dashboard data could not be retrieved from the central core.
+              </p>
+              <button onClick={() => window.location.reload()} className="cc-btn w-full py-3">
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-transparent">
