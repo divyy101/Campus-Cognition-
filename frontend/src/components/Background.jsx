@@ -1,23 +1,42 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 /**
  * Background — Clean, minimal application background.
- * Uses a high-opacity cinematic space/galaxy video loop.
+ * Uses a high-opacity cinematic space/galaxy video loop, changing based on the route.
  */
 const Background = () => {
+  const location = useLocation();
+  const path = location.pathname.toLowerCase();
+
+  // Determine video based on route
+  let videoSrc = "https://videos.pexels.com/video-files/3141208/3141208-hd_1920_1080_25fps.mp4"; // Default: Galaxy/Space
+
+  if (path.includes('study')) {
+    // Abstract neural/plexus video for Study Agent
+    videoSrc = "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4";
+  } else if (path.includes('code-lab') || path.includes('agent')) {
+    // Tech/Data stream for Code Lab and other generic agents
+    videoSrc = "https://videos.pexels.com/video-files/853889/853889-hd_1920_1080_25fps.mp4";
+  } else if (path.includes('internship') || path.includes('opportunit') || path.includes('scholarship')) {
+    // Network/Globe/City for Opportunity/Network scanners
+    videoSrc = "https://videos.pexels.com/video-files/3129957/3129957-hd_1920_1080_25fps.mp4";
+  }
+
   return (
     <div
       className="fixed inset-0 pointer-events-none overflow-hidden"
       style={{ zIndex: -1, backgroundColor: 'var(--bg)' }}
     >
       <video
+        key={videoSrc} // Force re-render of video element when source changes
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 0.6 }} // High opacity for cinematic feel
-        src="https://videos.pexels.com/video-files/3141208/3141208-hd_1920_1080_25fps.mp4"
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+        style={{ opacity: 0.8 }} // Increased opacity for richer cinematic feel as requested
+        src={videoSrc}
       />
       {/* Dark overlay to ensure text contrast in both light and dark modes */}
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
