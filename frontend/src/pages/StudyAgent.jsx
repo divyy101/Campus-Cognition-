@@ -117,10 +117,10 @@ const StudyAgent = () => {
                 <BookOpen className="w-6 h-6 text-[var(--accent)]" />
               </div>
               <div>
-                <h1 className="cc-h1">Study Agent</h1>
+                <h1 className="cc-h1 !text-white drop-shadow-lg">Study Agent</h1>
                 <div className="flex items-center gap-2 mt-1">
                    <StatusDot status={isUploading || isChatting ? 'analyzing' : 'active'} />
-                   <span className="cc-caption uppercase">Neural Memory Active</span>
+                   <span className="cc-caption !text-white/80 uppercase drop-shadow-md">Neural Memory Active</span>
                 </div>
               </div>
             </div>

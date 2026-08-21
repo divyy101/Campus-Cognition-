@@ -84,10 +84,10 @@ const CodeLab = () => {
                     <Code2 className="w-6 h-6 text-[var(--warning)]" />
                   </div>
                   <div>
-                    <h1 className="cc-h2">Engineering Core</h1>
+                    <h1 className="cc-h2 !text-white drop-shadow-lg">Engineering Core</h1>
                     <div className="flex items-center gap-2 mt-1">
                        <StatusDot status={isAnalyzing ? 'analyzing' : 'active'} />
-                       <span className="cc-caption uppercase tracking-wide">IDE Active</span>
+                       <span className="cc-caption !text-white/80 uppercase tracking-wide drop-shadow-md">IDE Active</span>
                     </div>
                   </div>
                 </div>
