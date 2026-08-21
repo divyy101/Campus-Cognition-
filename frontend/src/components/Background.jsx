@@ -22,11 +22,11 @@ const Background = () => {
     // Office / working for Internship
     videoSrc = "https://videos.pexels.com/video-files/3129977/3129977-hd_1920_1080_30fps.mp4";
   } else if (path.includes('opportunit')) {
-    // Networking / Global / Tech for Opportunity
-    videoSrc = "https://videos.pexels.com/video-files/3163534/3163534-hd_1920_1080_30fps.mp4";
+    // Galaxy for Opportunity
+    videoSrc = "https://videos.pexels.com/video-files/3141208/3141208-hd_1920_1080_25fps.mp4";
   } else if (path.includes('scholarship')) {
-    // Library / Academia for Scholarship
-    videoSrc = "https://videos.pexels.com/video-files/2715410/2715410-hd_1920_1080_25fps.mp4";
+    // Revolving Black Hole for Scholarship (Wikimedia Commons NASA Visualization)
+    videoSrc = "https://upload.wikimedia.org/wikipedia/commons/4/43/Isolated_Black_Hole_Visualization_%28SVS14620_-_2-Approaching_a_bare_black_hole-4K%29.webm";
   }
 
   return (
