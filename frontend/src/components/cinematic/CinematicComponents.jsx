@@ -37,11 +37,11 @@ export const PageHeader = ({ eyebrow, title, description, icon: Icon, actions, c
           )}
           <div>
             {eyebrow && (
-              <span className="cc-eyebrow text-[var(--accent)] mb-1 block">{eyebrow}</span>
+              <span className="cc-eyebrow !text-white/80 mb-1 block drop-shadow-md">{eyebrow}</span>
             )}
-            <h1 className="cc-h1">{title}</h1>
+            <h1 className="cc-h1 !text-white drop-shadow-lg">{title}</h1>
             {description && (
-              <p className="cc-small mt-1 max-w-xl">{description}</p>
+              <p className="cc-small !text-white/90 mt-1 max-w-xl drop-shadow-md">{description}</p>
             )}
           </div>
         </div>
