@@ -21,7 +21,7 @@ const OpportunityAgent = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('');
 
-  const TAGS = ['AI/ML', 'Frontend', 'Backend', 'Data Science', 'Product Management', 'DevOps', 'UI/UX', 'Remote'];
+  const TAGS = ['Java', 'Python', 'Machine Learning', 'React', 'Cloud', 'Data', 'Software', 'Remote'];
 
   const fetchOpportunities = async (searchQuery = '') => {
     setLoading(true);
@@ -38,7 +38,7 @@ const OpportunityAgent = () => {
   };
 
   useEffect(() => {
-    fetchOpportunities('Entry level');
+    fetchOpportunities('');
   }, []);
 
   const handleTagClick = (tag) => {

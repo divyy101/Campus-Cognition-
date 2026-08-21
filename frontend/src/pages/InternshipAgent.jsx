@@ -20,7 +20,7 @@ const InternshipAgent = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('');
 
-  const TAGS = ['AI/ML', 'Frontend', 'Backend', 'Data Science', 'Product Management', 'DevOps', 'UI/UX', 'Remote'];
+  const TAGS = ['Java', 'Python', 'Machine Learning', 'React', 'Cloud', 'Data', 'Software', 'Remote'];
 
   const fetchInternships = async (searchQuery = '') => {
     setLoading(true);
@@ -37,7 +37,7 @@ const InternshipAgent = () => {
   };
 
   useEffect(() => {
-    fetchInternships('Entry level');
+    fetchInternships('');
   }, []);
 
   const handleTagClick = (tag) => {

@@ -169,7 +169,10 @@ class SearchService {
     
     const reqSkills = (opp.requiredSkills || []).map(s => s.toLowerCase());
     const prefSkills = (opp.preferredSkills || []).map(s => s.toLowerCase());
-    const titleMatch = opp.title.toLowerCase().includes(lowerQuery) || opp.company.toLowerCase().includes(lowerQuery);
+    const titleMatch = opp.title.toLowerCase().includes(lowerQuery) || 
+                       opp.company.toLowerCase().includes(lowerQuery) ||
+                       (opp.description || '').toLowerCase().includes(lowerQuery) ||
+                       (opp.location || '').toLowerCase().includes(lowerQuery);
 
     let exactReqMatches = 0;
     let exactPrefMatches = 0;

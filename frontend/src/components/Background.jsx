@@ -15,12 +15,18 @@ const Background = () => {
   if (path.includes('study')) {
     // Abstract neural/plexus video for Study Agent
     videoSrc = "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4";
-  } else if (path.includes('code-lab') || path.includes('agent')) {
+  } else if (path.includes('code-lab') || path.includes('agent') && !path.includes('internship') && !path.includes('opportunit') && !path.includes('scholarship')) {
     // Hacker / Code stream for Code Lab and other generic agents
     videoSrc = "https://videos.pexels.com/video-files/5377684/5377684-hd_1920_1080_25fps.mp4";
-  } else if (path.includes('internship') || path.includes('opportunit') || path.includes('scholarship')) {
-    // Working professional / Office for Opportunity/Network scanners
+  } else if (path.includes('internship')) {
+    // Office / working for Internship
     videoSrc = "https://videos.pexels.com/video-files/3129977/3129977-hd_1920_1080_30fps.mp4";
+  } else if (path.includes('opportunit')) {
+    // Tech / Data for Opportunity
+    videoSrc = "https://videos.pexels.com/video-files/853755/853755-hd_1920_1080_25fps.mp4";
+  } else if (path.includes('scholarship')) {
+    // Study / Academic for Scholarship
+    videoSrc = "https://videos.pexels.com/video-files/5978135/5978135-hd_1920_1080_25fps.mp4";
   }
 
   return (
