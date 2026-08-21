@@ -21,7 +21,7 @@ const OpportunityAgent = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('');
 
-  const TAGS = ['Java', 'Python', 'Machine Learning', 'React', 'Cloud', 'Data', 'Software', 'Remote'];
+  const TAGS = ['Microsoft', 'Stripe', 'Capgemini', 'Deloitte', 'Java', 'Cloud', 'React', 'Remote'];
 
   const fetchOpportunities = async (searchQuery = '') => {
     setLoading(true);

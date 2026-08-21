@@ -13,7 +13,7 @@ exports.searchInternships = async (req, res, next) => {
     };
 
     const searchRes = await SearchService.search({
-      query: `${q} internship`.trim(),
+      query: q.trim(),
       type: 'internship',
       userProfile: userProfile,
       page: parseInt(page, 10),
@@ -41,7 +41,7 @@ exports.exploreInternships = async (req, res, next) => {
     };
 
     const searchRes = await SearchService.search({
-      query: `${query} internship`.trim(),
+      query: query.trim(),
       type: 'internship',
       userProfile: userProfile,
       page: 1,

@@ -15,8 +15,8 @@ exports.searchOpportunities = async (req, res, next) => {
     };
 
     const searchRes = await SearchService.search({
-      query: q || 'engineering opportunity',
-      type: 'all',
+      query: q.trim(),
+      type: 'opportunity',
       userProfile: userProfile,
       page: parseInt(page, 10),
       limit: parseInt(limit, 10)
@@ -44,8 +44,8 @@ exports.exploreOpportunities = async (req, res, next) => {
 
     const query = `${role} ${skills}`.trim() || 'software engineering';
     const searchRes = await SearchService.search({
-      query: query,
-      type: 'all',
+      query: query.trim(),
+      type: 'opportunity',
       userProfile: userProfile,
       page: 1,
       limit: 30

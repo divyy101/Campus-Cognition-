@@ -20,7 +20,7 @@ const InternshipAgent = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('');
 
-  const TAGS = ['Java', 'Python', 'Machine Learning', 'React', 'Cloud', 'Data', 'Software', 'Remote'];
+  const TAGS = ['Google', 'Meta', 'Amazon', 'Java', 'Python', 'React', 'Machine Learning', 'Remote'];
 
   const fetchInternships = async (searchQuery = '') => {
     setLoading(true);

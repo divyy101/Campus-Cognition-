@@ -22,11 +22,11 @@ const Background = () => {
     // Office / working for Internship
     videoSrc = "https://videos.pexels.com/video-files/3129977/3129977-hd_1920_1080_30fps.mp4";
   } else if (path.includes('opportunit')) {
-    // Tech / Data for Opportunity
-    videoSrc = "https://videos.pexels.com/video-files/853755/853755-hd_1920_1080_25fps.mp4";
+    // Code/Hacker for Opportunity
+    videoSrc = "https://videos.pexels.com/video-files/5377684/5377684-hd_1920_1080_25fps.mp4";
   } else if (path.includes('scholarship')) {
-    // Study / Academic for Scholarship
-    videoSrc = "https://videos.pexels.com/video-files/5978135/5978135-hd_1920_1080_25fps.mp4";
+    // Neural/Study for Scholarship
+    videoSrc = "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4";
   }
 
   return (
